@@ -12,65 +12,7 @@ $perfumes = listarPerfumes();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fragrâncias Nicho</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .lista-fragrancias {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            padding: 20px;
-            justify-content: center;
-        }
-
-        .fragrancia-item {
-            width: 200px;
-            text-align: center;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            padding: 10px;
-            background-color: #fff;
-        }
-
-        .fragrancia-item img {
-            width: 100%;
-            border-radius: 8px;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        .fragrancia-item:hover img {
-            transform: scale(1.1); /* Aumenta ligeiramente a imagem */
-            opacity: 0.8; /* Torna a imagem um pouco translúcida */
-        }
-
-        .informacoes-fragrancia {
-            margin-top: 10px;
-        }
-
-        .informacoes-fragrancia h2 {
-            font-size: 1em;
-            color: #333;
-            margin: 5px 0;
-            font-weight: bold;
-            text-transform: capitalize;
-        }
-
-        .informacoes-fragrancia h2:hover {
-            text-decoration: underline; /* Sublinha ao passar o rato */
-            color: #000; /* Fica preto ao passar o rato */
-        }
-
-        .informacoes-fragrancia p {
-            margin: 5px 0;
-            color: #888;
-            font-size: 0.9em;
-        }
-
-        .informacoes-fragrancia .preco {
-            font-size: 1.1em;
-            color: #333;
-            font-weight: bold;
-        }
-    </style>
+    
 </head>
 <body>
     <!-- Menu de Navegação -->
@@ -89,20 +31,33 @@ $perfumes = listarPerfumes();
     <!-- Lista de Fragrâncias -->
     <section class="lista-fragrancias">
         <?php foreach ($perfumes as $perfume): ?>
-            <div class="fragrancia-item">
-                <a href="produto.php?id=<?php echo $perfume['id']; ?>"></a>
-                    <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" 
-                        alt="<?php echo htmlspecialchars($perfume['nome']); ?>" 
-                        onmouseover="this.src='<?php echo htmlspecialchars($perfume['caminho_imagem_hover']); ?>';">
-                        onmouseout="this.src='<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>';">
-                    <div class="informacoes-fragrancia">
-                        <h2><?php echo htmlspecialchars($perfume['nome']); ?></h2>
-                        <p><?php echo htmlspecialchars($perfume['marca']); ?></p>
-                        <p class="preco"><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
+            <div class="fragrancia-item" caminho_imagem_hover="<?php echo htmlspecialchars($perfume['caminho_imagem_hover']); ?>">
+                <a href="produto.php?id=<?php echo $perfume['id']; ?>">
+                    <div class="imagem-fragrancia">
+                        <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
                     </div>
+                    <div class="informacoes-fragrancia">
+                        <h2><u><?php echo htmlspecialchars($perfume['nome']); ?></u></h2>
+                        <p class="marca"><u><?php echo htmlspecialchars($perfume['marca']); ?></u></p>
+                        <p class="preco"><u><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></u></p>
+                        </div>
                 </a>
             </div>
         <?php endforeach; ?>
     </section>
+
+    <script>
+        const items = document.querySelectorAll('.fragrancia-item');
+        items.forEach(item => {
+            const caminhoImagemOriginal = item.querySelector('img').src;
+            const caminhoImagemAlternativa = item.getAttribute('caminho_imagem_hover');
+            item.addEventListener('mouseover', () => {
+                item.querySelector('img').src = caminhoImagemAlternativa;
+            });
+            item.addEventListener('mouseout', () => {
+                item.querySelector('img').src = caminhoImagemOriginal;
+            });
+        });
+    </script>
 </body>
 </html>
