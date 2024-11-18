@@ -1,0 +1,68 @@
+.menu ul {
+    display: flex;
+    justify-content: space-around;
+    list-style-type: none;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+}
+
+.menu ul li {
+    cursor: pointer;
+}
+
+/* Estilo da Lista de Fragrâncias */
+.lista-fragrancias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+ /* Estilo para o layout */
+ .lista-fragrancias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.fragrancia-item {
+    width: 200px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.fragrancia-item img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.fragrancia-item:hover {
+    transform: scale(1.05);
+}
+
+.informacoes-fragrancia {
+    margin-top: 10px;
+}
+
+.informacoes-fragrancia h2 {
+    font-size: 1em;
+    color: #333;
+}
+
+.informacoes-fragrancia p {
+    margin: 5px 0;
+    color: #080808;
+    font-size: 0.9em;
+}
+
+.preco {
+    font-size: 1.1em;
+    color: #333;
+    font-weight: bold;
+}

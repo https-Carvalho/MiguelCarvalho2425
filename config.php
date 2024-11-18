@@ -1,9 +1,9 @@
 <?php
 
-$host = 'root'; 
-$user = 'root';  
-$password = '';  
-$dbname = 'perfumes_nicho';  
+$host = 'localhost'; 
+$user = 'root';  // Nome de utilizador 
+$password = '';  // Senha
+$dbname = 'perfumes_nicho';  // Nome da base de dados
 
 // Conectar à base de dados
 $liga = mysqli_connect($host, $user, $password, $dbname);
@@ -17,7 +17,7 @@ if (!$liga) {
 function listarPerfumes() {
     global $liga;  // Usar a conexão global
 
-    $sql = "SELECT perfumes.nome, perfumes.preco, perfumes.caminho_imagem, perfumes.estacao, marcas.nome AS marca
+    $sql = "SELECT perfumes.id, perfumes.nome, perfumes.preco, perfumes.caminho_imagem, perfumes.caminho_imagem_hover, marcas.nome AS marca
             FROM perfumes
             JOIN marcas ON perfumes.id_marca = marcas.id";
     $result = mysqli_query($liga, $sql);  // Usar a função mysqli_query com a conexão existente

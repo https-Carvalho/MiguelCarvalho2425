@@ -11,22 +11,8 @@ $perfumes = listarPerfumes();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fragrâncias Nicho</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        /* Estilo do Menu */
-        .menu ul {
-            display: flex;
-            justify-content: space-around;
-            list-style-type: none;
-            padding: 10px;
-            background-color: #333;
-            color: #fff;
-        }
-
-        .menu ul li {
-            cursor: pointer;
-        }
-
-        /* Estilo da Lista de Fragrâncias */
         .lista-fragrancias {
             display: flex;
             flex-wrap: wrap;
@@ -35,61 +21,54 @@ $perfumes = listarPerfumes();
             justify-content: center;
         }
 
-        /* Estilos do Link */
-        .fragrancia-link {
-            text-decoration: none;
-            color: inherit;
-            display: inline-block;
-            width: 100%;
-        }
-
         .fragrancia-item {
             width: 200px;
-            padding: 10px;
             text-align: center;
-            transition: transform 0.3s ease, background-color 0.3s ease;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            color: inherit;
+            transition: transform 0.3s ease;
+            padding: 10px;
+            background-color: #fff;
         }
 
         .fragrancia-item img {
             width: 100%;
             border-radius: 8px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        .fragrancia-item:hover {
-            transform: scale(1.05);
+        .fragrancia-item:hover img {
+            transform: scale(1.1); /* Aumenta ligeiramente a imagem */
+            opacity: 0.8; /* Torna a imagem um pouco translúcida */
         }
 
-        .fragrancia-item[data-estacao="verao"]:hover {
-            background-color: #FFD700; /* Amarelo para Verão */
+        .informacoes-fragrancia {
+            margin-top: 10px;
         }
 
-        .fragrancia-item[data-estacao="inverno"]:hover {
-            background-color: #87CEEB; /* Azul Claro para Inverno */
-        }
-
-        .fragrancia-item[data-estacao="primavera"]:hover {
-            background-color: #98FB98; /* Verde Claro para Primavera */
-        }
-
-        .fragrancia-item[data-estacao="outono"]:hover {
-            background-color: #FF8C00; /* Laranja para Outono */
-        }
-
-        /* Estilos de Texto */
-        .fragrancia-item h2 {
-            color: #333;
-            font-size: 1.1em;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-
-        .preco {
+        .informacoes-fragrancia h2 {
             font-size: 1em;
             color: #333;
-            margin-top: 5px;
+            margin: 5px 0;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .informacoes-fragrancia h2:hover {
+            text-decoration: underline; /* Sublinha ao passar o rato */
+            color: #000; /* Fica preto ao passar o rato */
+        }
+
+        .informacoes-fragrancia p {
+            margin: 5px 0;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .informacoes-fragrancia .preco {
+            font-size: 1.1em;
+            color: #333;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -110,17 +89,20 @@ $perfumes = listarPerfumes();
     <!-- Lista de Fragrâncias -->
     <section class="lista-fragrancias">
         <?php foreach ($perfumes as $perfume): ?>
-            <a href="produto.php?id=<?php echo $perfume['id']; ?>" class="fragrancia-link">
-                <div class="fragrancia-item" data-estacao="<?php echo htmlspecialchars($perfume['estacao']); ?>">
-                    <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
-                    <h2><?php echo htmlspecialchars($perfume['nome']); ?></h2>
-                    <p class="preco"><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
-                </div>
-            </a>
+            <div class="fragrancia-item">
+                <a href="produto.php?id=<?php echo $perfume['id']; ?>"></a>
+                    <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" 
+                        alt="<?php echo htmlspecialchars($perfume['nome']); ?>" 
+                        onmouseover="this.src='<?php echo htmlspecialchars($perfume['caminho_imagem_hover']); ?>';">
+                        onmouseout="this.src='<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>';">
+                    <div class="informacoes-fragrancia">
+                        <h2><?php echo htmlspecialchars($perfume['nome']); ?></h2>
+                        <p><?php echo htmlspecialchars($perfume['marca']); ?></p>
+                        <p class="preco"><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
+                    </div>
+                </a>
+            </div>
         <?php endforeach; ?>
     </section>
-
-    <script src="animacoes.js"></script>
 </body>
 </html>
-
