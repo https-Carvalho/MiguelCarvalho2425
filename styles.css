@@ -52,11 +52,17 @@
   text-decoration: none;  
 }
 
+a {
+    text-decoration: none;
+}
+
 .informacoes-fragrancia .marca {
     color: #888888; /* Cor cinza */
     font-size: 0.9em;
     font-weight: normal;
     margin-top: 5px;
+    text-decoration: none;  
+
 }
 
 .informacoes-fragrancia .preco {
@@ -64,4 +70,6 @@
     color: #000000; /* Cor preta */
     font-weight: bold;
     margin-top: 5px;
+    text-decoration: none;  
+
 }

@@ -37,9 +37,9 @@ $perfumes = listarPerfumes();
                         <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
                     </div>
                     <div class="informacoes-fragrancia">
-                        <h2><u><?php echo htmlspecialchars($perfume['nome']); ?></u></h2>
-                        <p class="marca"><u><?php echo htmlspecialchars($perfume['marca']); ?></u></p>
-                        <p class="preco"><u><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></u></p>
+                        <h2><?php echo htmlspecialchars($perfume['nome']); ?></h2>
+                        <p class="marca"><?php echo htmlspecialchars($perfume['marca']); ?></p>
+                        <p class="preco"><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
                         </div>
                 </a>
             </div>
