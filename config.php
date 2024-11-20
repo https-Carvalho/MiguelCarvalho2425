@@ -1,6 +1,6 @@
 <?php
 
-$host = 'localhost'; 
+$host = 'localhost';
 $user = 'root';  // Nome de utilizador 
 $password = '';  // Senha
 $dbname = 'perfumes_nicho';  // Nome da base de dados
@@ -14,7 +14,8 @@ if (!$liga) {
 }
 
 // Função para listar perfumes
-function listarPerfumes() {
+function listarPerfumes()
+{
     global $liga;  // Usar a conexão global
 
     $sql = "SELECT perfumes.id, perfumes.nome, perfumes.preco, perfumes.caminho_imagem, perfumes.caminho_imagem_hover, marcas.nome AS marca
@@ -32,11 +33,12 @@ function listarPerfumes() {
     return $perfumes;
 }
 
-function buscarDetalhesPerfume($idPerfume) {
+
+
+ function buscarInformacoesPerfume($idPerfume) {
     global $liga;
 
-    // Consulta para obter os detalhes do perfume e da marca associada
-    $sql = "SELECT perfumes.nome, perfumes.descricao, perfumes.preco, perfumes.caminho_imagem, perfumes.estacao, marcas.nome AS marca
+    $sql = "SELECT perfumes.id, perfumes.nome, perfumes.descricao, perfumes.preco, perfumes.caminho_imagem, marcas.nome AS marca
             FROM perfumes
             JOIN marcas ON perfumes.id_marca = marcas.id
             WHERE perfumes.id = ?";
@@ -47,24 +49,24 @@ function buscarDetalhesPerfume($idPerfume) {
     $result = mysqli_stmt_get_result($stmt);
     $perfume = mysqli_fetch_assoc($result);
 
-    // Verifica se o perfume foi encontrado
-    if ($perfume) {
-        // Nova consulta para buscar as imagens adicionais
-        $sqlImagens = "SELECT caminho_imagem FROM imagens_perfume WHERE perfume_id = ?";
-        $stmtImagens = mysqli_prepare($liga, $sqlImagens);
-        mysqli_stmt_bind_param($stmtImagens, 'i', $idPerfume);
-        mysqli_stmt_execute($stmtImagens);
-        $resultImagens = mysqli_stmt_get_result($stmtImagens);
+    return $perfume; // Retorna apenas as informações do perfume
+}
 
-        // Armazena todas as imagens adicionais em um array
-        $imagens = [];
-        while ($imagem = mysqli_fetch_assoc($resultImagens)) {
-            $imagens[] = $imagem['caminho_imagem'];
-        }
+function buscarImagensPerfume($idPerfume) {
+    global $liga;
 
-        // Adiciona o array de imagens adicionais ao array principal do perfume
-        $perfume['imagens_adicionais'] = $imagens;
+    $sql = "SELECT caminho_imagem FROM imagens_perfume WHERE perfume_id = ?";
+    $stmt = mysqli_prepare($liga, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $idPerfume);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $imagens = [];
+    while ($imagem = mysqli_fetch_assoc($result)) {
+        $imagens[] = $imagem['caminho_imagem'];
     }
 
-    return $perfume;
+    return $imagens; // Retorna apenas as imagens
 }
+
+

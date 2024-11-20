@@ -73,3 +73,168 @@ a {
     text-decoration: none;  
 
 }
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+}
+
+.menu ul {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    padding: 15px;
+    background-color: #333;
+    color: #fff;
+}
+
+.menu ul li a {
+    text-decoration: none;
+    color: white;
+}
+
+
+
+
+.slider {
+    position: relative;
+    width: 43%;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.list {
+    display: flex;
+    transition: all 0.3s ease-in-out;
+    width: 100%;
+}
+
+.item {
+    min-width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.item img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.buttons {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.buttons button {
+    pointer-events: all;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+.dots li {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background-color: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dots li.active {
+    background-color: #333;
+}
+
+
+
+.descricao-produto h1 {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.descricao-produto .preco {
+    font-size: 1.5em;
+    color: #333;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.descricao-produto .descricao {
+    font-size: 1em;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.descricao-produto .marca {
+    font-size: 1em;
+    color: #333;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+
+
+.produto-container {
+    display: flex;
+    align-items: stretch; /* Garante que os itens se alinhem em toda a altura */
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px; /* Espaçamento entre as colunas */
+    padding-top: 20px; /* Espaço abaixo do menu */
+}
+
+.imagens-produto {
+    flex: 1; /* O slider ocupa metade do espaço */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px; /* Tamanho máximo para o slider */
+    margin: 0 auto; /* Centraliza o slider */
+}
+
+.separator {
+    width: 2px;
+    background-color: #e0e0e0; /* Cor da linha */
+    margin: 0 20px; /* Espaçamento entre as colunas */
+    height:auto; /* Ajusta automaticamente à altura do container */
+    min-height: 100%; /* Garante que preencha o espaço vertical */
+}
+
+.descricao-produto {
+    flex: 1;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: min-content;
+}
+
