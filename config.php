@@ -18,9 +18,9 @@ function listarPerfumes()
 {
     global $liga;  // Usar a conexão global
 
-    $sql = "SELECT perfumes.id, perfumes.nome, perfumes.preco, perfumes.caminho_imagem, perfumes.caminho_imagem_hover, marcas.nome AS marca
+    $sql = "SELECT perfumes.id_perfume, perfumes.nome, perfumes.preco, perfumes.caminho_imagem, perfumes.caminho_imagem_hover, marcas.nome AS marca
             FROM perfumes
-            JOIN marcas ON perfumes.id_marca = marcas.id";
+            JOIN marcas ON perfumes.id_marca = marcas.id_marca";
     $result = mysqli_query($liga, $sql);  // Usar a função mysqli_query com a conexão existente
 
     $perfumes = [];
@@ -34,23 +34,66 @@ function listarPerfumes()
 }
 
 
-
- function buscarInformacoesPerfume($idPerfume) {
+function buscarInformacoesComNotas($idPerfume) {
     global $liga;
 
-    $sql = "SELECT perfumes.id, perfumes.nome, perfumes.descricao, perfumes.preco, perfumes.caminho_imagem, marcas.nome AS marca
-            FROM perfumes
-            JOIN marcas ON perfumes.id_marca = marcas.id
-            WHERE perfumes.id = ?";
+    // Query principal para obter detalhes do perfume
+    $sql = "SELECT 
+                perfumes.id_perfume,
+                perfumes.nome,
+                perfumes.descricao,
+                perfumes.preco,
+                perfumes.caminho_imagem,
+                marcas.nome AS marca
+            FROM 
+                perfumes
+            JOIN 
+                marcas ON perfumes.id_marca = marcas.id_marca
+            WHERE 
+                perfumes.id_perfume = ?";
     
     $stmt = mysqli_prepare($liga, $sql);
     mysqli_stmt_bind_param($stmt, 'i', $idPerfume);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
+
     $perfume = mysqli_fetch_assoc($result);
 
-    return $perfume; // Retorna apenas as informações do perfume
+    // Query para buscar as notas olfativas organizadas por tipo
+    $sqlNotas = "SELECT 
+                    notas_olfativas.descricao,
+                    notas_olfativas.tipo
+                FROM 
+                    perfume_notas
+                JOIN 
+                    notas_olfativas ON perfume_notas.id_notes = notas_olfativas.id_notes
+                WHERE 
+                    perfume_notas.id_perfume = ?
+                ORDER BY 
+                    FIELD(notas_olfativas.tipo, 'topo', 'coração', 'base')";
+    
+    $stmtNotas = mysqli_prepare($liga, $sqlNotas);
+    mysqli_stmt_bind_param($stmtNotas, 'i', $idPerfume);
+    mysqli_stmt_execute($stmtNotas);
+    $resultNotas = mysqli_stmt_get_result($stmtNotas);
+
+    $notas = [
+        'topo' => [],
+        'coração' => [],
+        'base' => []
+    ];
+
+    // Organiza as notas por tipo
+    while ($nota = mysqli_fetch_assoc($resultNotas)) {
+        $notas[$nota['tipo']][] = $nota['descricao'];
+    }
+
+    // Adiciona as notas ao array do perfume
+    $perfume['notas'] = $notas;
+
+    return $perfume;
 }
+
 
 function buscarImagensPerfume($idPerfume) {
     global $liga;
@@ -66,7 +109,6 @@ function buscarImagensPerfume($idPerfume) {
         $imagens[] = $imagem['caminho_imagem'];
     }
 
-    return $imagens; // Retorna apenas as imagens
+    return $imagens; // Retorna um array com cada imagem separada
 }
-
 

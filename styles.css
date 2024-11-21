@@ -1,240 +1,209 @@
+/* ---------- MENU ---------- */
 .menu ul {
-    display: flex;
-    justify-content: space-around;
-    list-style-type: none;
-    padding: 10px;
-    background-color: #333;
-    color: #fff;
+    display: flex; /* Organiza os itens em linha */
+    justify-content: space-around; /* Distribui os itens com espaço uniforme */
+    list-style-type: none; /* Remove os marcadores padrão das listas */
+    padding: 10px; /* Adiciona espaçamento interno */
+    background-color: #333; /* Cor de fundo escura */
+    color: #fff; /* Cor do texto branca */
 }
 
 .menu ul li {
-    cursor: pointer;
-}
-
-/* Estilo da Lista de Fragrâncias */
-.lista-fragrancias {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    justify-content: center;
-}
-
-.fragrancia-item {
-    width: 200px;
-    text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    padding: 10px;
-    background-color: #fff;
-}
-
-.fragrancia-item img {
-    width: 100%;
-    border-radius: 8px;
-}
-
-.fragrancia-item:hover {
-    transform: scale(1.05);
-}
-
-.informacoes-fragrancia {
-    margin-top: 0px;
-    text-decoration: none;
-}
-
-.informacoes-fragrancia h2{
-  font-size: 1em;
-  color: #333;
-  margin: 5px 0;
-  font-weight: bold;
-  text-decoration: none;  
-}
-
-a {
-    text-decoration: none;
-}
-
-.informacoes-fragrancia .marca {
-    color: #888888; /* Cor cinza */
-    font-size: 0.9em;
-    font-weight: normal;
-    margin-top: 5px;
-    text-decoration: none;  
-
-}
-
-.informacoes-fragrancia .preco {
-    font-size: 1em;
-    color: #000000; /* Cor preta */
-    font-weight: bold;
-    margin-top: 5px;
-    text-decoration: none;  
-
-}
-
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f8f8f8;
-}
-
-.menu ul {
-    display: flex;
-    justify-content: space-around;
-    list-style: none;
-    padding: 15px;
-    background-color: #333;
-    color: #fff;
+    cursor: pointer; /* Define o ponteiro do mouse como indicador clicável */
 }
 
 .menu ul li a {
-    text-decoration: none;
-    color: white;
+    text-decoration: none; /* Remove o sublinhado dos links */
+    color: white; /* Mantém a cor branca nos links */
 }
 
+/* ---------- LISTA DE FRAGRÂNCIAS ---------- */
+.lista-fragrancias {
+    display: flex; /* Organiza os itens em linha */
+    flex-wrap: wrap; /* Permite que os itens sejam quebrados para novas linhas */
+    gap: 20px; /* Espaço entre os itens */
+    padding: 20px; /* Espaçamento interno da lista */
+    justify-content: center; /* Centraliza os itens */
+}
 
+.fragrancia-item {
+    width: 200px; /* Largura fixa para cada item */
+    text-align: center; /* Centraliza o texto */
+    border-radius: 8px; /* Arredonda os cantos */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona sombra ao redor */
+    transition: transform 0.3s ease; /* Animação suave ao passar o mouse */
+    padding: 10px; /* Espaçamento interno */
+    background-color: #fff; /* Fundo branco */
+}
 
+.fragrancia-item img {
+    width: 100%; /* Ajusta a largura da imagem ao container */
+    border-radius: 8px; /* Arredonda os cantos da imagem */
+}
 
+.fragrancia-item:hover {
+    transform: scale(1.05); /* Aumenta o tamanho ao passar o mouse */
+}
+
+.informacoes-fragrancia {
+    margin-top: 0px; /* Remove margens no topo */
+    text-decoration: none; /* Remove sublinhado nos textos */
+}
+
+.informacoes-fragrancia h2 {
+    font-size: 1em; /* Tamanho do texto */
+    color: #333; /* Cor escura */
+    margin: 5px 0; /* Espaçamento vertical */
+    font-weight: bold; /* Texto em negrito */
+}
+
+.informacoes-fragrancia .marca {
+    color: #888888; /* Cor cinza clara */
+    font-size: 0.9em; /* Tamanho reduzido */
+    font-weight: normal; /* Sem negrito */
+    margin-top: 5px; /* Espaçamento acima */
+}
+
+.informacoes-fragrancia .preco {
+    font-size: 1em; /* Tamanho padrão */
+    color: #000000; /* Cor preta */
+    font-weight: bold; /* Texto em negrito */
+    margin-top: 5px; /* Espaçamento acima */
+}
+
+/* ---------- CONFIGURAÇÃO GERAL ---------- */
+body {
+    font-family: Arial, sans-serif; /* Define fonte padrão */
+    margin: 0; /* Remove margens padrão */
+    padding: 0; /* Remove preenchimento padrão */
+    background-color: #f8f8f8; /* Fundo cinza claro */
+}
+
+/* ---------- SLIDER ---------- */
 .slider {
-    position: relative;
-    width: 43%;
-    overflow: hidden;
-    border-radius: 10px;
+    position: relative; /* Permite posicionamento absoluto interno */
+    width: 43%; /* Largura do slider */
+    overflow: hidden; /* Oculta imagens que saem da área visível */
+    margin: 0 auto; /* Centraliza horizontalmente */
+    border-radius: 10px; /* Arredonda os cantos */
 }
 
-.list {
-    display: flex;
-    transition: all 0.3s ease-in-out;
-    width: 100%;
+.slider .list {
+    display: flex; /* Organiza os itens em linha */
+    transition: all 0.5s ease-in-out; /* Animação suave ao deslizar */
+    width: 100%; /* Ocupa toda a área do slider */
 }
 
-.item {
-    min-width: 100%;
-    box-sizing: border-box;
-    text-align: center;
+.slider .item {
+    min-width: 100%; /* Cada slide ocupa 100% da área visível */
+    box-sizing: border-box; /* Inclui bordas no cálculo de largura */
+    text-align: center; /* Centraliza o conteúdo */
 }
 
-.item img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
+.slider .item img {
+    width: 100%; /* Imagem ocupa toda a largura */
+    height: auto; /* Mantém a proporção da imagem */
+    border-radius: 10px; /* Arredonda os cantos */
 }
 
-.buttons {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    pointer-events: none;
+.slider .buttons {
+    position: absolute; /* Botões posicionados sobre o slider */
+    top: 45%; /* Centraliza verticalmente */
+    left: 5%; /* Posiciona à esquerda */
+    width: 90%; /* Ocupa quase toda a largura */
+    display: flex; /* Organiza os botões em linha */
+    justify-content: space-between; /* Botões nas extremidades */
 }
 
-.buttons button {
-    pointer-events: all;
-    background: rgba(0, 0, 0, 0.5);
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 50%;
+.slider .buttons button {
+    width: 50px; /* Largura fixa */
+    height: 50px; /* Altura fixa */
+    border-radius: 50%; /* Forma circular */
+    background-color: #fff5; /* Fundo semitransparente */
+    color: #fff; /* Cor branca */
+    border: none; /* Remove bordas */
+    font-family: monospace; /* Fonte do botão */
+    font-weight: bold; /* Texto em negrito */
 }
 
-.dots {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    list-style: none;
-    padding: 0;
+.slider .dots {
+    position: absolute; /* Posiciona sobre o slider */
+    bottom: 5%; /* Distância do fundo */
+    left: 0; /* Alinha à esquerda */
+    width: 100%; /* Ocupa toda a largura */
+    display: flex; /* Organiza os pontos em linha */
+    justify-content: center; /* Centraliza horizontalmente */
 }
 
-.dots li {
-    width: 10px;
-    height: 10px;
-    margin: 0 5px;
-    background-color: #ccc;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.slider .dots li {
+    list-style: none; /* Remove marcadores padrão */
+    width: 10px; /* Largura dos pontos */
+    height: 10px; /* Altura dos pontos */
+    background-color: black; /* Cor preta */
+    margin: 4px; /* Espaçamento entre os pontos */
+    border-radius: 20px; /* Forma arredondada */
+    transition: 0.5s; /* Animação suave ao ativar */
 }
 
-.dots li.active {
-    background-color: #333;
+.slider .dots li.active {
+    width: 30px; /* Aumenta o tamanho do ponto ativo */
 }
 
-
-
-.descricao-produto h1 {
-    font-size: 2em;
-    color: #333;
-    margin-bottom: 10px;
+@media screen and (max-width: 768px) {
+    .slider {
+        height: 400px; /* Ajusta a altura do slider em telas pequenas */
+    }
 }
 
-.descricao-produto .preco {
-    font-size: 1.5em;
-    color: #333;
-    margin: 10px 0;
-    font-weight: bold;
-}
-
-.descricao-produto .descricao {
-    font-size: 1em;
-    color: #666;
-    line-height: 1.5;
-    margin-bottom: 20px;
-}
-
-.descricao-produto .marca {
-    font-size: 1em;
-    color: #333;
-    font-weight: bold;
-    margin-top: 20px;
-}
-
-
-
-.produto-container {
-    display: flex;
-    align-items: stretch; /* Garante que os itens se alinhem em toda a altura */
-    justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
-    gap: 20px; /* Espaçamento entre as colunas */
-    padding-top: 20px; /* Espaço abaixo do menu */
-}
-
-.imagens-produto {
-    flex: 1; /* O slider ocupa metade do espaço */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 600px; /* Tamanho máximo para o slider */
-    margin: 0 auto; /* Centraliza o slider */
-}
-
-.separator {
-    width: 2px;
-    background-color: #e0e0e0; /* Cor da linha */
-    margin: 0 20px; /* Espaçamento entre as colunas */
-    height:auto; /* Ajusta automaticamente à altura do container */
-    min-height: 100%; /* Garante que preencha o espaço vertical */
-}
-
+/* ---------- DETALHES DO PRODUTO ---------- */
 .descricao-produto {
-    flex: 1;
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    display: flex;
+    flex: 1; /* O conteúdo ocupa metade do espaço */
+    background-color: #fff; /* Fundo branco */
+    padding: 20px; /* Espaçamento interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ao redor */
+    border-radius: 10px; /* Cantos arredondados */
+    font-family: Arial, sans-serif; /* Fonte padrão */
+    line-height: 1.6; /* Espaçamento entre linhas */
+    display: flex; /* Organiza os elementos verticalmente */
     flex-direction: column;
-    justify-content: center;
-    height: min-content;
+    justify-content: center; /* Centraliza verticalmente */
+    height: min-content; /* Ajusta à altura do conteúdo */
 }
 
+.notas-olfativas {
+    border-top: 1px solid #ccc; /* Linha divisória no topo */
+    margin-top: 20px; /* Espaçamento acima */
+}
+
+.nota {
+    border-bottom: 1px solid #ccc; /* Linha divisória entre notas */
+    margin-bottom: 10px; /* Espaçamento inferior */
+}
+
+.nota-titulo {
+    background: none; /* Sem cor de fundo */
+    border: none; /* Remove bordas */
+    text-align: left; /* Alinha o texto à esquerda */
+    font-size: 16px; /* Tamanho do texto */
+    padding: 10px; /* Espaçamento interno */
+    cursor: pointer; /* Mostra o ponteiro do mouse */
+    display: flex; /* Organiza em linha */
+    justify-content: space-between; /* Título e seta nas extremidades */
+}
+
+.nota-titulo:after {
+    content: '▼'; /* Adiciona seta para baixo */
+    font-size: 12px; /* Tamanho da seta */
+    transition: transform 0.3s; /* Animação suave ao expandir */
+}
+
+.nota-titulo.active:after {
+    transform: rotate(-180deg); /* Roda a seta ao expandir */
+}
+
+.nota-conteudo {
+    display: none; /* Oculta o conteúdo inicialmente */
+    padding: 10px; /* Espaçamento interno */
+    font-size: 14px; /* Tamanho do texto */
+    color: #555; /* Cor do texto */
+}

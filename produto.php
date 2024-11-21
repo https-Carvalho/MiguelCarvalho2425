@@ -4,9 +4,9 @@ include('config.php'); // Inclui a configuração da base de dados e as funçõe
 // Obtém o ID do produto a partir da URL
 $idPerfume = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-// Busca as informações e imagens do perfume
-$perfume = buscarInformacoesPerfume($idPerfume);
-$imagensPerfume = buscarImagensPerfume($idPerfume);
+// Busca as informações do perfume, imagens e notas olfativas
+$perfume = buscarInformacoesComNotas($idPerfume); // Função com notas organizadas
+$imagensPerfume = buscarImagensPerfume($idPerfume); // Busca as imagens adicionais
 
 // Verifica se o perfume foi encontrado
 if (!$perfume) {
@@ -15,11 +15,6 @@ if (!$perfume) {
 }
 
 // Verifica se a quantidade de imagens é menor que 1
-if (count($imagensPerfume) < 1) {
-    echo "<h1>Não há imagens disponíveis para este produto.</h1>";
-    exit;
-}
-
 if (empty($imagensPerfume)) {
     $imagensPerfume = ['images/default.jpg']; // Imagem padrão caso não haja imagens
 }
@@ -57,13 +52,14 @@ if (empty($imagensPerfume)) {
                 <div class="list">
                     <?php foreach ($imagensPerfume as $imagem): ?>
                         <div class="item">
-                            <img src="<?php echo htmlspecialchars($imagem); ?>">
+                            <img src="<?php echo htmlspecialchars($imagem); ?>" alt="Imagem do Perfume">
                         </div>
                     <?php endforeach; ?>
                 </div>
                 <div class="buttons">
-                    <button id="prev"><</button>
-                    <button id="next">></button>
+                    <button id="prev">
+                        << /button>
+                            <button id="next">></button>
                 </div>
                 <ul class="dots">
                     <?php foreach ($imagensPerfume as $key => $imagem): ?>
@@ -72,11 +68,7 @@ if (empty($imagensPerfume)) {
                 </ul>
             </div>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                inicializarSlider();
-                });
-            </script>
+            <script src="slide.js"></script>
 
             <div class="separator"></div>
 
@@ -86,6 +78,35 @@ if (empty($imagensPerfume)) {
                 <p class="preco"><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
                 <p class="descricao"><?php echo htmlspecialchars($perfume['descricao']); ?></p>
                 <p class="marca">Marca: <?php echo htmlspecialchars($perfume['marca']); ?></p>
+                <div class="notas-olfativas">
+                    <?php if (!empty($perfume['notas']['topo'])): ?>
+                        <div class="nota">
+                            <button class="nota-titulo">Notas de topo:</button>
+                            <div class="nota-conteudo">
+                                <p><?php echo implode(", ", $perfume['notas']['topo']); ?></p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($perfume['notas']['coração'])): ?>
+                        <div class="nota">
+                            <button class="nota-titulo">Notas de coração:</button>
+                            <div class="nota-conteudo">
+                                <p><?php echo implode(", ", $perfume['notas']['coração']); ?></p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($perfume['notas']['base'])): ?>
+                        <div class="nota">
+                            <button class="nota-titulo">Notas de base:</button>
+                            <div class="nota-conteudo">
+                                <p><?php echo implode(", ", $perfume['notas']['base']); ?></p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
             </div>
         </div>
     </section>

@@ -32,7 +32,7 @@ $perfumes = listarPerfumes();
     <section class="lista-fragrancias">
         <?php foreach ($perfumes as $perfume): ?>
             <div class="fragrancia-item" caminho_imagem_hover="<?php echo htmlspecialchars($perfume['caminho_imagem_hover']); ?>">
-                <a href="produto.php?id=<?php echo $perfume['id']; ?>">
+                <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>">
                     <div class="imagem-fragrancia">
                         <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
                     </div>
