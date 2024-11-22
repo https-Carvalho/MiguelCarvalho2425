@@ -57,9 +57,8 @@ if (empty($imagensPerfume)) {
                     <?php endforeach; ?>
                 </div>
                 <div class="buttons">
-                    <button id="prev">
-                        << /button>
-                            <button id="next">></button>
+                    <button id="prev"><</button>
+                    <button id="next">></button>
                 </div>
                 <ul class="dots">
                     <?php foreach ($imagensPerfume as $key => $imagem): ?>
@@ -67,9 +66,6 @@ if (empty($imagensPerfume)) {
                     <?php endforeach; ?>
                 </ul>
             </div>
-
-            <script src="slide.js"></script>
-
             <div class="separator"></div>
 
             <!-- Informações do Produto -->
@@ -110,7 +106,8 @@ if (empty($imagensPerfume)) {
             </div>
         </div>
     </section>
-
+    <script src="notas.js"></script>
+    <script src="slide.js"></script>
 </body>
 
 </html>

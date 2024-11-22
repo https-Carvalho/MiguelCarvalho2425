@@ -12,11 +12,6 @@
     cursor: pointer; /* Define o ponteiro do mouse como indicador clicável */
 }
 
-.menu ul li a {
-    text-decoration: none; /* Remove o sublinhado dos links */
-    color: white; /* Mantém a cor branca nos links */
-}
-
 /* ---------- LISTA DE FRAGRÂNCIAS ---------- */
 .lista-fragrancias {
     display: flex; /* Organiza os itens em linha */
@@ -49,12 +44,16 @@
     margin-top: 0px; /* Remove margens no topo */
     text-decoration: none; /* Remove sublinhado nos textos */
 }
-
-.informacoes-fragrancia h2 {
+.informacoes-fragrancia h2{
     font-size: 1em; /* Tamanho do texto */
     color: #333; /* Cor escura */
     margin: 5px 0; /* Espaçamento vertical */
     font-weight: bold; /* Texto em negrito */
+    text-decoration: none;  /* Remove sublinhado nos textos */
+}
+
+a {
+    text-decoration: none;
 }
 
 .informacoes-fragrancia .marca {
@@ -62,6 +61,8 @@
     font-size: 0.9em; /* Tamanho reduzido */
     font-weight: normal; /* Sem negrito */
     margin-top: 5px; /* Espaçamento acima */
+    text-decoration: none;  
+
 }
 
 .informacoes-fragrancia .preco {
@@ -69,6 +70,8 @@
     color: #000000; /* Cor preta */
     font-weight: bold; /* Texto em negrito */
     margin-top: 5px; /* Espaçamento acima */
+    text-decoration: none;  
+
 }
 
 /* ---------- CONFIGURAÇÃO GERAL ---------- */
@@ -78,6 +81,7 @@ body {
     padding: 0; /* Remove preenchimento padrão */
     background-color: #f8f8f8; /* Fundo cinza claro */
 }
+
 
 /* ---------- SLIDER ---------- */
 .slider {
@@ -130,11 +134,11 @@ body {
     position: absolute; /* Posiciona sobre o slider */
     bottom: 5%; /* Distância do fundo */
     left: 0; /* Alinha à esquerda */
+    color: black;
     width: 100%; /* Ocupa toda a largura */
     display: flex; /* Organiza os pontos em linha */
     justify-content: center; /* Centraliza horizontalmente */
 }
-
 .slider .dots li {
     list-style: none; /* Remove marcadores padrão */
     width: 10px; /* Largura dos pontos */
@@ -155,6 +159,7 @@ body {
     }
 }
 
+
 /* ---------- DETALHES DO PRODUTO ---------- */
 .descricao-produto {
     flex: 1; /* O conteúdo ocupa metade do espaço */
@@ -173,6 +178,7 @@ body {
 .notas-olfativas {
     border-top: 1px solid #ccc; /* Linha divisória no topo */
     margin-top: 20px; /* Espaçamento acima */
+    font-family: Arial, sans-serif;
 }
 
 .nota {
@@ -181,6 +187,7 @@ body {
 }
 
 .nota-titulo {
+    width: 100%;
     background: none; /* Sem cor de fundo */
     border: none; /* Remove bordas */
     text-align: left; /* Alinha o texto à esquerda */
@@ -189,6 +196,7 @@ body {
     cursor: pointer; /* Mostra o ponteiro do mouse */
     display: flex; /* Organiza em linha */
     justify-content: space-between; /* Título e seta nas extremidades */
+    align-items: center;
 }
 
 .nota-titulo:after {
@@ -206,4 +214,67 @@ body {
     padding: 10px; /* Espaçamento interno */
     font-size: 14px; /* Tamanho do texto */
     color: #555; /* Cor do texto */
+}
+
+.nota-conteudo p {
+    margin: 0;
+}
+
+
+
+
+.descricao-produto h1 {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.descricao-produto .preco {
+    font-size: 1.5em;
+    color: #333;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.descricao-produto .descricao {
+    font-size: 1em;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.descricao-produto .marca {
+    font-size: 1em;
+    color: #333;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+
+
+.produto-container {
+    display: flex;
+    align-items: stretch; /* Garante que os itens se alinhem em toda a altura */
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px; /* Espaçamento entre as colunas */
+    padding-top: 20px; /* Espaço abaixo do menu */
+}
+
+.imagens-produto {
+    flex: 1; /* O slider ocupa metade do espaço */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px; /* Tamanho máximo para o slider */
+    margin: 0 auto; /* Centraliza o slider */
+}
+
+.separator {
+    width: 2px;
+    background-color: #e0e0e0; /* Cor da linha */
+    margin: 0 20px; /* Espaçamento entre as colunas */
+    height:auto; /* Ajusta automaticamente à altura do container */
+    min-height: 100%; /* Garante que preencha o espaço vertical */
 }
