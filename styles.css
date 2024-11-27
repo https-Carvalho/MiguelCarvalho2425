@@ -1,4 +1,11 @@
 /* #region---------- MENU GERAL ---------- */
+.menu {
+    display: flex;
+    justify-content: space-around; /* Espaço uniforme entre os itens */
+    align-items: center; /* Centraliza verticalmente */
+    background-color: #333; /* Cor de fundo */
+    padding: 10px 0; /* Espaçamento interno vertical */
+}
 .menu ul {
     display: flex; /* Organiza os itens em linha */
     justify-content: space-around; /* Distribui os itens com espaço uniforme */
@@ -19,11 +26,19 @@
 
 .menu ul li a {    
     font-size: 16px;
-    padding: 10px 20px; /* Espaçamento interno */
+
+    color: black;
     display: block; /* Garante o clique em todo o espaço */
     text-decoration: none; /* Remove sublinhado */
 }
 
+.menu ul li a:hover {
+    text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
+}
+
+.menu ul li a:visited {
+    color: rgb(0, 0, 0); /* Garante que a cor não muda após o clique */
+}
 /* ---------- DROPDOWN MARCAS ---------- */
 .dropdown-content {
     display: none; /* Oculta o conteúdo inicialmente */
