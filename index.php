@@ -3,6 +3,7 @@ include('config.php'); // Inclui a configuração da base de dados e a função 
 
 // Obtém os perfumes da base de dados
 $perfumes = listarPerfumes();
+$marcas = buscarMarcasAgrupadas();
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +21,22 @@ $perfumes = listarPerfumes();
         <ul>
             <li>Início</li>
             <li>Discovery Kit</li>
-            <li>Marcas ▼</li>
+            <li class="dropdown">
+            <a href="#">Marcas ▼</a>
+                <div class="dropdown-content">
+                    <?php foreach ($marcas as $inicial => $nomes): ?>
+                        <div class="brands-column">
+                            <h3><?php echo htmlspecialchars($inicial); ?></h3>
+                            <?php foreach ($nomes as $nome): ?>
+                                <p><?php echo htmlspecialchars($nome); ?></p>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <div class="view-all">
+                        <a href="#">Ver todas as marcas</a>
+                    </div>
+                </div>
+            </li>
             <li>Família Olfativa ▼</li>
             <li>Categorias ▼</li>
             <li>Sobre Nós ▼</li>
@@ -32,7 +48,7 @@ $perfumes = listarPerfumes();
     <section class="lista-fragrancias">
         <?php foreach ($perfumes as $perfume): ?>
             <div class="fragrancia-item" caminho_imagem_hover="<?php echo htmlspecialchars($perfume['caminho_imagem_hover']); ?>">
-                <a href="produto.php?id=<?php echo $perfume['id']; ?>">
+                <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>">
                     <div class="imagem-fragrancia">
                         <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
                     </div>
