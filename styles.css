@@ -26,7 +26,6 @@
 
 .menu ul li a {    
     font-size: 16px;
-
     color: black;
     display: block; /* Garante o clique em todo o espaço */
     text-decoration: none; /* Remove sublinhado */
@@ -42,9 +41,10 @@
 /* ---------- DROPDOWN MARCAS ---------- */
 .dropdown-content {
     display: none; /* Oculta o conteúdo inicialmente */
-    position: absolute; /* Posiciona o dropdown abaixo do item */
+    position: absolute; /* Posiciona o dropdown */
     top: 100%; /* Coloca logo abaixo do item pai */
-    left: 0; /* Alinha à esquerda */
+    left: 50%; /* Posiciona no centro horizontalmente */
+    transform: translateX(-50%); /* Ajusta para alinhar perfeitamente ao centro */
     background-color: white; /* Fundo branco */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona sombra */
     padding: 20px; /* Espaçamento interno */
@@ -87,6 +87,7 @@
 .brands-column p:hover {
     text-decoration: underline; /* Sublinha ao passar o mouse */
 }
+
 
 /* ---------- BOTÃO "VER TODAS AS MARCAS" ---------- */
 .view-all {
@@ -475,3 +476,49 @@ body {
 .view-all a:hover {
     background-color: #b48a60;
 }
+/* #region Cabeçalho */
+.marca-header {
+    background-color: #f8f9fa; /* Fundo claro */
+    padding: 20px; /* Espaçamento interno */
+    border-bottom: 1px solid #ddd; /* Linha separadora no final */
+    margin-bottom: 20px; /* Espaço após o cabeçalho */
+    text-align: center; /* Centralizar conteúdo */
+    display: grid; /* Usar grid para organizar regiões */
+    grid-template-rows: auto auto; /* Duas linhas: banner e texto */
+    grid-template-areas: 
+        "banner"
+        "texto"; /* Define as áreas */
+}
+/* #endregion */
+
+/* #region Banner */
+.marca-banner {
+    grid-area: banner; /* Define a área do banner no grid */
+    position: relative; /* Permitir elementos posicionados */
+    height: 300px; /* Altura fixa para o banner */
+    background-size: cover; /* Faz com que a imagem cubra todo o container */
+    background-position: center; /* Centraliza a imagem no banner */
+    background-repeat: no-repeat; /* Evita repetição da imagem */
+    border-radius: 10px; /* Bordas arredondadas */
+}
+/* #endregion */
+
+/* #region Texto */
+.marca-header .marca-texto {
+    grid-area: texto; /* Define a área do texto no grid */
+    padding: 20px 0; /* Espaçamento interno para o texto */
+}
+
+.marca-header h1 {
+    font-size: 2.5rem; /* Tamanho grande do título */
+    color: #333; /* Cor escura */
+    margin: 10px 0; /* Espaçamento superior e inferior */
+    font-weight: bold; /* Texto em negrito */
+}
+
+.marca-header p {
+    font-size: 1.2rem; /* Tamanho médio para o texto */
+    color: #555; /* Cor mais clara */
+    margin: 0; /* Remover margens extras */
+}
+/* #endregion */

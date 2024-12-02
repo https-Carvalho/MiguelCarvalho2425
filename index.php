@@ -4,17 +4,20 @@ include('config.php'); // Inclui a configuração da base de dados e a função 
 // Obtém os perfumes da base de dados
 $perfumes = listarPerfumes();
 $marcas = buscarMarcasAgrupadas();
+
 ?>
 
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fragrâncias Nicho</title>
     <link rel="stylesheet" href="styles.css">
-    
+
 </head>
+
 <body>
     <!-- Menu de Navegação -->
     <nav class="menu">
@@ -22,21 +25,26 @@ $marcas = buscarMarcasAgrupadas();
             <li>Início</li>
             <li>Discovery Kit</li>
             <li class="dropdown">
-            <a href="#">Marcas ▼</a>
+                <a href="#">Marcas ▼</a>
                 <div class="dropdown-content">
-                    <?php foreach ($marcas as $inicial => $nomes): ?>
+                    <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
                         <div class="brands-column">
                             <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                            <?php foreach ($nomes as $nome): ?>
-                                <p><?php echo htmlspecialchars($nome); ?></p>
+                            <?php foreach ($grupoMarcas as $marca): ?>
+                                <p>
+                                    <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
+                                        <?php echo htmlspecialchars($marca['nome']); ?>
+                                    </a>
+                                </p>
                             <?php endforeach; ?>
                         </div>
                     <?php endforeach; ?>
                     <div class="view-all">
-                        <a href="#">Ver todas as marcas</a>
+                        <a href="todas_marcas.php">Ver todas as marcas</a>
                     </div>
                 </div>
             </li>
+
             <li>Família Olfativa ▼</li>
             <li>Categorias ▼</li>
             <li>Sobre Nós ▼</li>
@@ -47,16 +55,18 @@ $marcas = buscarMarcasAgrupadas();
     <!-- Lista de Fragrâncias -->
     <section class="lista-fragrancias">
         <?php foreach ($perfumes as $perfume): ?>
-            <div class="fragrancia-item" caminho_imagem_hover="<?php echo htmlspecialchars($perfume['caminho_imagem_hover']); ?>">
+            <div class="fragrancia-item"
+                caminho_imagem_hover="<?php echo htmlspecialchars($perfume['caminho_imagem_hover']); ?>">
                 <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>">
                     <div class="imagem-fragrancia">
-                        <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
+                        <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>"
+                            alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
                     </div>
                     <div class="informacoes-fragrancia">
                         <h2><?php echo htmlspecialchars($perfume['nome']); ?></h2>
                         <p class="marca"><?php echo htmlspecialchars($perfume['marca']); ?></p>
                         <p class="preco"><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
-                        </div>
+                    </div>
                 </a>
             </div>
         <?php endforeach; ?>
@@ -76,4 +86,5 @@ $marcas = buscarMarcasAgrupadas();
         });
     </script>
 </body>
+
 </html>
