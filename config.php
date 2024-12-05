@@ -14,22 +14,24 @@ if (!$liga) {
 }
 
 // Função para listar perfumes
-function listarPerfumes(){
-    global $liga;  // Usar a conexão globals
-    
+function listarPerfumes() {
+    global $liga; // Usar a conexão global
+
+    // SQL para selecionar detalhes do perfume e da marca
     $sql = "SELECT perfumes.id_perfume, perfumes.nome, perfumes.preco, perfumes.caminho_imagem, perfumes.caminho_imagem_hover, marcas.nome AS marca
             FROM perfumes
             JOIN marcas ON perfumes.id_marca = marcas.id_marca";
-    $result = mysqli_query($liga, $sql);  // Usar a função mysqli_query com a conexão existente
+    
+    $result = mysqli_query($liga, $sql); // Executa a query
 
     $perfumes = [];
     if ($result && mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            $perfumes[] = $row;
+            $perfumes[] = $row; // Adiciona perfume ao array
         }
     }
 
-    return $perfumes;
+    return $perfumes; // Retorna o array de perfumes
 }
 
 
@@ -39,7 +41,7 @@ function buscarInformacoesComNotas($idPerfume) {
     // Query principal para obter detalhes do perfume
     $sql = "SELECT 
                 perfumes.id_perfume,
-                perfumes.nome,
+                perfumes.nome, 
                 perfumes.descricao,
                 perfumes.preco,
                 perfumes.caminho_imagem,
@@ -51,7 +53,7 @@ function buscarInformacoesComNotas($idPerfume) {
             WHERE 
                 perfumes.id_perfume = ?";
     
-    $stmt = mysqli_prepare($liga, $sql);
+    $stmt = mysqli_prepare($liga, query: $sql);
     mysqli_stmt_bind_param($stmt, 'i', $idPerfume);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -114,11 +116,10 @@ function buscarImagensPerfume($idPerfume) {
     return $imagens;
 }
 
-function buscarMarcasAgrupadas()
-{
+function buscarMarcasAgrupadas() {
     global $liga;
 
-    $sql = "SELECT id_marca, nome FROM marcas ORDER BY nome ASC";
+    $sql = "SELECT id_marca, nome, descricao, caminho_imagem FROM marcas ORDER BY nome ASC";
     $result = mysqli_query($liga, $sql);
 
     $marcasAgrupadas = [];
@@ -130,7 +131,9 @@ function buscarMarcasAgrupadas()
             }
             $marcasAgrupadas[$inicial][] = [
                 'id_marca' => $marca['id_marca'],
-                'nome' => $marca['nome']
+                'nome' => $marca['nome'],
+                'descricao' => $marca['descricao'],
+                'caminho_imagem' => $marca['caminho_imagem'] // Inclui o caminho da imagem
             ];
         }
     }
@@ -185,4 +188,26 @@ function getPerfumesPorMarca($id_marca) {
     } else {
         return null; // Retornar null em caso de falha
     }
+}
+
+
+function buscarMarcas() {
+    global $liga;
+
+    // Consulta SQL para buscar apenas o nome e o caminho da imagem das marcas
+    $sql = "SELECT nome, caminho_imagem FROM marcas ORDER BY nome ASC";
+    $result = mysqli_query($liga, $sql);
+
+    $marcas = [];
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($marca = mysqli_fetch_assoc($result)) {
+            $marcas[]= [
+                'nome' => $marca['nome'] ?? 'Nome não disponível', // Nome da marca ou valor padrão
+                'caminho_imagem' => $marca['caminho_imagem'] ?? 'imagens/placeholder.jpg' // Caminho da imagem ou placeholder
+
+            ];
+        }
+    }
+
+    return $marcas;
 }

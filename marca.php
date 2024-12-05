@@ -38,7 +38,7 @@ $perfumes = getPerfumesPorMarca(id_marca: $id_marca);
     <!-- Menu de Navegação -->
     <nav class="menu">
         <ul>
-            <li>Início</li>
+            <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
             <li class="dropdown">
                 <a href="#">Marcas ▼</a>
@@ -70,6 +70,7 @@ $perfumes = getPerfumesPorMarca(id_marca: $id_marca);
     <header class="marca-header">
         <div class="marca-banner" style="background-image: url('<?php echo htmlspecialchars($marca['caminho_imagem']); ?>');"></div>
         <div class="marca-descricao">
+            <img src="<?php echo htmlspecialchars($marca['caminho_imagem']); ?>" alt="">
             <h1><?php echo htmlspecialchars($marca['nome']); ?></h1>
             <p><?php echo nl2br(htmlspecialchars($marca['descricao'])); ?></p>
         </div>
@@ -98,6 +99,20 @@ $perfumes = getPerfumesPorMarca(id_marca: $id_marca);
                 <p>Nenhum perfume disponível para esta marca.</p>
             <?php endif; ?>
         </section>
+
+        <script>
+        const items = document.querySelectorAll('.fragrancia-item');
+        items.forEach(item => {
+            const caminhoImagemOriginal = item.querySelector('img').src;
+            const caminhoImagemAlternativa = item.getAttribute('caminho_imagem_hover');
+            item.addEventListener('mouseover', () => {
+                item.querySelector('img').src = caminhoImagemAlternativa;
+            });
+            item.addEventListener('mouseout', () => {
+                item.querySelector('img').src = caminhoImagemOriginal;
+            });
+        });
+    </script>
     </main>
 </body>
 </html>

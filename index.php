@@ -22,7 +22,7 @@ $marcas = buscarMarcasAgrupadas();
     <!-- Menu de Navegação -->
     <nav class="menu">
         <ul>
-            <li>Início</li>
+            <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
             <li class="dropdown">
                 <a href="#">Marcas ▼</a>

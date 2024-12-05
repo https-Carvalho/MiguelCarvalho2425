@@ -19,6 +19,8 @@ if (empty($imagensPerfume)) {
     $imagensPerfume = ['images/default.jpg']; // Imagem padrão caso não haja imagens
 }
 
+$marcas = buscarMarcasAgrupadas();
+
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +38,26 @@ if (empty($imagensPerfume)) {
         <ul>
             <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
-            <li>Marcas ▼</li>
+            <li class="dropdown">
+                <a href="#">Marcas ▼</a>
+                <div class="dropdown-content">
+                    <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
+                        <div class="brands-column">
+                            <h3><?php echo htmlspecialchars($inicial); ?></h3>
+                            <?php foreach ($grupoMarcas as $marca): ?>
+                                <p>
+                                    <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
+                                        <?php echo htmlspecialchars($marca['nome']); ?>
+                                    </a>
+                                </p>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <div class="view-all">
+                        <a href="todas_marcas.php">Ver todas as marcas</a>
+                    </div>
+                </div>
+            </li>
             <li>Família Olfativa ▼</li>
             <li>Categorias ▼</li>
             <li>Sobre Nós ▼</li>
@@ -68,9 +89,7 @@ if (empty($imagensPerfume)) {
                     </ul>
                 </div>
             </div>
-
             <div class="separator"></div>
-
             <!-- Container exclusivo das informações -->
             <div class="descricao-container">
                 <div class="descricao-produto">
