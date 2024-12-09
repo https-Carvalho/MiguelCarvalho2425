@@ -1,17 +1,36 @@
 /* #region---------- MENU GERAL ---------- */
 .menu {
     display: flex;
-    justify-content: space-around; /* Espaço uniforme entre os itens */
-    align-items: center; /* Centraliza verticalmente */
-    background-color: #333; /* Cor de fundo */
-    padding: 10px 0; /* Espaçamento interno vertical */
+    justify-content: space-between; /* Espaço entre o logo e os itens do menu */
+    background-color: #ffffff; /* Cor de fundo branco */
+    border-bottom: 0.5px solid #000000; /* Borda preta para separar o menu do restante */
+    padding: 10px 20px; /* Espaçamento interno */
+    font-family: 'Arial', sans-serif; /* Fonte clean */
 }
+
+.menu .logo {
+    color: #333; /* Cor escura para o nome LuxFragrance */
+    font-size: 24px; /* Tamanho da fonte */
+    font-weight: bold; /* Negrito */
+    text-transform: uppercase; /* Letras maiúsculas */
+    letter-spacing: 2px; /* Espaçamento entre as letras */
+    margin-right: 30px; /* Espaço entre o logo e os itens do menu */
+    display: flex; /* Utiliza flexbox para alinhar o texto */
+    align-items: center; /* Garante que o logo esteja centralizado verticalmente */
+}
+
+.menu .logo a{
+    text-decoration: inherit;
+    color: inherit;
+}
+
+
 .menu ul {
     display: flex; /* Organiza os itens em linha */
     justify-content: space-around; /* Distribui os itens com espaço uniforme */
     list-style-type: none; /* Remove marcadores padrão */
     padding: 10px; /* Adiciona espaçamento interno */
-    background-color: #ffffff; /* Fundo escuro */
+    background-color: #ffffff; /* Fundo claro */
     margin: 0; /* Remove margens */
 }
 
@@ -20,8 +39,6 @@
     cursor: pointer; /* Muda o cursor ao passar o mouse */
     font-size: 16px;
     padding: 10px 20px; /* Espaçamento interno */
-
-
 }
 
 .menu ul li a {    
@@ -129,11 +146,14 @@
     transition: transform 0.3s ease, border-color 0.3s ease; /* Animação suave ao passar o mouse */
     padding: 10px; /* Espaçamento interno */
     background-color: #fff; /* Fundo branco */
-    border: 1px solid transparent}
+    border: 1px solid transparent;
+}
 
 .fragrancia-item img {
-    width: 100%; /* Ajusta a largura da imagem ao container */
+    width: 100%; /* A largura ocupa todo o espaço do container */
+    height: 200px; /* Mantém a proporção da imagem */
     border-radius: 8px; /* Arredonda os cantos da imagem */
+    object-fit: contain; /* Garante que a imagem preencha o container */
 }
 
 .fragrancia-item:hover {

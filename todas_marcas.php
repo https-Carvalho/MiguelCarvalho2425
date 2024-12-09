@@ -18,6 +18,9 @@ $marcas = buscarMarcasAgrupadas();
 <body>
     <!-- Menu de Navegação -->
     <nav class="menu">
+    <div class="logo">
+        <a href="index.php">LuxFragrance</a>
+    </div>
         <ul>
             <li><a href="index.php">Início</a></li>
             <li><a href="#">Discovery Kit</a></li>
@@ -34,6 +37,9 @@ $marcas = buscarMarcasAgrupadas();
                             <?php endforeach; ?>
                         </div>
                     <?php endforeach; ?>
+                    <div class="view-all">
+                        <a href="todas_marcas.php">Ver todas as marcas</a>
+                    </div>
                 </div>
             </li>
             <li><a href="#">Família Olfativa ▼</a></li>

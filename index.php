@@ -21,6 +21,9 @@ $marcas = buscarMarcasAgrupadas();
 <body>
     <!-- Menu de Navegação -->
     <nav class="menu">
+    <div class="logo">
+        <a href="index.php">LuxFragrance</a>
+    </div>
         <ul>
             <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
