@@ -28,7 +28,7 @@ $marcas = buscarMarcasAgrupadas();
             <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
             <li class="dropdown">
-                <a href="#">Marcas ▼</a>
+                <a href="#">Marcas </a>
                 <div class="dropdown-content">
                     <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
                         <div class="brands-column">
@@ -48,9 +48,9 @@ $marcas = buscarMarcasAgrupadas();
                 </div>
             </li>
 
-            <li>Família Olfativa ▼</li>
-            <li>Categorias ▼</li>
-            <li>Sobre Nós ▼</li>
+            <li>Família Olfativa </li>
+            <li>Categorias </li>
+            <li>Sobre Nós </li>
             <li>Contactos</li>
         </ul>
     </nav>

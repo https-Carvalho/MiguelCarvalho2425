@@ -41,11 +41,14 @@
     padding: 10px 20px; /* Espaçamento interno */
 }
 
+.menu ul li:hover {
+    text-decoration: underline;
+}
+
 .menu ul li a {    
     font-size: 16px;
     color: black;
     display: block; /* Garante o clique em todo o espaço */
-    text-decoration: none; /* Remove sublinhado */
 }
 
 .menu ul li a:hover {

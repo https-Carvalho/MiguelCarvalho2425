@@ -63,9 +63,9 @@ $perfumes = getPerfumesPorMarca(id_marca: $id_marca);
                     </div>
                 </div>
             </li>
-            <li>Família Olfativa ▼</li>
-            <li>Categorias ▼</li>
-            <li>Sobre Nós ▼</li>
+            <li>Família Olfativa </li>
+            <li>Categorias </li>
+            <li>Sobre Nós </li>
             <li>Contactos</li>
         </ul>
     </nav>
