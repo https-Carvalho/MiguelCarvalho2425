@@ -1,0 +1,18 @@
+.dropdown-content {
+    position: fixed;
+    background-color: white; /* Fundo branco */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona sombra */
+    padding: 20px; /* Espaçamento interno */
+    max-height: 400px; /* Define altura máxima */
+    overflow-y: auto; /* Adiciona scroll se ultrapassar altura */
+    border-radius: 8px; /* Bordas arredondadas */
+    margin: 21px 0 0 0;
+    top: 0;
+    left: 100%; /* Centraliza horizontalmente */
+    transform: translateX(-60%); /* Move para alinhar no centro */
+ 
+}
+
+.dropdown:hover .dropdown-content {
+    display: block; /* Exibe o conteúdo ao passar o mouse */
+}

@@ -39,10 +39,12 @@
     cursor: pointer; /* Muda o cursor ao passar o mouse */
     font-size: 16px;
     padding: 10px 20px; /* Espaçamento interno */
+    transition: .3s;
 }
 
 .menu ul li:hover {
     text-decoration: underline;
+    transition: .3s
 }
 
 .menu ul li a {    
@@ -53,42 +55,47 @@
 
 .menu ul li a:hover {
     text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
+    transition: .3s;
 }
 
 .menu ul li a:visited {
     color: rgb(0, 0, 0); /* Garante que a cor não muda após o clique */
 }
 /* ---------- DROPDOWN MARCAS ---------- */
-.dropdown-content {
-    display: none; /* Oculta o conteúdo inicialmente */
-    position: absolute; /* Posiciona o dropdown */
-    top: 100%; /* Coloca logo abaixo do item pai */
-    left: 50%; /* Posiciona no centro horizontalmente */
-    transform: translateX(-50%); /* Ajusta para alinhar perfeitamente ao centro */
-    background-color: white; /* Fundo branco */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona sombra */
-    padding: 20px; /* Espaçamento interno */
-    width: 800px; /* Largura do dropdown */
-    z-index: 1000; /* Garante que fique acima de outros elementos */
-    max-height: 300px; /* Define altura máxima */
-    overflow-y: auto; /* Adiciona scroll se ultrapassar altura */
-    display: flex; /* Organiza os itens em colunas */
-    gap: 20px; /* Espaço entre as colunas */
-    flex-wrap: wrap;
+.dropdown {
+    position: relative; /* Base para posicionar o conteúdo associado */
+    padding: 10px 15px; /* Espaçamento interno */
     border-radius: 8px; /* Bordas arredondadas */
+    cursor: pointer; /* Cursor em formato de mão */
+    text-align: left; /* Centraliza o texto */
+}
+
+.dropdown .dropdown-content {
+    display: none; /* Oculta o dropdown inicialmente */
+    position: absolute; /* Posiciona em relação ao elemento pai */
+    top: 100%; /* Aparece logo abaixo do elemento pai */
+    left: 0; /* Alinha à esquerda */
+    width: 100%; /* Preenche toda a largura disponível */
+    background-color: white; /* Fundo branco */
+    overflow-y: auto; /* Scroll vertical para conteúdos longos */
+    padding: 20px; /* Espaçamento interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra leve */
+    z-index: 1000; /* Garante que o dropdown fique acima de outros elementos */
+    display: grid; /* Organiza os itens em grade */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Colunas responsivas */
+    gap: 20px; /* Espaçamento entre os itens */
 }
 
 .dropdown:hover .dropdown-content {
-    display: flex; /* Exibe o conteúdo ao passar o mouse */
+    display: grid; /* Torna visível o dropdown ao passar o mouse */
 }
-
 /* ---------- COLUNAS DO DROPDOWN ---------- */
-.brands-column {
+.column {
     flex: 1; /* Divide o espaço igualmente entre as colunas */
     min-width: 150px; /* Largura mínima para cada coluna */
 }
 
-.brands-column h3 {
+.column h3 {
     margin: 0;
     font-size: 18px;
     font-weight: bold;
@@ -97,7 +104,7 @@
     border-bottom: 1px solid #ccc; /* Linha abaixo do título */
 }
 
-.brands-column p {
+.column p {
     margin: 5px 0; /* Espaçamento vertical */
     cursor: pointer; /* Muda o cursor ao passar o mouse */
     font-size: 14px;

@@ -4,6 +4,7 @@ include('config.php'); // Inclui a configuração da base de dados e a função 
 // Obtém os perfumes da base de dados
 $perfumes = listarPerfumes();
 $marcas = buscarMarcasAgrupadas();
+$familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
 
 ?>
 
@@ -15,15 +16,16 @@ $marcas = buscarMarcasAgrupadas();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fragrâncias Nicho</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="stye.css">
 
 </head>
 
 <body>
     <!-- Menu de Navegação -->
     <nav class="menu">
-    <div class="logo">
-        <a href="index.php">LuxFragrance</a>
-    </div>
+        <div class="logo">
+            <a href="index.php">LuxFragrance</a>
+        </div>
         <ul>
             <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
@@ -31,7 +33,7 @@ $marcas = buscarMarcasAgrupadas();
                 <a href="#">Marcas </a>
                 <div class="dropdown-content">
                     <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
-                        <div class="brands-column">
+                        <div class="column">
                             <h3><?php echo htmlspecialchars($inicial); ?></h3>
                             <?php foreach ($grupoMarcas as $marca): ?>
                                 <p>
@@ -47,8 +49,33 @@ $marcas = buscarMarcasAgrupadas();
                     </div>
                 </div>
             </li>
+            <li class="dropdown">
+                <a href="#">Famílias Olfativas</a>
+                <div class="dropdown-content">
+                    <?php
+                    $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
+                    if (!empty($familias)): ?>
+                        <div class="column">
+                            <?php foreach ($familias as $familia): ?>
+                                <p>
+                                    <a href="familia.php?id=<?php echo htmlspecialchars($familia['id_familia']); ?>">
+                                        <?php echo htmlspecialchars($familia['nome_familia']); ?>
+                                    </a>
+                                </p>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="column">
+                            <p>Nenhuma família olfativa disponível.</p>
+                        </div>
+                    <?php endif; ?>
+                    <div class="view-all">
+                        <a href="todas_familias.php">Ver todas as famílias</a>
+                    </div>
+                </div>
+            </li>
 
-            <li>Família Olfativa </li>
+
             <li>Categorias </li>
             <li>Sobre Nós </li>
             <li>Contactos</li>

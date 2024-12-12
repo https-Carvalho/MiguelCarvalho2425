@@ -190,24 +190,66 @@ function getPerfumesPorMarca($id_marca) {
     }
 }
 
-
-function buscarMarcas() {
+function atribuirFamiliaDominante() {
     global $liga;
 
-    // Consulta SQL para buscar apenas o nome e o caminho da imagem das marcas
-    $sql = "SELECT nome, caminho_imagem FROM marcas ORDER BY nome ASC";
+    // Obter todos os perfumes
+    $sqlPerfumes = "SELECT id_perfume FROM perfumes";
+    $resultPerfumes = mysqli_query($liga, $sqlPerfumes);
+
+    if ($resultPerfumes && mysqli_num_rows($resultPerfumes) > 0) {
+        while ($row = mysqli_fetch_assoc($resultPerfumes)) {
+            $id_perfume = $row['id_perfume'];
+
+            // Determinar a família dominante com base nas notas
+            $sqlFamiliaDominante = "
+                SELECT f.id_familia
+                FROM notas_olfativas n
+                JOIN familias_olfativas f ON n.id_familia = f.id_familia
+                JOIN perfume_notas pn ON n.id_notes = pn.id_notes
+                WHERE pn.id_perfume = $id_perfume
+                GROUP BY f.id_familia
+                ORDER BY COUNT(n.id_notes) DESC
+                LIMIT 1
+            ";
+
+            $resultFamilia = mysqli_query($liga, $sqlFamiliaDominante);
+
+            if ($resultFamilia && mysqli_num_rows($resultFamilia) > 0) {
+                $familia = mysqli_fetch_assoc($resultFamilia);
+                $id_familia = $familia['id_familia'];
+
+                // Atualizar a tabela perfumes com a família dominante
+                $sqlUpdate = "
+                    UPDATE perfumes
+                    SET id_familia = $id_familia
+                    WHERE id_perfume = $id_perfume
+                ";
+                if (mysqli_query($liga, $sqlUpdate)) {
+                    echo "Família atribuída ao perfume $id_perfume com sucesso.<br>";
+                } else {
+                    echo "Erro ao atualizar o perfume $id_perfume: " . mysqli_error($liga) . "<br>";
+                }
+            }
+        }
+    } else {
+        echo "Nenhum perfume encontrado.<br>";
+    }
+}
+
+function buscarFamiliasOlfativas() {
+    global $liga; // Usar a conexão global
+
+    // Query para buscar todas as famílias disponíveis
+    $sql = "SELECT id_familia, nome_familia FROM familias_olfativas ORDER BY nome_familia ASC";
     $result = mysqli_query($liga, $sql);
 
-    $marcas = [];
+    $familias = [];
     if ($result && mysqli_num_rows($result) > 0) {
-        while ($marca = mysqli_fetch_assoc($result)) {
-            $marcas[]= [
-                'nome' => $marca['nome'] ?? 'Nome não disponível', // Nome da marca ou valor padrão
-                'caminho_imagem' => $marca['caminho_imagem'] ?? 'imagens/placeholder.jpg' // Caminho da imagem ou placeholder
-
-            ];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $familias[] = $row; // Adiciona a família ao array
         }
     }
 
-    return $marcas;
+    return $familias; // Retorna o array de famílias
 }
