@@ -190,7 +190,7 @@ function getPerfumesPorMarca($id_marca) {
     }
 }
 
-function atribuirFamiliaDominante() {
+/*function atribuirFamiliaDominante() {
     global $liga;
 
     // Obter todos os perfumes
@@ -235,9 +235,9 @@ function atribuirFamiliaDominante() {
     } else {
         echo "Nenhum perfume encontrado.<br>";
     }
-}
+}*/
 
-function buscarFamiliasOlfativas() {
+/*function buscarFamiliasOlfativas() {
     global $liga; // Usar a conexão global
 
     // Query para buscar todas as famílias disponíveis
@@ -252,4 +252,4 @@ function buscarFamiliasOlfativas() {
     }
 
     return $familias; // Retorna o array de famílias
-}
+}*/

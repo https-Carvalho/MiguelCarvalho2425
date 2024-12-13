@@ -4,7 +4,7 @@ include('config.php'); // Inclui a configuração da base de dados e a função 
 // Obtém os perfumes da base de dados
 $perfumes = listarPerfumes();
 $marcas = buscarMarcasAgrupadas();
-$familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
+//$familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
 
 ?>
 
@@ -16,8 +16,6 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fragrâncias Nicho</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="stye.css">
-
 </head>
 
 <body>
@@ -32,6 +30,9 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
             <li class="dropdown">
                 <a href="#">Marcas </a>
                 <div class="dropdown-content">
+                    <div class="view-all">
+                        <a href="todas_marcas.php">Ver todas as marcas</a>
+                    </div>
                     <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
                         <div class="column">
                             <h3><?php echo htmlspecialchars($inicial); ?></h3>
@@ -44,16 +45,13 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                             <?php endforeach; ?>
                         </div>
                     <?php endforeach; ?>
-                    <div class="view-all">
-                        <a href="todas_marcas.php">Ver todas as marcas</a>
-                    </div>
                 </div>
             </li>
             <li class="dropdown">
                 <a href="#">Famílias Olfativas</a>
                 <div class="dropdown-content">
                     <?php
-                    $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
+                    //$familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
                     if (!empty($familias)): ?>
                         <div class="column">
                             <?php foreach ($familias as $familia): ?>

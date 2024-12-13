@@ -25,15 +25,17 @@ $marcas = buscarMarcasAgrupadas();
             <li><a href="index.php">Início</a></li>
             <li><a href="#">Discovery Kit</a></li>
             <li class="dropdown">
-                <a href="#">Marcas</a>
+                <a href="#">Marcas </a>
                 <div class="dropdown-content">
-                    <?php foreach ($marcas as $inicial => $nomes): ?>
-                        <div class="brands-column">
+                    <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
+                        <div class="column">
                             <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                            <?php foreach ($nomes as $marca): ?>
-                                <a href="marca.php?id=<?php echo $marca['id_marca']; ?>">
-                                    <p><?php echo htmlspecialchars($marca['nome']); ?></p>
-                                </a>
+                            <?php foreach ($grupoMarcas as $marca): ?>
+                                <p>
+                                    <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
+                                        <?php echo htmlspecialchars($marca['nome']); ?>
+                                    </a>
+                                </p>
                             <?php endforeach; ?>
                         </div>
                     <?php endforeach; ?>

@@ -6,6 +6,9 @@
     border-bottom: 0.5px solid #000000; /* Borda preta para separar o menu do restante */
     padding: 10px 20px; /* Espaçamento interno */
     font-family: 'Arial', sans-serif; /* Fonte clean */
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 .menu .logo {
@@ -40,6 +43,7 @@
     font-size: 16px;
     padding: 10px 20px; /* Espaçamento interno */
     transition: .3s;
+    height: 100%;
 }
 
 .menu ul li:hover {
@@ -61,83 +65,106 @@
 .menu ul li a:visited {
     color: rgb(0, 0, 0); /* Garante que a cor não muda após o clique */
 }
-/* ---------- DROPDOWN MARCAS ---------- */
+/* #endregion---------- MENU GERAL ---------- */
+/* #region dropdown */
+/* ---------- DROPDOWN PRINCIPAL E CONTEÚDO (MARCA) ---------- */
 .dropdown {
     position: relative; /* Base para posicionar o conteúdo associado */
     padding: 10px 15px; /* Espaçamento interno */
     border-radius: 8px; /* Bordas arredondadas */
     cursor: pointer; /* Cursor em formato de mão */
-    text-align: left; /* Centraliza o texto */
+    transition: background-color 0.3s ease; /* Efeito suave ao passar o mouse */
 }
 
-.dropdown .dropdown-content {
+
+.dropdown-content {
     display: none; /* Oculta o dropdown inicialmente */
-    position: absolute; /* Posiciona em relação ao elemento pai */
-    top: 100%; /* Aparece logo abaixo do elemento pai */
-    left: 0; /* Alinha à esquerda */
-    width: 100%; /* Preenche toda a largura disponível */
+    position: fixed; /* Preenche a página toda */
+    width: 100vw; /* Garante que ocupa toda a largura */
+    height: 80vh; /* Garante que ocupa toda a altura */
+    top: 50vh; /* Centraliza verticalmente */
+    left: 50vw; /* Centraliza horizontalmente */
+    transform: translate(-50%, -50%); /* Ajusta o ponto de referência */
     background-color: white; /* Fundo branco */
+    z-index: 1000;
     overflow-y: auto; /* Scroll vertical para conteúdos longos */
-    padding: 20px; /* Espaçamento interno */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra leve */
-    z-index: 1000; /* Garante que o dropdown fique acima de outros elementos */
-    display: grid; /* Organiza os itens em grade */
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Colunas responsivas */
-    gap: 20px; /* Espaçamento entre os itens */
+    align-content: flex-start; /* Alinha os itens ao topo */
+    flex-wrap: wrap; /* Permite quebra em várias linhas */
+    padding: 20px; 
+    opacity: 95%;
+    border-radius: 8px; 
+    margin-top: 25px;
 }
 
+/* Exibe o dropdown ao passar o mouse */
 .dropdown:hover .dropdown-content {
-    display: grid; /* Torna visível o dropdown ao passar o mouse */
+    display: flex; /* Torna visível o dropdown */
 }
-/* ---------- COLUNAS DO DROPDOWN ---------- */
+
+/* ---------- COLUNAS E TÍTULOS DO DROPDOWN ---------- */
+
 .column {
-    flex: 1; /* Divide o espaço igualmente entre as colunas */
-    min-width: 150px; /* Largura mínima para cada coluna */
+    flex: 1 1 150px; /* Cada coluna ocupa pelo menos 150px */
+    display: flex;
+    flex-direction: column; /* Organiza os itens verticalmente */
+    padding-left: 20px;
+    
 }
 
 .column h3 {
     margin: 0;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333; /* Cor escura */
-    margin-bottom: 10px; /* Espaçamento abaixo */
-    border-bottom: 1px solid #ccc; /* Linha abaixo do título */
+    font-size: 18px; /* Tamanho do título */
+    font-weight: bold; /* Negrito para destaque */
+    color: #333; /* Cor escura para o título */
+    margin-bottom: 10px; /* Espaçamento abaixo do título */
 }
 
 .column p {
-    margin: 5px 0; /* Espaçamento vertical */
-    cursor: pointer; /* Muda o cursor ao passar o mouse */
-    font-size: 14px;
-    color: #555; /* Cor cinza */
+    margin: 5px 0; /* Espaçamento vertical entre itens */
+    font-size: 14px; /* Tamanho do texto dos itens */
+    color: #555; /* Cor cinza para os textos */
 }
 
-.brands-column p:hover {
-    text-decoration: underline; /* Sublinha ao passar o mouse */
+.column p a {
+    text-decoration: none; /* Remove sublinhado */
+    color: inherit; /* Herda a cor do pai */
+    transition: color 0.3s ease; /* Transição suave */
 }
 
+.column p a:hover {
+    color: #000; /* Escurece o texto ao passar o mouse */
+    text-decoration: underline; /* Sublinha o texto ao passar o mouse */
+}
 
 /* ---------- BOTÃO "VER TODAS AS MARCAS" ---------- */
+
 .view-all {
-    text-align: center;
-    margin-top: 20px; /* Espaçamento superior */
-    width: 100%; /* O botão ocupa toda a largura */
+    position: absolute;
+    bottom: 20px; /* Fixa o botão na parte inferior */
+    width: calc(100% - 5vw); /* Espaçamento dos lados (20px de cada lado) */
+    margin: 0 20px; /* Espaçamento esquerdo e direito */
+    text-align: center; /* Centraliza o botão */
+
 }
 
 .view-all a {
     display: inline-block;
     padding: 10px 20px; /* Espaçamento interno */
-    background-color: #c49e78; /* Cor de fundo */
+    background-color: #c49e78; /* Cor do botão */
     color: white; /* Cor do texto */
     text-decoration: none; /* Remove sublinhado */
     font-weight: bold; /* Texto em negrito */
-    border-radius: 5px; /* Bordas arredondadas */
+    border-radius: 8px; /* Bordas arredondadas */
+    transition: background-color 0.3s ease; /* Transição suave */
 }
 
 .view-all a:hover {
-    background-color: #b48a60; /* Cor ao passar o mouse */
+    background-color: #b38762; /* Cor mais escura ao passar o mouse */
+    transform: translateY(-2px); /* Efeito de "subir" ao passar o mouse */
 }
-/*#endregion */
 
+/* #endregion */
 
 /* #region================== LISTA DE FRAGRÂNCIAS ========================= */
 .lista-fragrancias {
@@ -317,7 +344,6 @@ body {
 /* #endregion */
 
 /* #region-- DETALHES DO PRODUTO ---------- */
-
 .descricao-container {
     flex: 1; /* Permite que as informações ocupem metade do espaço */
     
@@ -440,79 +466,6 @@ body {
 
 /* #endregion */
 
-.separator {
-    width: 2px;
-    background-color: #e0e0e0; /* Cor da linha */
-    margin: 0 20px; /* Espaçamento entre as colunas */
-    height:auto; /* Ajusta automaticamente à altura do container */
-    min-height: 100%; /* Garante que preencha o espaço vertical */
-    justify-content: center;
-}
-
-
-/* Dropdown */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 100%; 
-    background-color: white;
-    color: black;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 1000px;
-    padding: 20px;
-    gap: 20px;
-    flex-wrap: wrap;
-    z-index: 1000;
-    overflow-y: auto;
-    max-height: 300px;
-}
-
-.dropdown:hover .dropdown-content {
-    display: flex;
-}
-
-/* Colunas */
-.brands-column {
-    flex: 1;
-    min-width: 150px;
-}
-
-.brands-column h3 {
-    margin: 0;
-    font-size: 18px;
-    border-bottom: 1px solid #ccc;
-}
-
-.brands-column p {
-    margin: 5px 0;
-    cursor: pointer;
-}
-
-.brands-column p:hover {
-    text-decoration: underline;
-}
-
-/* Botão "Ver todas as marcas" */
-.view-all {
-    text-align: center;
-    margin-top: 20px;
-    width: 100%;
-}
-
-.view-all a {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #c49e78;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 5px;
-}
-
-.view-all a:hover {
-    background-color: #b48a60;
-}
 /* #region Cabeçalho */
 .marca-header {
     font: 30px Arial, sans-serif, bold;
@@ -530,7 +483,6 @@ body {
 /* #endregion */
 
 /* #region Descrição da Marca */
-#region Descrição da Marca
 .marca-descricao {
     display: flex; /* Layout flexível */
     flex-direction: column; /* Organiza elementos verticalmente */
