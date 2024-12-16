@@ -8,7 +8,6 @@ if (!isset($_GET['id'])) {
 
 // Obter o ID da marca
 $id_marca = intval($_GET['id']);
-
 // Obter os detalhes da marca
 $marca = getMarca($id_marca);
 if (!$marca) {
@@ -37,41 +36,53 @@ $perfumes = getPerfumesPorMarca(id_marca: $id_marca);
 <body>
     <!-- Menu de Navegação -->
     <nav class="menu">
-    <div class="logo">
-        <a href="index.php">LuxFragrance</a>
-    </div>
+        <div class="logo">
+            <a href="index.php">LuxFragrance</a>
+        </div>
         <ul>
             <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
             <li class="dropdown">
-                <a href="#">Marcas ▼</a>
-                <div class="dropdown-content">
-                    <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
-                        <div class="brands-column">
-                            <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                            <?php foreach ($grupoMarcas as $marcagrupo): ?>
-                                <p>
-                                    <a href="marca.php?id=<?php echo htmlspecialchars($marcagrupo['id_marca']); ?>">
-                                        <?php echo htmlspecialchars($marcagrupo['nome']); ?>
-                                    </a>
-                                </p>
-                            <?php endforeach; ?>
+                <a href="#">Marcas</a>
+                <div class="dropdown-content_under">
+                    <div class="dropdown-content">
+                        <div class="view-all">
+                            <a href="todas_marcas.php">Ver todas as marcas</a>
                         </div>
-                    <?php endforeach; ?>
-                    <div class="view-all">
-                        <a href="todas_marcas.php">Ver todas as marcas</a>
+                        <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
+                            <div class="column">
+                                <h3><?php echo htmlspecialchars($inicial); ?></h3>
+                                <?php foreach ($grupoMarcas as $marcas): ?>
+                                    <p>
+                                        <a href="marca.php?id=<?php echo htmlspecialchars($marcas['id_marca']); ?>">
+                                            <?php echo htmlspecialchars($marcas['nome']); ?>
+                                        </a>
+                                    </p>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </li>
-            <li>Família Olfativa </li>
-            <li>Categorias </li>
-            <li>Sobre Nós </li>
+            
+            <li>Categorias</li>
+            <li>Sobre Nós</li>
             <li>Contactos</li>
+            <li>
+                <img src="icones/carrinho.png" alt="Carrinho de compras"
+                    style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                <a href="carrinho.php"></a>
+            </li>
+            <li>
+                <img src="">
+                <a href="pesquisa.php"></a>
+            </li>
         </ul>
     </nav>
 
     <header class="marca-header">
-        <div class="marca-banner" style="background-image: url('<?php echo htmlspecialchars($marca['caminho_imagem']); ?>');"></div>
+        <div class="marca-banner"
+            style="background-image: url('<?php echo htmlspecialchars($marca['caminho_imagem']); ?>');"></div>
         <div class="marca-descricao">
             <img src="<?php echo htmlspecialchars($marca['caminho_imagem']); ?>" alt="">
             <h1><?php echo htmlspecialchars($marca['nome']); ?></h1>
@@ -104,18 +115,19 @@ $perfumes = getPerfumesPorMarca(id_marca: $id_marca);
         </section>
 
         <script>
-        const items = document.querySelectorAll('.fragrancia-item');
-        items.forEach(item => {
-            const caminhoImagemOriginal = item.querySelector('img').src;
-            const caminhoImagemAlternativa = item.getAttribute('caminho_imagem_hover');
-            item.addEventListener('mouseover', () => {
-                item.querySelector('img').src = caminhoImagemAlternativa;
+            const items = document.querySelectorAll('.fragrancia-item');
+            items.forEach(item => {
+                const caminhoImagemOriginal = item.querySelector('img').src;
+                const caminhoImagemAlternativa = item.getAttribute('caminho_imagem_hover');
+                item.addEventListener('mouseover', () => {
+                    item.querySelector('img').src = caminhoImagemAlternativa;
+                });
+                item.addEventListener('mouseout', () => {
+                    item.querySelector('img').src = caminhoImagemOriginal;
+                });
             });
-            item.addEventListener('mouseout', () => {
-                item.querySelector('img').src = caminhoImagemOriginal;
-            });
-        });
-    </script>
+        </script>
     </main>
 </body>
+
 </html>

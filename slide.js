@@ -40,4 +40,3 @@ setInterval(() => {
     active = (active + 1) % lengthItems;
     mudarSlide(active);
 }, 3000); // Tempo em milissegundos
-

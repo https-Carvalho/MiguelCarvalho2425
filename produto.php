@@ -35,17 +35,20 @@ $marcas = buscarMarcasAgrupadas();
 
 <body>
     <nav class="menu">
-    <div class="logo">
-        <a href="index.php">LuxFragrance</a>    
-    </div>        
+        <div class="logo">
+            <a href="index.php">LuxFragrance</a>
+        </div>
         <ul>
             <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
             <li class="dropdown">
-                <a href="#">Marcas ▼</a>
+                <a href="#">Marcas</a>
                 <div class="dropdown-content">
+                    <div class="view-all">
+                        <a href="todas_marcas.php">Ver todas as marcas</a>
+                    </div>
                     <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
-                        <div class="brands-column">
+                        <div class="column">
                             <h3><?php echo htmlspecialchars($inicial); ?></h3>
                             <?php foreach ($grupoMarcas as $marca): ?>
                                 <p>
@@ -56,15 +59,45 @@ $marcas = buscarMarcasAgrupadas();
                             <?php endforeach; ?>
                         </div>
                     <?php endforeach; ?>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a href="#">Famílias Olfativas</a>
+                <div class="dropdown-content">
+                    <?php
+                    //$familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
+                    if (!empty($familias)): ?>
+                        <div class="column">
+                            <?php foreach ($familias as $familia): ?>
+                                <p>
+                                    <a href="familia.php?id=<?php echo htmlspecialchars($familia['id_familia']); ?>">
+                                        <?php echo htmlspecialchars($familia['nome_familia']); ?>
+                                    </a>
+                                </p>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="column">
+                            <p>Nenhuma família olfativa disponível.</p>
+                        </div>
+                    <?php endif; ?>
                     <div class="view-all">
-                        <a href="todas_marcas.php">Ver todas as marcas</a>
+                        <a href="todas_familias.php">Ver todas as famílias</a>
                     </div>
                 </div>
             </li>
-            <li>Família Olfativa </li>
-            <li>Categorias </li>
-            <li>Sobre Nós </li>
+            <li>Categorias</li>
+            <li>Sobre Nós</li>
             <li>Contactos</li>
+            <li>
+                <img src="icones/carrinho.png" alt="Carrinho de compras"
+                    style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                <a href="carrinho.php"></a>
+            </li>
+            <li>
+                <img src="">
+                <a href="pesquisa.php"></a>
+            </li>
         </ul>
     </nav>
 
@@ -104,7 +137,7 @@ $marcas = buscarMarcasAgrupadas();
                         <?php if (!empty($perfume['notas']['topo'])): ?>
                             <div class="nota">
                                 <button class="nota-titulo">
-                                    <img src="images/notes.jpg" alt="Ícone de notas">
+                                    <img src="icones/notes.jpg" alt="Ícone de notas">
                                     Notas de topo
                                 </button>
                                 <div class="nota-conteudo">
@@ -116,7 +149,7 @@ $marcas = buscarMarcasAgrupadas();
                         <?php if (!empty($perfume['notas']['coração'])): ?>
                             <div class="nota">
                                 <button class="nota-titulo">
-                                    <img src="images/notes.jpg" alt="Ícone de notas">
+                                    <img src="icones/notes.jpg" alt="Ícone de notas">
                                     Notas de coração
                                 </button>
                                 <div class="nota-conteudo">
@@ -128,7 +161,7 @@ $marcas = buscarMarcasAgrupadas();
                         <?php if (!empty($perfume['notas']['base'])): ?>
                             <div class="nota">
                                 <button class="nota-titulo">
-                                    <img src="images/notes.jpg" alt="Ícone de notas">
+                                    <img src="icones/notes.jpg" alt="Ícone de notas">
                                     Notas de base
                                 </button>
                                 <div class="nota-conteudo">
@@ -141,9 +174,75 @@ $marcas = buscarMarcasAgrupadas();
             </div>
         </div>
     </section>
+    <script>let slider = document.querySelector('.slider .list');
+        let items = document.querySelectorAll('.slider .list .item');
+        let next = document.getElementById('next');
+        let prev = document.getElementById('prev');
+        let dots = document.querySelectorAll('.slider .dots li');
 
-    <script src="notas.js"></script>
-    <script src="slide.js"></script>
+        let active = 0; // Índice da imagem atual
+        let lengthItems = items.length;
+
+        // Função para mudar o slider
+        function mudarSlide(index) {
+            active = index;
+
+            // Move o slider
+            slider.style.transform = `translateX(-${active * 100}%)`;
+
+            // Atualiza os *dots*
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[active].classList.add('active');
+        }
+
+        // Botões de navegação
+        next.addEventListener('click', () => {
+            active = (active + 1) % lengthItems; // Próximo índice
+            mudarSlide(active);
+        });
+
+        prev.addEventListener('click', () => {
+            active = (active - 1 + lengthItems) % lengthItems; // Índice anterior
+            mudarSlide(active);
+        });
+
+        // Navegação pelos *dots*
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => mudarSlide(index));
+        });
+
+        // Atualiza automaticamente
+        setInterval(() => {
+            active = (active + 1) % lengthItems;
+            mudarSlide(active);
+        }, 3000); // Tempo em milissegundos
+    </script>
+
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.nota-titulo').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const isOpen = button.classList.contains('active');
+
+                    // Recolher todas as outras
+                    document.querySelectorAll('.nota-conteudo').forEach(c => {
+                        c.style.display = 'none';
+                    });
+                    document.querySelectorAll('.nota-titulo').forEach(b => {
+                        b.classList.remove('active');
+                    });
+
+                    // Expandir o atual se não estiver aberto
+                    if (!isOpen) {
+                        content.style.display = 'block';
+                        button.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script></script>
 </body>
 
 </html>

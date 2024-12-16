@@ -28,55 +28,40 @@ $marcas = buscarMarcasAgrupadas();
             <li><a href="index.php">Início</a></li>
             <li>Discovery Kit</li>
             <li class="dropdown">
-                <a href="#">Marcas </a>
-                <div class="dropdown-content">
-                    <div class="view-all">
-                        <a href="todas_marcas.php">Ver todas as marcas</a>
-                    </div>
-                    <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
-                        <div class="column">
-                            <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                            <?php foreach ($grupoMarcas as $marca): ?>
-                                <p>
-                                    <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
-                                        <?php echo htmlspecialchars($marca['nome']); ?>
-                                    </a>
-                                </p>
-                            <?php endforeach; ?>
+                <a href="#">Marcas</a>
+                <div class="dropdown-content_under">
+                    <div class="dropdown-content">
+                        <div class="view-all">
+                            <a href="todas_marcas.php">Ver todas as marcas</a>
                         </div>
-                    <?php endforeach; ?>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a href="#">Famílias Olfativas</a>
-                <div class="dropdown-content">
-                    <?php
-                    //$familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
-                    if (!empty($familias)): ?>
-                        <div class="column">
-                            <?php foreach ($familias as $familia): ?>
-                                <p>
-                                    <a href="familia.php?id=<?php echo htmlspecialchars($familia['id_familia']); ?>">
-                                        <?php echo htmlspecialchars($familia['nome_familia']); ?>
-                                    </a>
-                                </p>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="column">
-                            <p>Nenhuma família olfativa disponível.</p>
-                        </div>
-                    <?php endif; ?>
-                    <div class="view-all">
-                        <a href="todas_familias.php">Ver todas as famílias</a>
+                        <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
+                            <div class="column">
+                                <h3><?php echo htmlspecialchars($inicial); ?></h3>
+                                <?php foreach ($grupoMarcas as $marca): ?>
+                                    <p>
+                                        <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
+                                            <?php echo htmlspecialchars($marca['nome']); ?>
+                                        </a>
+                                    </p>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </li>
-
-
-            <li>Categorias </li>
-            <li>Sobre Nós </li>
+            
+            <li>Categorias</li>
+            <li>Sobre Nós</li>
             <li>Contactos</li>
+            <li>
+                <img src="icones/carrinho.png" alt="Carrinho de compras"
+                    style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                <a href="carrinho.php"></a>
+            </li>
+            <li>
+                <img src="">
+                <a href="pesquisa.php"></a>
+            </li>
         </ul>
     </nav>
 
