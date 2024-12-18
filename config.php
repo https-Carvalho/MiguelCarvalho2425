@@ -13,26 +13,47 @@ if (!$liga) {
     die("Erro na conexão à base de dados: " . mysqli_connect_error());
 }
 
-// Função para listar perfumes
-function listarPerfumes() {
-    global $liga; // Usar a conexão global
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Erro ao conectar ao banco de dados com PDO: " . $e->getMessage());
+}
 
-    // SQL para selecionar detalhes do perfume e da marca
-    $sql = "SELECT perfumes.id_perfume, perfumes.nome, perfumes.preco, perfumes.caminho_imagem, perfumes.caminho_imagem_hover, marcas.nome AS marca
+// Função para listar perfumes
+function listarPerfumes($termo = '') {
+    global $pdo; // Usa a conexão PDO global com a base de dados
+
+    // Query base para buscar perfumes com seus detalhes
+    $sql = "SELECT perfumes.id_perfume, perfumes.nome, perfumes.preco, perfumes.caminho_imagem, 
+                   perfumes.caminho_imagem_hover, marcas.nome AS marca
             FROM perfumes
             JOIN marcas ON perfumes.id_marca = marcas.id_marca";
-    
-    $result = mysqli_query($liga, $sql); // Executa a query
 
-    $perfumes = [];
-    if ($result && mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $perfumes[] = $row; // Adiciona perfume ao array
-        }
+    // Adiciona filtro de pesquisa se um termo for fornecido
+    if (!empty($termo)) {
+        // Busca que respeita a ordem das palavras e começa com a sequência fornecida
+        $sql .= " WHERE CONCAT(marcas.nome, ' ', perfumes.nome) LIKE :termo";
     }
 
-    return $perfumes; // Retorna o array de perfumes
+    // Prepara a query com PDO
+    $stmt = $pdo->prepare($sql);
+
+    // Liga os parâmetros se houver um termo de pesquisa
+    if (!empty($termo)) {
+        $likeTerm = $termo . "%"; // Exige que o termo comece exatamente como está escrito
+        $stmt->bindParam(':termo', $likeTerm, PDO::PARAM_STR);
+    }
+
+    // Executa a query
+    $stmt->execute();
+
+    // Obtém os resultados
+    $perfumes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return $perfumes; // Retorna os perfumes encontrados
 }
+
 
 
 function buscarInformacoesComNotas($idPerfume) {
@@ -125,7 +146,7 @@ function buscarMarcasAgrupadas() {
     $marcasAgrupadas = [];
     if ($result && mysqli_num_rows($result) > 0) {
         while ($marca = mysqli_fetch_assoc($result)) {
-            $inicial = strtoupper($marca['nome'][0]); // Obter a inicial do nome da marca
+            $inicial = strtoupper($marca['nome'][0]);
             if (!isset($marcasAgrupadas[$inicial])) {
                 $marcasAgrupadas[$inicial] = [];
             }
@@ -133,13 +154,14 @@ function buscarMarcasAgrupadas() {
                 'id_marca' => $marca['id_marca'],
                 'nome' => $marca['nome'],
                 'descricao' => $marca['descricao'],
-                'caminho_imagem' => $marca['caminho_imagem'] // Inclui o caminho da imagem
+                'caminho_imagem' => $marca['caminho_imagem']
             ];
         }
     }
 
     return $marcasAgrupadas;
 }
+
 
 
 function getMarca($id_marca) {
@@ -190,10 +212,10 @@ function getPerfumesPorMarca($id_marca) {
     }
 }
 
-/*function atribuirFamiliaDominante() {
-    global $liga;
+function atribuirFamiliaDominante() {
+    global $liga; // Usar a conexão mysqli global
 
-    // Obter todos os perfumes
+    // Busca todos os perfumes
     $sqlPerfumes = "SELECT id_perfume FROM perfumes";
     $resultPerfumes = mysqli_query($liga, $sqlPerfumes);
 
@@ -201,43 +223,61 @@ function getPerfumesPorMarca($id_marca) {
         while ($row = mysqli_fetch_assoc($resultPerfumes)) {
             $id_perfume = $row['id_perfume'];
 
-            // Determinar a família dominante com base nas notas
+            // Determina a família predominante com base nas notas
             $sqlFamiliaDominante = "
-                SELECT f.id_familia
-                FROM notas_olfativas n
-                JOIN familias_olfativas f ON n.id_familia = f.id_familia
+                SELECT f.id_familia, COUNT(fn.id_notes) AS total_notas
+                FROM familia_notas fn
+                JOIN notas_olfativas n ON fn.id_notes = n.id_notes
+                JOIN familias_olfativas f ON fn.id_familia = f.id_familia
                 JOIN perfume_notas pn ON n.id_notes = pn.id_notes
-                WHERE pn.id_perfume = $id_perfume
+                WHERE pn.id_perfume = ?
                 GROUP BY f.id_familia
-                ORDER BY COUNT(n.id_notes) DESC
+                ORDER BY total_notas DESC
                 LIMIT 1
             ";
 
-            $resultFamilia = mysqli_query($liga, $sqlFamiliaDominante);
+            // Prepara e executa a query
+            $stmtFamilia = mysqli_prepare($liga, $sqlFamiliaDominante);
+            if ($stmtFamilia === false) {
+                echo "Erro ao preparar a consulta para encontrar a família predominante.";
+                continue;
+            }
+            mysqli_stmt_bind_param($stmtFamilia, "i", $id_perfume);
+            mysqli_stmt_execute($stmtFamilia);
+            $resultFamilia = mysqli_stmt_get_result($stmtFamilia);
 
+            // Se houver uma família predominante
             if ($resultFamilia && mysqli_num_rows($resultFamilia) > 0) {
                 $familia = mysqli_fetch_assoc($resultFamilia);
                 $id_familia = $familia['id_familia'];
 
-                // Atualizar a tabela perfumes com a família dominante
-                $sqlUpdate = "
-                    UPDATE perfumes
-                    SET id_familia = $id_familia
-                    WHERE id_perfume = $id_perfume
-                ";
-                if (mysqli_query($liga, $sqlUpdate)) {
-                    echo "Família atribuída ao perfume $id_perfume com sucesso.<br>";
-                } else {
-                    echo "Erro ao atualizar o perfume $id_perfume: " . mysqli_error($liga) . "<br>";
+                // Atualiza a família dominante no perfume
+                $sqlUpdate = "UPDATE perfumes SET id_familia = ? WHERE id_perfume = ?";
+                $stmtUpdate = mysqli_prepare($liga, $sqlUpdate);
+                if ($stmtUpdate === false) {
+                    echo "Erro ao preparar a consulta para atualizar a família do perfume.";
+                    continue;
                 }
+
+                mysqli_stmt_bind_param($stmtUpdate, "ii", $id_familia, $id_perfume);
+                if (!mysqli_stmt_execute($stmtUpdate)) {
+                    echo "Erro ao atualizar o perfume com a família ID $id_familia.";
+                }
+
+                mysqli_stmt_close($stmtUpdate);
+            } else {
+                echo "Nenhuma família predominante encontrada para o perfume ID $id_perfume.";
             }
+
+            mysqli_stmt_close($stmtFamilia);
         }
     } else {
         echo "Nenhum perfume encontrado.<br>";
     }
-}*/
+}
 
-/*function buscarFamiliasOlfativas() {
+
+function buscarFamiliasOlfativas() {
     global $liga; // Usar a conexão global
 
     // Query para buscar todas as famílias disponíveis
@@ -252,4 +292,46 @@ function getPerfumesPorMarca($id_marca) {
     }
 
     return $familias; // Retorna o array de famílias
-}*/
+}
+
+function buscarPerfumesPorFamilia($id_familia) {
+    global $liga;
+
+    $sql = "
+        SELECT 
+            p.id_perfume, 
+            p.nome, 
+            p.caminho_imagem, 
+            p.preco, 
+            m.nome AS nome_marca
+        FROM perfumes p
+        LEFT JOIN marcas m ON p.id_marca = m.id_marca
+        WHERE p.id_familia = ?
+    ";
+
+    // Prepara a query
+    $stmt = mysqli_prepare($liga, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id_familia);
+    mysqli_stmt_execute($stmt);
+
+    // Retorna os resultados
+    return mysqli_stmt_get_result($stmt);
+}
+
+// Função para buscar detalhes de uma família
+function buscarDetalhesFamilia($id_familia) {
+    global $liga; // Assume que a variável de conexão está definida em outro lugar
+
+    // Consulta SQL para buscar os detalhes da família
+    $sql = "SELECT nome_familia, descricao FROM familias_olfativas WHERE id_familia = ?";
+    $stmt = mysqli_prepare($liga, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id_familia);
+    mysqli_stmt_execute($stmt);
+
+    // Obter o resultado
+    $result = mysqli_stmt_get_result($stmt);
+    $familia = mysqli_fetch_assoc($result);
+
+    mysqli_stmt_close($stmt);
+    return $familia;
+}

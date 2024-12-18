@@ -20,6 +20,7 @@ if (empty($imagensPerfume)) {
 }
 
 $marcas = buscarMarcasAgrupadas();
+$familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
 
 ?>
 
@@ -43,64 +44,81 @@ $marcas = buscarMarcasAgrupadas();
             <li>Discovery Kit</li>
             <li class="dropdown">
                 <a href="#">Marcas</a>
-                <div class="dropdown-content">
-                    <div class="view-all">
-                        <a href="todas_marcas.php">Ver todas as marcas</a>
-                    </div>
-                    <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
-                        <div class="column">
-                            <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                            <?php foreach ($grupoMarcas as $marca): ?>
-                                <p>
-                                    <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
-                                        <?php echo htmlspecialchars($marca['nome']); ?>
-                                    </a>
-                                </p>
-                            <?php endforeach; ?>
+                <div class="dropdown-content_under">
+                    <div class="dropdown-content">
+                        <div class="view-all">
+                            <a href="todas_marcas.php">Ver todas as marcas</a>
                         </div>
-                    <?php endforeach; ?>
+                        <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
+                            <div class="column">
+                                <h3><?php echo htmlspecialchars($inicial); ?></h3>
+                                <?php foreach ($grupoMarcas as $marcas): ?>
+                                    <p>
+                                        <a href="marca.php?id=<?php echo htmlspecialchars($marcas['id_marca']); ?>">
+                                            <?php echo htmlspecialchars($marcas['nome']); ?>
+                                        </a>
+                                    </p>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </li>
             <li class="dropdown">
                 <a href="#">Famílias Olfativas</a>
-                <div class="dropdown-content">
-                    <?php
-                    //$familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
-                    if (!empty($familias)): ?>
-                        <div class="column">
+                <div class="dropdown-content_under">
+                    <div class="dropdown-content">
+                        <div class="view-all">
+                            <a href="todas_familias.php">Ver todas as famílias olfativas</a>
+                        </div>
+                        <?php if (!empty($familias)): ?>
                             <?php foreach ($familias as $familia): ?>
-                                <p>
-                                    <a href="familia.php?id=<?php echo htmlspecialchars($familia['id_familia']); ?>">
-                                        <?php echo htmlspecialchars($familia['nome_familia']); ?>
-                                    </a>
-                                </p>
+                                <div class="column">
+                                    <p>
+                                        <a class="familia"
+                                            href="familia.php?id=<?php echo htmlspecialchars($familia['id_familia']); ?>">
+                                            <?php echo htmlspecialchars($familia['nome_familia']); ?>
+                                        </a>
+                                    </p>
+                                </div>
                             <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="column">
-                            <p>Nenhuma família olfativa disponível.</p>
-                        </div>
-                    <?php endif; ?>
-                    <div class="view-all">
-                        <a href="todas_familias.php">Ver todas as famílias</a>
+                        <?php else: ?>
+                            <div class="column">
+                                <p>Nenhuma família olfativa disponível no momento.</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </li>
             <li>Categorias</li>
             <li>Sobre Nós</li>
-            <li>Contactos</li>
+
+
+            <!-- Overlay de Pesquisa -->
+            <input type="checkbox" id="toggleSearch" style="display: none;">
+            <li>
+                <label for="toggleSearch">
+                    <img src="icones/pesquisa.png" alt="Pesquisa"
+                        style="width: 20px; vertical-align: middle; margin-right: 8px; cursor: pointer;">
+                </label>
+            </li>
+            <div id="searchOverlay">
+                <label for="toggleSearch" id="closeSearch">&times;</label>
+                <div class="search-content">
+                    <h2>O que você quer procurar?</h2>
+                    <input type="text" id="searchInput" placeholder="Start typing...">
+                    <div id="searchResults"></div>
+                </div>
+            </div>
+
+
             <li>
                 <img src="icones/carrinho.png" alt="Carrinho de compras"
                     style="width: 20px; vertical-align: middle; margin-right: 8px;">
                 <a href="carrinho.php"></a>
             </li>
-            <li>
-                <img src="">
-                <a href="pesquisa.php"></a>
-            </li>
         </ul>
     </nav>
-
     <!-- Detalhes do Produto -->
     <section class="detalhes-produto">
         <div class="produto-layout"> <!-- Div principal para layout flex -->
