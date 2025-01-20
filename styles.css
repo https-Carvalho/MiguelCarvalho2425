@@ -192,15 +192,31 @@
     padding: 20px; /* Espaçamento interno da lista */
     justify-content: center; /* Centraliza os itens */
 }
+.esgotado-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: black;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 15px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    opacity: 0.9;
+}
 
 .fragrancia-item {
-    width: 200px; /* Largura fixa para cada item */
-    text-align: center; /* Centraliza o texto */
-    border-radius: 8px; /* Arredonda os cantos */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adiciona sombra ao redor */
-    transition: transform 0.3s ease, border-color 0.3s ease; /* Animação suave ao passar o mouse */
-    padding: 10px; /* Espaçamento interno */
-    background-color: #fff; /* Fundo branco */
+    position: relative; /* Importante para o posicionamento do rótulo */
+    width: 200px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    padding: 10px;
+    background-color: #fff;
     border: 1px solid transparent;
 }
 
@@ -257,6 +273,21 @@ a {
     text-decoration: none;  
 }
 
+.esgotado-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: black;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 15px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000   ;
+    opacity: 0.9;
+}   
 /* #endregion */
 
 /* #region================== CONFIGURAÇÃO GERAL ========================= */
@@ -784,6 +815,7 @@ body {
     background-color: #f8f9fa; /* Fundo claro */
     padding: 20px; /* Espaçamento interno */
     border-bottom: 1px solid #ddd; /* Linha separadora no final */
+
     margin-bottom: 20px; /* Espaço após o cabeçalho */
     text-align: center; /* Centralizar conteúdo */
     display: grid; /* Usar grid para organizar regiões */
@@ -792,3 +824,137 @@ body {
         "banner"
         "texto"; /* Define as áreas */
 }
+
+/* #region css do discovery kit */
+
+.discovery-kit {
+    display: flex; /* Permite organizar os elementos em linha */
+    flex-wrap: wrap;
+    justify-content: space-between; /* Adiciona espaço entre os elementos */
+    align-items: stretch; /* Alinha os elementos à mesma altura */
+    max-width: 100%; /* Define o limite máximo de largura */
+    margin: 0 auto; /* Centraliza o layout */
+    gap: 20px; /* Espaçamento entre o slider e as informações */
+    padding: 10px 30px 15px 30px; /* Espaçamento interno */
+    box-sizing: border-box; /* Inclui padding no cálculo */
+}
+
+.left-side{
+    flex: 1; /* Permite que o slider ocupe metade do espaço */
+    max-width: 50%; /* Limita a largura máxima */
+    height: 100%; /* Faz o slider ocupar toda a altura disponível */
+}
+.left-side img{
+    width: 100%; /* Imagem ocupa toda a largura */
+    height: 100%; /* Mantém a proporção da imagem */
+    border-radius: 10px; /* Arredonda os cantos */
+}
+
+.right-side {
+    border-radius: 10px;
+    flex: 1; /* Permite que o slider ocupe metade do espaço */
+    width: 10%; /* Limita a largura máxima */
+    height: 100%; /* Faz o slider ocupar toda a altura disponível */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* Sombra mais intensa */
+}
+
+.search-field {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 0 auto 20px auto; /* Isso centraliza o container horizontalmente e adiciona uma margem inferior */
+    align-items: center; /* Isso centraliza os itens dentro do container */
+    justify-content: center; /* Garante que o conteúdo esteja centralizado verticalmente (se necessário) */
+}
+
+.search-field input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 5px;
+    width: 100%; /* Faz com que o campo de pesquisa ocupe a largura total do seu contêiner */
+}
+
+.search-field input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+/* Resultados de pesquisa */
+.search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    width: 80%;
+}
+.result-item {
+    display: flex;
+    cursor: pointer;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.result-item:hover {
+    background-color: #f0f0f0;
+}
+
+.result-content {
+    display: flex;
+    align-items: center;
+}
+
+.result-item img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.result-item .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.result-item h3 {
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+    font-weight: bold;
+}
+
+.result-item p {
+    font-size: 14px;
+    margin: 0;
+    color: #888;
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 600px) {
+    .search-field input {
+        font-size: 14px;
+    }
+
+    .result-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .result-item img {
+        margin-bottom: 10px;
+    }
+
+    .result-item h3 {
+        font-size: 14px;
+    }
+
+    .result-item p {
+        font-size: 12px;
+    }
+}
+/* #endregion */

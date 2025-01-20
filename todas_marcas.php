@@ -9,8 +9,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     if (!empty($perfumes)): ?>
         <?php foreach ($perfumes as $perfume): ?>
             <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>" class="result-item">
-                <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>" 
-                     alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
+                <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>"
+                    alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
                 <div class="info">
                     <h3><?php echo htmlspecialchars($perfume['nome']); ?></h3>
                     <p><?php echo htmlspecialchars($perfume['marca']); ?></p>
@@ -49,7 +49,7 @@ $marcas = buscarMarcasAgrupadas();
         </div>
         <ul>
             <li><a href="index.php">Início</a></li>
-            <li>Discovery Kit</li>
+            <li> <a href="discoveryKit.php">Discovery Kit</li>
             <li class="dropdown">
                 <a href="#">Marcas</a>
                 <div class="dropdown-content_under">
@@ -60,10 +60,10 @@ $marcas = buscarMarcasAgrupadas();
                         <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
                             <div class="column">
                                 <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                                <?php foreach ($grupoMarcas as $marcas): ?>
+                                <?php foreach ($grupoMarcas as $marca): ?>
                                     <p>
-                                        <a href="marca.php?id=<?php echo htmlspecialchars($marcas['id_marca']); ?>">
-                                            <?php echo htmlspecialchars($marcas['nome']); ?>
+                                        <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
+                                            <?php echo htmlspecialchars($marca['nome']); ?>
                                         </a>
                                     </p>
                                 <?php endforeach; ?>
@@ -76,9 +76,6 @@ $marcas = buscarMarcasAgrupadas();
                 <a href="#">Famílias Olfativas</a>
                 <div class="dropdown-content_under">
                     <div class="dropdown-content">
-                        <div class="view-all">
-                            <a href="todas_familias.php">Ver todas as famílias olfativas</a>
-                        </div>
                         <?php if (!empty($familias)): ?>
                             <?php foreach ($familias as $familia): ?>
                                 <div class="column">
@@ -178,4 +175,5 @@ $marcas = buscarMarcasAgrupadas();
         });
     </script>
 </body>
+
 </html>

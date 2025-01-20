@@ -41,7 +41,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
         </div>
         <ul>
             <li><a href="index.php">Início</a></li>
-            <li>Discovery Kit</li>
+            <li> <a href="discoveryKit.php">Discovery Kit</li>
             <li class="dropdown">
                 <a href="#">Marcas</a>
                 <div class="dropdown-content_under">
@@ -52,10 +52,10 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                         <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
                             <div class="column">
                                 <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                                <?php foreach ($grupoMarcas as $marcas): ?>
+                                <?php foreach ($grupoMarcas as $marca): ?>
                                     <p>
-                                        <a href="marca.php?id=<?php echo htmlspecialchars($marcas['id_marca']); ?>">
-                                            <?php echo htmlspecialchars($marcas['nome']); ?>
+                                        <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
+                                            <?php echo htmlspecialchars($marca['nome']); ?>
                                         </a>
                                     </p>
                                 <?php endforeach; ?>
@@ -68,9 +68,6 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                 <a href="#">Famílias Olfativas</a>
                 <div class="dropdown-content_under">
                     <div class="dropdown-content">
-                        <div class="view-all">
-                            <a href="todas_familias.php">Ver todas as famílias olfativas</a>
-                        </div>
                         <?php if (!empty($familias)): ?>
                             <?php foreach ($familias as $familia): ?>
                                 <div class="column">
@@ -134,7 +131,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                     </div>
                     <div class="buttons">
                         <button id="prev"><</button>
-                        <button id="next">></button>
+                            <button id="next">></button>
                     </div>
                     <ul class="dots">
                         <?php foreach ($imagensPerfume as $key => $imagem): ?>
@@ -151,6 +148,15 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                     <p class="preco"><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
                     <p class="descricao"><?php echo htmlspecialchars($perfume['descricao']); ?></p>
                     <p class="marca">Marca: <?php echo htmlspecialchars($perfume['marca']); ?></p>
+                    <!-- Mostrar o stock -->
+                    <?php if ($perfume['stock'] > 10): ?>
+                        <p class="stock">Em stock: <?php echo $perfume['stock']; ?> unidades.</p>
+                    <?php elseif ($perfume['stock'] > 0): ?>
+                        <p class="stock" style="color: red;">Apenas <?php echo $perfume['stock']; ?> unidades restantes!</p>
+                    <?php else: ?>
+                        <p class="stock" style="color: red;">Produto esgotado!</p>
+                    <?php endif; ?>
+
                     <div class="notas-olfativas">
                         <?php if (!empty($perfume['notas']['topo'])): ?>
                             <div class="nota">
@@ -162,16 +168,16 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                                     <p><?php echo implode(", ", $perfume['notas']['topo']); ?></p>
                                 </div>
                             </div>
-                        <?php endif; ?>
+                        <?php endif;?>
 
-                        <?php if (!empty($perfume['notas']['coração'])): ?>
+                        <?php if (!empty($perfume['notas']['coracao'])): ?>
                             <div class="nota">
                                 <button class="nota-titulo">
                                     <img src="icones/notes.jpg" alt="Ícone de notas">
                                     Notas de coração
                                 </button>
                                 <div class="nota-conteudo">
-                                    <p><?php echo implode(", ", $perfume['notas']['coração']); ?></p>
+                                    <p><?php echo implode(", ", $perfume['notas']['coracao']); ?></p>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -188,6 +194,8 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                             </div>
                         <?php endif; ?>
                     </div>
+
+
                 </div>
             </div>
         </div>

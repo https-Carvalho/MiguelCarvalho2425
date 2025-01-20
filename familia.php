@@ -122,6 +122,11 @@ $marcas = buscarMarcasAgrupadas();
                 <?php while ($perfume = mysqli_fetch_assoc($resultPerfumes)): ?>
                     <div class="fragrancia-item"
                         caminho_imagem_hover="<?php echo htmlspecialchars($perfume['caminho_imagem_hover'] ?? ''); ?>">
+                        
+                        <?php if ($perfume['stock'] == 0): ?>
+                            <div class="esgotado-label">Esgotado</div>
+                        <?php endif; ?>
+
                         <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>">
                             <div class="imagem-fragrancia">
                                 <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>"
@@ -146,6 +151,19 @@ $marcas = buscarMarcasAgrupadas();
                 <p>Nenhum perfume disponível nesta família olfativa.</p>
             <?php endif; ?>
         </section>
+        <script>
+            const items = document.querySelectorAll('.fragrancia-item');
+            items.forEach(item => {
+                const caminhoImagemOriginal = item.querySelector('img').src;
+                const caminhoImagemAlternativa = item.getAttribute('caminho_imagem_hover');
+                item.addEventListener('mouseover', () => {
+                    item.querySelector('img').src = caminhoImagemAlternativa;
+                });
+                item.addEventListener('mouseout', () => {
+                    item.querySelector('img').src = caminhoImagemOriginal;
+                });
+            });
+        </script>
     </main>
 </body>
 

@@ -42,7 +42,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
         </div>
         <ul>
             <li><a href="index.php">Início</a></li>
-            <li>Discovery Kit</li>
+            <li> <a href="discoveryKit.php">Discovery Kit</li>
             <li class="dropdown">
                 <a href="#">Marcas</a>
                 <div class="dropdown-content_under">
@@ -69,9 +69,6 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                 <a href="#">Famílias Olfativas</a>
                 <div class="dropdown-content_under">
                     <div class="dropdown-content">
-                        <div class="view-all">
-                            <a href="todas_familias.php">Ver todas as famílias olfativas</a>
-                        </div>
                         <?php if (!empty($familias)): ?>
                             <?php foreach ($familias as $familia): ?>
                                 <div class="column">
@@ -137,6 +134,10 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                 <?php foreach ($perfumes as $perfume): ?>
                     <div class="fragrancia-item"
                         caminho_imagem_hover="<?php echo htmlspecialchars($perfume['caminho_imagem_hover']); ?>">
+                        <?php if ($perfume['stock'] == 0): ?>
+                            <div class="esgotado-label">Esgotado</div>
+                        <?php endif; ?>
+                            
                         <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>">
                             <div class="imagem-fragrancia">
                                 <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>"
