@@ -1,5 +1,51 @@
 <?php
+session_start();
 include('config.php'); // Inclui a configuração da base de dados e as funções
+
+$totalCarrinho = isset($_SESSION['id_user']) ? contarItensCarrinho($_SESSION['id_user']) : 0;
+
+// Verifica o tipo do usuário
+$id_usuario = $_SESSION['id_user'] ?? null;
+$tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
+
+//funcao de busca
+if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+    $termo = isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '';
+    $perfumes = listarPerfumes($termo);
+
+    // Gera os resultados como HTML
+    if (!empty($perfumes)): ?>
+        <?php foreach ($perfumes as $perfume): ?>
+            <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>" class="result-item">
+                <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>"
+                    alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
+                <div class="info">
+                    <h3><?php echo htmlspecialchars($perfume['nome']); ?></h3>
+                    <p><?php echo htmlspecialchars($perfume['marca']); ?></p>
+                    <p><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>Nenhum resultado encontrado.</p>
+    <?php endif;
+
+    exit; // Encerra a execução para evitar renderizar o restante do HTML
+}
+
+// Define a variável de controle
+$mostrar_carrinho = true;
+
+// Verifica se o usuário está logado
+if (isset($_SESSION['id_user'])) {
+    $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']); // Obtém o tipo do usuário
+
+    // Se for admin ou trabalhador, oculta o carrinho
+    if ($tipo_usuario === "admin" || $tipo_usuario === "trabalhador") {
+        $mostrar_carrinho = false;
+    }
+}
+
 
 // Obtém o ID do produto a partir da URL
 $idPerfume = isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -34,88 +80,10 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-    <nav class="menu">
-        <div class="logo">
-            <a href="index.php">LuxFragrance</a>
-        </div>
-        <ul>
-            <li><a href="index.php">Início</a></li>
-            <li> <a href="discoveryKit.php">Discovery Kit</li>
-            <li class="dropdown">
-                <a href="#">Marcas</a>
-                <div class="dropdown-content_under">
-                    <div class="dropdown-content">
-                        <div class="view-all">
-                            <a href="todas_marcas.php">Ver todas as marcas</a>
-                        </div>
-                        <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
-                            <div class="column">
-                                <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                                <?php foreach ($grupoMarcas as $marca): ?>
-                                    <p>
-                                        <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
-                                            <?php echo htmlspecialchars($marca['nome']); ?>
-                                        </a>
-                                    </p>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a href="#">Famílias Olfativas</a>
-                <div class="dropdown-content_under">
-                    <div class="dropdown-content">
-                        <?php if (!empty($familias)): ?>
-                            <?php foreach ($familias as $familia): ?>
-                                <div class="column">
-                                    <p>
-                                        <a class="familia"
-                                            href="familia.php?id=<?php echo htmlspecialchars($familia['id_familia']); ?>">
-                                            <?php echo htmlspecialchars($familia['nome_familia']); ?>
-                                        </a>
-                                    </p>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="column">
-                                <p>Nenhuma família olfativa disponível no momento.</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </li>
-            <li>Categorias</li>
-            <li>Sobre Nós</li>
+<body class="<?php echo strtolower($tipo_usuario); ?>">
+    <!-- Menu de Navegação -->
+    <?php include('menu.php'); ?>
 
-
-            <!-- Overlay de Pesquisa -->
-            <input type="checkbox" id="toggleSearch" style="display: none;">
-            <li>
-                <label for="toggleSearch">
-                    <img src="icones/pesquisa.png" alt="Pesquisa"
-                        style="width: 20px; vertical-align: middle; margin-right: 8px; cursor: pointer;">
-                </label>
-            </li>
-            <div id="searchOverlay">
-                <label for="toggleSearch" id="closeSearch">&times;</label>
-                <div class="search-content">
-                    <h2>O que você quer procurar?</h2>
-                    <input type="text" id="searchInput" placeholder="Start typing...">
-                    <div id="searchResults"></div>
-                </div>
-            </div>
-
-
-            <li>
-                <img src="icones/carrinho.png" alt="Carrinho de compras"
-                    style="width: 20px; vertical-align: middle; margin-right: 8px;">
-                <a href="carrinho.php"></a>
-            </li>
-        </ul>
-    </nav>
     <!-- Detalhes do Produto -->
     <section class="detalhes-produto">
         <div class="produto-layout"> <!-- Div principal para layout flex -->
@@ -130,8 +98,9 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                         <?php endforeach; ?>
                     </div>
                     <div class="buttons">
-                        <button id="prev"><</button>
-                            <button id="next">></button>
+                        <button id="prev">
+                            << /button>
+                                <button id="next">></button>
                     </div>
                     <ul class="dots">
                         <?php foreach ($imagensPerfume as $key => $imagem): ?>
@@ -148,6 +117,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                     <p class="preco"><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
                     <p class="descricao"><?php echo htmlspecialchars($perfume['descricao']); ?></p>
                     <p class="marca">Marca: <?php echo htmlspecialchars($perfume['marca']); ?></p>
+
                     <!-- Mostrar o stock -->
                     <?php if ($perfume['stock'] > 10): ?>
                         <p class="stock">Em stock: <?php echo $perfume['stock']; ?> unidades.</p>
@@ -168,7 +138,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                                     <p><?php echo implode(", ", $perfume['notas']['topo']); ?></p>
                                 </div>
                             </div>
-                        <?php endif;?>
+                        <?php endif; ?>
 
                         <?php if (!empty($perfume['notas']['coracao'])): ?>
                             <div class="nota">
@@ -195,12 +165,36 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                         <?php endif; ?>
                     </div>
 
+                    <!-- Botão para adicionar ao carrinho -->
+                    <form action="adicionar_carrinho.php" method="POST">
+                        <input type="hidden" name="id_produto" value="<?php echo $perfume['id_perfume']; ?>">
+                        <input type="number" name="quantidade" value="1" min="1" max="<?php echo $perfume['stock']; ?>">
+                        <button type="submit" <?php echo ($perfume['stock'] == 0) ? 'disabled' : ''; ?>>
+                            <?php echo ($perfume['stock'] == 0) ? 'Esgotado' : 'Adicionar ao Carrinho'; ?>
+                        </button>
+                    </form>
+
+
+                    <?php if (isset($_SESSION['id_user'])):
+                        $estadoFavorito = verificarFavorito($_SESSION['id_user'], $perfume['id_perfume']) ? 'remover' : 'adicionar';
+                        $textoFavorito = ($estadoFavorito === 'remover') ? '❤️ Remover dos Favoritos' : '🤍 Adicionar aos Favoritos';
+                        ?>
+                        <button class="favorito-btn" data-id="<?php echo $perfume['id_perfume']; ?>"
+                            data-estado="<?php echo $estadoFavorito; ?>">
+                            <?php echo $textoFavorito; ?>
+                        </button>
+                    <?php else: ?>
+                        <a href="login.php" class="favorito-btn">🤍 Entrar para Favoritar</a>
+                    <?php endif; ?>
 
                 </div>
             </div>
         </div>
     </section>
-    <script>let slider = document.querySelector('.slider .list');
+
+    <!-- slider -->
+    <script>
+        let slider = document.querySelector('.slider .list');
         let items = document.querySelectorAll('.slider .list .item');
         let next = document.getElementById('next');
         let prev = document.getElementById('prev');
@@ -244,6 +238,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
         }, 3000); // Tempo em milissegundos
     </script>
 
+    <!-- Botão das notas -->
     <script>document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.nota-titulo').forEach(button => {
                 button.addEventListener('click', () => {
@@ -268,7 +263,33 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
         });
     </script>
 
-    <script></script>
+    <!-- script pra adicionar aos favs -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".favorito-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    let idProduto = this.dataset.id;
+                    let acao = this.dataset.estado;
+
+                    fetch("favorito.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `id_produto=${idProduto}&acao=${acao}`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.dataset.estado = data.estado;
+                                this.textContent = data.novoTexto;
+                            } else {
+                                alert(data.error);
+                            }
+                        })
+                        .catch(error => console.error("Erro na requisição:", error));
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

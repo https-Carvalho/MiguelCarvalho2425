@@ -1,5 +1,50 @@
 <?php
-include 'config.php';
+session_start();
+include('config.php'); // Inclui a configuração da base de dados
+
+// Obtém a quantidade de itens no carrinho do usuário logado
+$id_usuario = $_SESSION['id_user'] ?? null;
+$tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
+$totalCarrinho = $id_usuario ? contarItensCarrinho($id_usuario) : 0;
+
+//funcao de busca
+if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+    $termo = isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '';
+    $perfumes = listarPerfumes($termo);
+
+    // Gera os resultados como HTML
+    if (!empty($perfumes)): ?>
+        <?php foreach ($perfumes as $perfume): ?>
+            <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>" class="result-item">
+                <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>"
+                    alt="<?php echo htmlspecialchars($perfume['nome']); ?>">
+                <div class="info">
+                    <h3><?php echo htmlspecialchars($perfume['nome']); ?></h3>
+                    <p><?php echo htmlspecialchars($perfume['marca']); ?></p>
+                    <p><?php echo number_format($perfume['preco'], 2, ',', ' ') . ' €'; ?></p>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>Nenhum resultado encontrado.</p>
+    <?php endif;
+
+    exit; // Encerra a execução para evitar renderizar o restante do HTML
+}
+
+
+// Define a variável de controle
+$mostrar_carrinho = true;
+
+// Verifica se o usuário está logado
+if (isset($_SESSION['id_user'])) {
+    $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']); // Obtém o tipo do usuário
+
+    // Se for admin ou trabalhador, oculta o carrinho
+    if ($tipo_usuario === "admin" || $tipo_usuario === "trabalhador") {
+        $mostrar_carrinho = false;
+    }
+}
 
 // Verifica se o ID da marca foi passado
 if (!isset($_GET['id'])) {
@@ -9,7 +54,7 @@ if (!isset($_GET['id'])) {
 // Obter o ID da marca
 $id_marca = intval($_GET['id']);
 // Obter os detalhes da marca
-$marca = getMarca($id_marca);
+$marca = buscarInformacoesMarca($id_marca);
 if (!$marca) {
     die('Marca não encontrada.');
 }
@@ -34,89 +79,9 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
 
 </head>
 
-<body>
+<body class="<?php echo strtolower($tipo_usuario); ?>">
     <!-- Menu de Navegação -->
-    <nav class="menu">
-        <div class="logo">
-            <a href="index.php">LuxFragrance</a>
-        </div>
-        <ul>
-            <li><a href="index.php">Início</a></li>
-            <li> <a href="discoveryKit.php">Discovery Kit</li>
-            <li class="dropdown">
-                <a href="#">Marcas</a>
-                <div class="dropdown-content_under">
-                    <div class="dropdown-content">
-                        <div class="view-all">
-                            <a href="todas_marcas.php">Ver todas as marcas</a>
-                        </div>
-                        <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
-                            <div class="column">
-                                <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                                <?php foreach ($grupoMarcas as $marcas): ?>
-                                    <p>
-                                        <a href="marca.php?id=<?php echo htmlspecialchars($marcas['id_marca']); ?>">
-                                            <?php echo htmlspecialchars($marcas['nome']); ?>
-                                        </a>
-                                    </p>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a href="#">Famílias Olfativas</a>
-                <div class="dropdown-content_under">
-                    <div class="dropdown-content">
-                        <?php if (!empty($familias)): ?>
-                            <?php foreach ($familias as $familia): ?>
-                                <div class="column">
-                                    <p>
-                                        <a class="familia"
-                                            href="familia.php?id=<?php echo htmlspecialchars($familia['id_familia']); ?>">
-                                            <?php echo htmlspecialchars($familia['nome_familia']); ?>
-                                        </a>
-                                    </p>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="column">
-                                <p>Nenhuma família olfativa disponível no momento.</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </li>
-            <li>Categorias</li>
-            <li>Sobre Nós</li>
-
-
-            <!-- Overlay de Pesquisa -->
-            <input type="checkbox" id="toggleSearch" style="display: none;">
-            <li>
-                <label for="toggleSearch">
-                    <img src="icones/pesquisa.png" alt="Pesquisa"
-                        style="width: 20px; vertical-align: middle; margin-right: 8px; cursor: pointer;">
-                </label>
-            </li>
-            <div id="searchOverlay">
-                <label for="toggleSearch" id="closeSearch">&times;</label>
-                <div class="search-content">
-                    <h2>O que você quer procurar?</h2>
-                    <input type="text" id="searchInput" placeholder="Start typing...">
-                    <div id="searchResults"></div>
-                </div>
-            </div>
-
-
-            <li>
-                <img src="icones/carrinho.png" alt="Carrinho de compras"
-                    style="width: 20px; vertical-align: middle; margin-right: 8px;">
-                <a href="carrinho.php"></a>
-            </li>
-        </ul>
-    </nav>
+    <?php include('menu.php'); ?>
 
     <header class="marca-header">
         <div class="marca-banner"
@@ -137,7 +102,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                         <?php if ($perfume['stock'] == 0): ?>
                             <div class="esgotado-label">Esgotado</div>
                         <?php endif; ?>
-                            
+
                         <a href="produto.php?id=<?php echo $perfume['id_perfume']; ?>">
                             <div class="imagem-fragrancia">
                                 <img src="<?php echo htmlspecialchars($perfume['caminho_imagem']); ?>"

@@ -1,5 +1,8 @@
 <?php
-include 'config.php';
+session_start();
+include('config.php'); // Inclui a configuração da base de dados e as funções
+
+$totalCarrinho = isset($_SESSION['id_user']) ? contarItensCarrinho($_SESSION['id_user']) : 0;
 
 if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     $termo = isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '';
@@ -41,7 +44,7 @@ $marcas = buscarMarcasAgrupadas();
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
+<body class="<?php echo strtolower($tipo_usuario); ?>">
     <!-- Menu de Navegação -->
     <nav class="menu">
         <div class="logo">
@@ -95,8 +98,7 @@ $marcas = buscarMarcasAgrupadas();
                     </div>
                 </div>
             </li>
-            <li>Categorias</li>
-            <li>Sobre Nós</li>
+                <li>Sobre Nós</li>
 
 
             <!-- Overlay de Pesquisa -->
@@ -118,9 +120,34 @@ $marcas = buscarMarcasAgrupadas();
 
 
             <li>
-                <img src="icones/carrinho.png" alt="Carrinho de compras"
-                    style="width: 20px; vertical-align: middle; margin-right: 8px;">
-                <a href="carrinho.php"></a>
+                <a href="carrinho.php" class="carrinho-link">
+                    <img src="icones/carrinho.png" alt="Carrinho de compras"
+                        style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                    <?php if ($totalCarrinho > 0): ?>
+                        <span class="carrinho-count"><?php echo $totalCarrinho; ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+
+
+            <li class="user-dropdown">
+                <?php if (isset($_SESSION['id_user'])): ?>
+                    <button class="user-btn">
+                        <img src="icones/user.png" alt="Perfil"
+                            style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                        <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                    </button>
+                    <div class="dropdown-content-user">
+                        <a href="perfil.php">Meu Perfil</a>
+                        <a href="logout.php">Sair</a>
+                    </div>
+                <?php else: ?>
+                    <a href="login.php" class="user-btn">
+                        <img src="icones/user.png" alt="Login"
+                            style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                        <span>Entrar</span>
+                    </a>
+                <?php endif; ?>
             </li>
         </ul>
     </nav>

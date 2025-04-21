@@ -1,4 +1,5 @@
 <?php
+// Configurações de sessão 24 horas     
 
 $host = 'localhost';
 $user = 'root';  // Nome de utilizador 
@@ -22,66 +23,164 @@ try {
 
 // Função para listar perfumes
 // Função de pesquisa de perfumes
-function listarPerfumes($termo = '')
-{
-    global $pdo; // Usa a conexão PDO global com a base de dados
+function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtroMarcas = [], $familias = [], $disponibilidade = null, $ordenacao = '') {
+    global $pdo;
 
-    // Query base para buscar perfumes com seus detalhes
+    // Query base com JOIN para trazer o nome da marca
     $sql = "SELECT perfumes.id_perfume, perfumes.nome, perfumes.preco, perfumes.caminho_imagem, 
                    perfumes.caminho_imagem_hover, perfumes.stock, marcas.nome AS marca
             FROM perfumes
-            JOIN marcas ON perfumes.id_marca = marcas.id_marca";
+            JOIN marcas ON perfumes.id_marca = marcas.id_marca
+            WHERE 1=1"; // Condição base para facilitar a adição de filtros
 
-    // Inicializa os parâmetros para evitar erros
-    $parametros = [];
+    $params = [];
 
-    // Se houver um termo de pesquisa, cria a condição WHERE para buscar no nome da marca e do perfume
+    /** 🔹 FILTRO: PESQUISA PELO TERMO **/
     if (!empty($termo)) {
-        // Divide o termo de pesquisa em palavras individuais
         $termos = explode(' ', $termo);
         $condicoes = [];
 
-        // Para cada palavra, adiciona uma condição LIKE para nome da marca ou do perfume
         foreach ($termos as $index => $palavra) {
-            $palavra = trim($palavra); // Remove espaços extras
+            $palavra = trim($palavra);
             if (!empty($palavra)) {
-                if (strlen($palavra) === 1) {
-                    // Para termos de apenas 1 caractere, busca apenas no início da palavra
-                    $condicoes[] = "(marcas.nome LIKE :termo$index OR perfumes.nome LIKE :termo$index)";
-                    $parametros[":termo$index"] = $palavra . "%"; // Começa com a letra
-                } else {
-                    // Para termos maiores, busca em qualquer lugar
-                    $condicoes[] = "(marcas.nome LIKE :termo$index OR perfumes.nome LIKE :termo$index)";
-                    $parametros[":termo$index"] = "%" . $palavra . "%"; // Substring
-                }
+                $condicoes[] = "(marcas.nome LIKE :termo$index OR perfumes.nome LIKE :termo$index)";
+                $params[":termo$index"] = $palavra . "%"; // Começa com o termo digitado
             }
         }
 
-        // Junta todas as condições com 'AND' (todos os termos precisam estar presentes no nome)
         if (!empty($condicoes)) {
-            $sql .= ' WHERE ' . implode(' AND ', $condicoes);
+            $sql .= ' AND (' . implode(' AND ', $condicoes) . ')';
         } else {
-            // Se não houver condições válidas, retorna uma lista vazia
-            return [];
+            return []; // Retorna vazio se não houver condições válidas
         }
     }
 
-    // Prepara a query com PDO
+    /** 🔹 FILTRO: PREÇO **/
+    if (!empty($precoMin)) {
+        $sql .= " AND perfumes.preco >= :preco_min";
+        $params[':preco_min'] = $precoMin;
+    }
+    if (!empty($precoMax)) {
+        $sql .= " AND perfumes.preco <= :preco_max";
+        $params[':preco_max'] = $precoMax;
+    }
+
+    /** 🔹 FILTRO: MARCAS **/
+    if (!empty($filtroMarcas)) {
+        $marcaPlaceholders = [];
+        foreach ($filtroMarcas as $index => $marca_filtro) {
+            $key = ":marca_$index";
+            $marcaPlaceholders[] = $key;
+            $params[$key] = $marca_filtro;
+        }
+        $sql .= " AND perfumes.id_marca IN (" . implode(',', $marcaPlaceholders) . ")";
+    }
+
+    /** 🔹 FILTRO: FAMÍLIAS OLFATIVAS **/
+    if (!empty($familias)) {
+        $familiaPlaceholders = [];
+        foreach ($familias as $index => $familia) {
+            $key = ":familia_$index";
+            $familiaPlaceholders[] = $key;
+            $params[$key] = $familia;
+        }
+        $sql .= " AND perfumes.id_familia IN (" . implode(',', $familiaPlaceholders) . ")";
+    }
+
+    /** 🔹 FILTRO: DISPONIBILIDADE (ESTOQUE) **/
+    if ($disponibilidade !== null && $disponibilidade !== "") {
+        $sql .= " AND perfumes.stock " . ($disponibilidade == 1 ? "> 0" : "= 0");
+    }
+
+    /** 🔹 ORDENAR DINAMICAMENTE SE FOR DEFINIDO **/
+    if (!empty($ordenacao)) {
+        switch ($ordenacao) {
+            case 'nome_asc':
+                $sql .= " ORDER BY perfumes.nome ASC";
+                break;
+            case 'nome_desc':
+                $sql .= " ORDER BY perfumes.nome DESC";
+                break;
+            case 'preco_menor':
+                $sql .= " ORDER BY perfumes.preco ASC";
+                break;
+            case 'preco_maior':
+                $sql .= " ORDER BY perfumes.preco DESC";
+                break;
+        }
+    }
+
+    // 🔹 NÃO ADICIONA `LIMIT` e `OFFSET`, pois a paginação será feita via JavaScript.
+
+    // Preparar e executar a query
     $stmt = $pdo->prepare($sql);
 
-    // Liga os parâmetros de forma segura
-    foreach ($parametros as $key => $value) {
+    // Associar os parâmetros
+    foreach ($params as $key => $value) {
         $stmt->bindValue($key, $value, PDO::PARAM_STR);
     }
 
-    // Executa a query
     $stmt->execute();
-
-    // Obtém os resultados
-    $perfumes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    return $perfumes; // Retorna os perfumes encontrados
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+
+
+//contar perfumes pra paginacao
+function contarTotalPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtroMarcas = [], $familias = [], $disponibilidade = null) {
+    global $pdo;
+
+    $sql = "SELECT COUNT(*) AS total FROM perfumes JOIN marcas ON perfumes.id_marca = marcas.id_marca WHERE 1=1";
+    $params = [];
+
+    /** 🔹 Aplicar os mesmos filtros da listagem **/
+    if (!empty($termo)) {
+        $termos = explode(' ', $termo);
+        $condicoes = [];
+        foreach ($termos as $index => $palavra) {
+            $condicoes[] = "(marcas.nome LIKE :termo$index OR perfumes.nome LIKE :termo$index)";
+            $params[":termo$index"] = $palavra . "%";
+        }
+        $sql .= ' AND (' . implode(' AND ', $condicoes) . ')';
+    }
+
+    if (!empty($precoMin)) {
+        $sql .= " AND perfumes.preco >= :preco_min";
+        $params[':preco_min'] = $precoMin;
+    }
+    if (!empty($precoMax)) {
+        $sql .= " AND perfumes.preco <= :preco_max";
+        $params[':preco_max'] = $precoMax;
+    }
+
+    if (!empty($filtroMarcas)) {
+        $marcaPlaceholders = [];
+        foreach ($filtroMarcas as $index => $marca_filtro) {
+            $marcaPlaceholders[] = ":marca_$index";
+            $params[":marca_$index"] = $marca_filtro;
+        }
+        $sql .= " AND perfumes.id_marca IN (" . implode(',', $marcaPlaceholders) . ")";
+    }
+
+    if (!empty($familias)) {
+        $familiaPlaceholders = [];
+        foreach ($familias as $index => $familia) {
+            $familiaPlaceholders[] = ":familia_$index";
+            $params[":familia_$index"] = $familia;
+        }
+        $sql .= " AND perfumes.id_familia IN (" . implode(',', $familiaPlaceholders) . ")";
+    }
+
+    if ($disponibilidade !== null && $disponibilidade !== "") {
+        $sql .= " AND perfumes.stock " . ($disponibilidade == 1 ? "> 0" : "= 0");
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+}
+
+
 
 function buscarInformacoesComNotas($idPerfume)
 {
@@ -190,6 +289,27 @@ function buscarImagensPerfume($idPerfume)
     return $imagens;
 }
 
+
+function buscarMarcas()
+{
+    global $liga;
+
+    $sql = "SELECT id_marca, nome FROM marcas ORDER BY nome ASC";
+    $result = mysqli_query($liga, $sql);
+
+    $marcasLista = [];
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($marca = mysqli_fetch_assoc($result)) {
+            $marcasLista[] = [
+                'id_marca' => $marca['id_marca'],
+                'nome' => $marca['nome']
+            ];
+        }
+    }
+
+    return $marcasLista; // Retorna uma lista simples de marcas
+}
+
 function buscarMarcasAgrupadas()
 {
     global $liga;
@@ -216,7 +336,7 @@ function buscarMarcasAgrupadas()
     return $marcasAgrupadas;
 }
 
-function getMarca($id_marca)
+function  buscarInformacoesMarca($id_marca)
 {
     global $liga; // Conexão usando mysqli
 
@@ -383,4 +503,198 @@ function atribuirFamiliaDominante() {
             mysqli_stmt_close($stmtFamilia);
         }
     }
+}
+
+
+//login
+function logarUtilizador($email, $password) {
+    global $pdo; // Usar a conexão PDO global
+
+    try {
+        // Busca o usuário pelo email e senha
+        $sql = "SELECT * FROM tbl_user WHERE email = :email AND password = :password LIMIT 1";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+        $stmt->bindValue(':password', $password, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // Retorna os dados do usuário se encontrado
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        // Lida com erros no banco de dados
+        error_log("Erro no login: " . $e->getMessage());
+        return false;
+    }
+}
+
+function verificarSessao() {
+    if (!isset($_SESSION['id_user'])) {
+        // Redireciona para o login caso o usuário não esteja logado
+        header("Location: login.php");
+        exit();
+    }
+}
+
+
+//carrinho
+function adicionarAoCarrinho($id_usuario, $id_produto, $quantidade = 1) {
+    global $pdo;
+
+    // Verifica se o item já está no carrinho do usuário
+    $sql = "SELECT * FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($item) {
+        // Atualiza a quantidade caso o item já exista
+        $sql = "UPDATE carrinho SET quantidade = quantidade + :quantidade WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['quantidade' => $quantidade, 'id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+    } else {
+        // Insere um novo item no carrinho
+        $sql = "INSERT INTO carrinho (id_usuario, id_produto, quantidade) VALUES (:id_usuario, :id_produto, :quantidade)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto, 'quantidade' => $quantidade]);
+    }
+}
+
+
+// Função para remover um item do carrinho
+function removerDoCarrinho($id_usuario, $id_produto) {
+    global $pdo;
+    $sql = "DELETE FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+
+    // Retorna true se pelo menos 1 linha foi afetada
+    return $stmt->rowCount() > 0;
+}
+
+// Função para buscar os itens do carrinho do usuário
+function buscarItensCarrinho($id_usuario) {
+    global $pdo;
+
+    $sql = "SELECT c.id_produto, c.quantidade, p.nome, p.preco, p.caminho_imagem, p.stock
+            FROM carrinho c
+            JOIN perfumes p ON c.id_produto = p.id_perfume
+            WHERE c.id_usuario = :id_usuario";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_usuario' => $id_usuario]);
+    $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Verificar se a quantidade no carrinho excede o stock disponível
+    foreach ($itens as &$item) {
+        if ($item['quantidade'] > $item['stock']) {
+            $item['quantidade'] = $item['stock']; // Ajusta para o máximo disponível
+        }
+    }
+
+    return $itens;
+}
+
+
+function contarItensCarrinho($id_usuario) {
+    global $pdo;
+
+    $sql = "SELECT SUM(quantidade) AS total_itens FROM carrinho WHERE id_usuario = :id_usuario";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_usuario' => $id_usuario]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $result['total_itens'] ?? 0; // Se não houver itens, retorna 0
+}
+
+function atualizarQuantidadeCarrinho($id_usuario, $id_produto, $quantidade) {
+    global $pdo;
+
+    // Verifica se o produto existe no carrinho
+    $sql = "SELECT quantidade FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($item) {
+        $novaQuantidade = $item['quantidade'] + $quantidade;
+
+        if ($novaQuantidade > 0) {
+            // Atualiza a quantidade no carrinho
+            $sql = "UPDATE carrinho SET quantidade = :quantidade WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['quantidade' => $novaQuantidade, 'id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+        } else {
+            // Remove o produto se a quantidade chegar a zero
+            $sql = "DELETE FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+        }
+    }
+}
+
+//verifica tipo de user
+function verificarTipoUsuario($id_usuario) {
+    global $pdo;
+
+    $sql = "SELECT tipo FROM tbl_user WHERE id_user = :id_usuario";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_usuario' => $id_usuario]);
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $usuario['tipo'] ?? null; // Retorna null se não encontrar o usuário
+}
+
+
+//favoritos
+// Adicionar um produto à wishlist
+function adicionarAosFavoritos($id_user, $id_produto) {
+    global $pdo;
+
+    // Verifica se o produto já está na wishlist
+    $sql = "SELECT * FROM wishlist WHERE id_user = :id_user AND id_produto = :id_produto";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
+
+    if (!$stmt->fetch()) {
+        // Insere se não existir
+        $sql = "INSERT INTO wishlist (id_user, id_produto) VALUES (:id_user, :id_produto)";
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
+    }
+    return false;
+}
+
+// Remover um produto da wishlist
+function removerDosFavoritos($id_user, $id_produto) {
+    global $pdo;
+    $sql = "DELETE FROM wishlist WHERE id_user = :id_user AND id_produto = :id_produto";
+    $stmt = $pdo->prepare($sql);
+    return $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
+}
+
+// Verificar se um produto está na wishlist
+function verificarFavorito($id_user, $id_produto) {
+    global $pdo;
+    $sql = "SELECT * FROM wishlist WHERE id_user = :id_user AND id_produto = :id_produto";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
+    return $stmt->fetch() ? true : false;
+}
+
+
+
+
+    
+function buscarWishlist($id_usuario) {
+    global $pdo;
+    
+    $sql = "SELECT w.id_produto, p.id_perfume, p.nome, p.preco, p.caminho_imagem, p.stock, m.nome AS marca
+            FROM wishlist w
+            JOIN perfumes p ON w.id_produto = p.id_perfume
+            JOIN marcas m ON p.id_marca = m.id_marca
+            WHERE w.id_user = :id_usuario";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_usuario' => $id_usuario]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
