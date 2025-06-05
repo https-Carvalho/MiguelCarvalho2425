@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 21-Abr-2025 às 22:38
+-- Tempo de geração: 22-Abr-2025 às 06:35
 -- Versão do servidor: 10.4.32-MariaDB
--- versão do PHP: 8.1.25
+-- versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -41,6 +41,140 @@ CREATE TABLE `carrinho` (
 
 INSERT INTO `carrinho` (`id_item`, `id_usuario`, `id_produto`, `quantidade`, `adicionado_em`) VALUES
 (13, 1, 3, 3, '2025-04-08 08:39:16');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `encomendas`
+--
+
+CREATE TABLE `encomendas` (
+  `id_encomenda` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `data_encomenda` datetime DEFAULT current_timestamp(),
+  `total` decimal(10,2) NOT NULL,
+  `status` varchar(50) DEFAULT 'Pendente'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `encomendas`
+--
+
+INSERT INTO `encomendas` (`id_encomenda`, `id_user`, `data_encomenda`, `total`, `status`) VALUES
+(1, 3, '2025-04-21 23:31:34', 1840.00, 'Pendente'),
+(2, 3, '2025-04-21 23:31:49', 300.00, 'Pendente'),
+(3, 3, '2025-04-21 23:34:09', 300.00, 'Pendente'),
+(4, 3, '2025-04-22 00:19:35', 300.00, 'Pendente'),
+(5, 3, '2025-04-22 00:20:21', 300.00, 'Pendente'),
+(6, 3, '2025-04-22 00:29:30', 300.00, 'Pendente'),
+(7, 3, '2025-04-22 00:30:18', 300.00, 'Pendente'),
+(8, 3, '2025-04-22 00:30:53', 300.00, 'Pendente'),
+(9, 3, '2025-04-22 00:32:46', 300.00, 'Pendente'),
+(10, 3, '2025-04-22 00:32:59', 300.00, 'Pendente'),
+(11, 3, '2025-04-22 00:34:09', 300.00, 'Pendente'),
+(12, 3, '2025-04-22 00:36:31', 300.00, 'Pendente'),
+(13, 3, '2025-04-22 00:46:27', 0.00, 'Pendente'),
+(14, 3, '2025-04-22 01:11:41', 230.00, 'Pendente'),
+(15, 3, '2025-04-22 01:11:59', 230.00, 'Pendente'),
+(16, 3, '2025-04-22 01:14:27', 230.00, 'Pendente'),
+(17, 3, '2025-04-22 01:14:56', 230.00, 'Pendente'),
+(18, 3, '2025-04-22 01:15:52', 230.00, 'Pendente'),
+(19, 3, '2025-04-22 01:17:01', 230.00, 'Pendente'),
+(20, 3, '2025-04-22 01:18:52', 230.00, 'Pendente'),
+(21, 3, '2025-04-22 01:23:56', 230.00, 'Pendente'),
+(22, 3, '2025-04-22 01:24:08', 230.00, 'Pendente'),
+(23, 3, '2025-04-22 01:24:30', 230.00, 'Pendente'),
+(24, 3, '2025-04-22 01:37:02', 230.00, 'Pendente'),
+(25, 3, '2025-04-22 01:37:04', 230.00, 'Pendente'),
+(26, 3, '2025-04-22 01:37:32', 230.00, 'Pendente'),
+(27, 3, '2025-04-22 01:56:23', 230.00, 'Pendente'),
+(28, 3, '2025-04-22 01:57:17', 230.00, 'Pendente'),
+(29, 3, '2025-04-22 03:00:42', 230.00, 'Pendente'),
+(30, 3, '2025-04-22 03:01:07', 230.00, 'Pendente'),
+(31, 3, '2025-04-22 03:06:25', 0.00, 'Pendente'),
+(32, 3, '2025-04-22 03:07:17', 0.00, 'Pendente'),
+(33, 3, '2025-04-22 03:08:21', 0.00, 'Pendente'),
+(34, 3, '2025-04-22 03:09:19', 0.00, 'Pendente'),
+(35, 3, '2025-04-22 03:09:52', 0.00, 'Pendente'),
+(36, 3, '2025-04-22 03:27:54', 0.00, 'Pendente'),
+(37, 3, '2025-04-22 03:28:50', 0.00, 'Pendente'),
+(38, 3, '2025-04-22 03:30:18', 0.00, 'Pendente'),
+(39, 3, '2025-04-22 03:30:51', 230.00, 'Pendente'),
+(40, 3, '2025-04-22 03:32:11', 230.00, 'Pendente'),
+(41, 3, '2025-04-22 04:12:31', 970.00, 'Pendente'),
+(42, 3, '2025-04-22 04:13:17', 970.00, 'Pendente'),
+(43, 3, '2025-04-22 04:13:49', 0.00, 'Pendente'),
+(44, 3, '2025-04-22 04:42:22', 530.00, 'Pendente'),
+(45, 3, '2025-04-22 04:42:49', 530.00, 'Pendente'),
+(46, 3, '2025-04-22 04:47:22', 0.00, 'Pendente'),
+(47, 3, '2025-04-22 04:47:44', 230.00, 'Pendente'),
+(48, 3, '2025-04-22 04:47:56', 230.00, 'Pendente'),
+(49, 3, '2025-04-22 05:08:36', 230.00, 'Pendente'),
+(50, 3, '2025-04-22 05:08:56', 230.00, 'Pendente');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `encomenda_produtos`
+--
+
+CREATE TABLE `encomenda_produtos` (
+  `id` int(11) NOT NULL,
+  `id_encomenda` int(11) NOT NULL,
+  `id_produto` int(11) NOT NULL,
+  `quantidade` int(11) NOT NULL,
+  `preco_unitario` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `encomenda_produtos`
+--
+
+INSERT INTO `encomenda_produtos` (`id`, `id_encomenda`, `id_produto`, `quantidade`, `preco_unitario`) VALUES
+(1, 1, 1, 8, 230.00),
+(2, 2, 3, 1, 300.00),
+(3, 3, 3, 1, 300.00),
+(4, 4, 3, 1, 300.00),
+(5, 5, 3, 1, 300.00),
+(6, 6, 3, 1, 300.00),
+(7, 7, 3, 1, 300.00),
+(8, 8, 3, 1, 300.00),
+(9, 9, 3, 1, 300.00),
+(10, 10, 3, 1, 300.00),
+(11, 11, 3, 1, 300.00),
+(12, 12, 3, 1, 300.00),
+(13, 13, 3, 1, 300.00),
+(14, 14, 1, 1, 230.00),
+(15, 15, 1, 1, 230.00),
+(16, 16, 1, 1, 230.00),
+(17, 17, 1, 1, 230.00),
+(18, 18, 1, 1, 230.00),
+(19, 19, 1, 1, 230.00),
+(20, 20, 1, 1, 230.00),
+(21, 21, 1, 1, 230.00),
+(22, 22, 1, 1, 230.00),
+(23, 23, 1, 1, 230.00),
+(24, 24, 1, 1, 230.00),
+(25, 25, 1, 1, 230.00),
+(26, 26, 1, 1, 230.00),
+(27, 27, 1, 1, 230.00),
+(28, 28, 1, 1, 230.00),
+(29, 29, 1, 1, 230.00),
+(30, 30, 1, 1, 230.00),
+(31, 39, 1, 1, 230.00),
+(32, 40, 1, 1, 230.00),
+(33, 41, 1, 3, 230.00),
+(34, 41, 5, 1, 280.00),
+(35, 42, 1, 3, 230.00),
+(36, 42, 5, 1, 280.00),
+(37, 44, 3, 1, 300.00),
+(38, 44, 1, 1, 230.00),
+(39, 45, 3, 1, 300.00),
+(40, 45, 1, 1, 230.00),
+(41, 47, 1, 1, 230.00),
+(42, 48, 1, 1, 230.00),
+(43, 49, 1, 1, 230.00),
+(44, 50, 1, 1, 230.00);
 
 -- --------------------------------------------------------
 
@@ -364,11 +498,11 @@ CREATE TABLE `perfumes` (
 --
 
 INSERT INTO `perfumes` (`id_perfume`, `nome`, `descricao`, `preco`, `caminho_imagem`, `caminho_imagem_hover`, `id_marca`, `id_familia`, `stock`) VALUES
-(1, 'Erba Pura Magica', 'Um perfume com notas orientais e frutadas.', 230.00, 'images/sospiro_erba_pura.jpg', 'images/sospiro_erbapura_hover.jpg', 1, 1, 10),
+(1, 'Erba Pura Magica', 'Um perfume com notas orientais e frutadas.', 230.00, 'images/sospiro_erba_pura.jpg', 'images/sospiro_erbapura_hover.jpg', 1, 1, 1),
 (2, 'Alexandria II', 'Uma fragrância clássica com notas orientais.', 340.00, 'images/alexandria_ii.jpg', 'images/alexandria_ii_hover.jpg', 2, 8, 0),
-(3, 'Accento', 'Uma fragrância cítrica e amadeirada com notas de abacaxi e almíscar.', 300.00, 'images/accento.jpg', 'images/accento_hover.jpg', 2, 3, 12),
+(3, 'Accento', 'Uma fragrância cítrica e amadeirada com notas de abacaxi e almíscar.', 300.00, 'images/accento.jpg', 'images/accento_hover.jpg', 2, 3, 10),
 (4, 'Erba Pura', 'Uma fragrância oriental fresca e frutada com notas de âmbar.', 320.00, 'images/erba_pura.jpg', 'images/erba_pura_hover.jpg', 2, 1, 15),
-(5, 'Renaissance', 'Uma fragrância fresca com toques cítricos e de menta.', 280.00, 'images/renaissance.jpg', 'images/renaissance_hover.jpg', 2, 1, 20),
+(5, 'Renaissance', 'Uma fragrância fresca com toques cítricos e de menta.', 280.00, 'images/renaissance.jpg', 'images/renaissance_hover.jpg', 2, 1, 19),
 (6, 'La Capitale', 'Uma fragrância gourmand com notas de morango e baunilha.', 350.00, 'images/la_capitale.jpg', 'images/la_capitale_hover.jpg', 2, 2, 10),
 (7, 'Tabac Rose', 'Uma fragrância floral oriental com toques de tabaco e rosa.', 280.00, 'images/tabac_rose.jpg', 'images/tabac_rose_hover.jpg', 3, NULL, 15),
 (8, 'Velvet Tonka', 'Um perfume gourmand com toques de fava tonka e baunilha.', 240.00, 'images/velvet_tonka.jpg', 'images/velvet_tonka_hover.jpg', 3, NULL, 8),
@@ -482,7 +616,7 @@ CREATE TABLE `tbl_user` (
 INSERT INTO `tbl_user` (`id_user`, `username`, `password`, `email`, `tipo`, `criado_em`) VALUES
 (1, 'admin', 'admin', 'admin@example.com', 'Admin', '2025-01-26 22:50:33'),
 (2, 'trabalhador1', 'trabalhador', 'trabalhador@example.com', 'trabalhador', '2025-01-26 22:50:33'),
-(3, 'cliente1', 'cliente', 'cliente@example.com', 'cliente', '2025-01-26 22:50:33');
+(3, 'cliente1', 'cliente', 'mcmaluco07@outlook.pt', 'cliente', '2025-01-26 22:50:33');
 
 -- --------------------------------------------------------
 
@@ -515,6 +649,21 @@ INSERT INTO `wishlist` (`id`, `id_user`, `id_produto`, `data_adicionado`) VALUES
 ALTER TABLE `carrinho`
   ADD PRIMARY KEY (`id_item`),
   ADD KEY `id_usuario` (`id_usuario`),
+  ADD KEY `id_produto` (`id_produto`);
+
+--
+-- Índices para tabela `encomendas`
+--
+ALTER TABLE `encomendas`
+  ADD PRIMARY KEY (`id_encomenda`),
+  ADD KEY `id_user` (`id_user`);
+
+--
+-- Índices para tabela `encomenda_produtos`
+--
+ALTER TABLE `encomenda_produtos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_encomenda` (`id_encomenda`),
   ADD KEY `id_produto` (`id_produto`);
 
 --
@@ -592,7 +741,19 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT de tabela `carrinho`
 --
 ALTER TABLE `carrinho`
-  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
+-- AUTO_INCREMENT de tabela `encomendas`
+--
+ALTER TABLE `encomendas`
+  MODIFY `id_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+
+--
+-- AUTO_INCREMENT de tabela `encomenda_produtos`
+--
+ALTER TABLE `encomenda_produtos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT de tabela `familias_olfativas`
@@ -658,6 +819,19 @@ ALTER TABLE `wishlist`
 ALTER TABLE `carrinho`
   ADD CONSTRAINT `carrinho_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `tbl_user` (`id_user`),
   ADD CONSTRAINT `carrinho_ibfk_2` FOREIGN KEY (`id_produto`) REFERENCES `perfumes` (`id_perfume`);
+
+--
+-- Limitadores para a tabela `encomendas`
+--
+ALTER TABLE `encomendas`
+  ADD CONSTRAINT `encomendas_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `tbl_user` (`id_user`);
+
+--
+-- Limitadores para a tabela `encomenda_produtos`
+--
+ALTER TABLE `encomenda_produtos`
+  ADD CONSTRAINT `encomenda_produtos_ibfk_1` FOREIGN KEY (`id_encomenda`) REFERENCES `encomendas` (`id_encomenda`),
+  ADD CONSTRAINT `encomenda_produtos_ibfk_2` FOREIGN KEY (`id_produto`) REFERENCES `perfumes` (`id_perfume`);
 
 --
 -- Limitadores para a tabela `familia_notas`

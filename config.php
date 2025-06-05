@@ -698,3 +698,45 @@ function buscarWishlist($id_usuario) {
     $stmt->execute(['id_usuario' => $id_usuario]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+
+//funcoes pra compra
+
+function buscarEmailUsuario($id_user) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT email FROM tbl_user WHERE id_user = ?");
+    $stmt->execute([$id_user]);
+    return $stmt->fetchColumn();
+}
+function criarEncomenda($id_user, $total) {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO encomendas (id_user, total, data_encomenda) VALUES (?, ?, NOW())");
+    $stmt->execute([$id_user, $total]);
+    return $pdo->lastInsertId();
+}
+
+function adicionarProdutoEncomenda($id_encomenda, $id_produto, $quantidade, $preco_unitario) {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO encomenda_produtos (id_encomenda, id_produto, quantidade, preco_unitario) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$id_encomenda, $id_produto, $quantidade, $preco_unitario]);
+}
+
+
+function limparCarrinho($id_user) {
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM carrinho WHERE id_usuario = ?");
+    $stmt->execute([$id_user]);
+}
+
+function atualizarStock($id_produto, $quantidadeVendida) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE perfumes SET stock = stock - ? WHERE id_perfume = ?");
+    $stmt->execute([$quantidadeVendida, $id_produto]);
+}
+
+//imagem pros emails
+function imgToBase64($path) {
+    $type = pathinfo($path, PATHINFO_EXTENSION);
+    $data = file_get_contents($path);
+    return 'data:image/' . $type . ';base64,' . base64_encode($data);
+}

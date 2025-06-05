@@ -81,7 +81,9 @@ $familias = buscarFamiliasOlfativas();
                     <span>Total:</span>
                     <span class="total-valor"><?php echo number_format($totalCompra, 2, ',', ' ') . ' €'; ?></span>
                 </div>
-                <a href="checkout.php" class="checkout-button">Finalizar Compra</a>
+                <form action="checkout.php" method="POST">
+                    <button type="submit" class="checkout-button">Finalizar Compra</button>
+                </form>
             </div>
         <?php else: ?>
             <p class="carrinho-vazio">Seu carrinho está vazio.</p>
