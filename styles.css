@@ -389,21 +389,6 @@ a {
     text-decoration: none;
 }
 
-.esgotado-label {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: black;
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 15px;
-    text-transform: uppercase;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    opacity: 0.9;
-}
 
 /*filtros*/
 .filtro-form {
@@ -422,6 +407,32 @@ a {
     align-items: center;
     gap: 15px;
     flex-wrap: wrap;
+}
+
+.filtros-ativos {
+    margin: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.filtro-badge {
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.filtro-badge .remover-filtro {
+    color: #fff;
+    margin-left: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .dropbtn {
@@ -453,7 +464,7 @@ a {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     padding: 10px;
     border-radius: 5px;
-    z-index: 999;
+    z-index: 1000;
 }
 
 .dropdown-content-filtro label {
@@ -1059,6 +1070,7 @@ body {
 }
 
 /* #endregion */
+
 /*#region paginacao*/
 .paginacao {
     display: flex;

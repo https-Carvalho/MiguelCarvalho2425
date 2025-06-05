@@ -59,11 +59,10 @@ $pagina = isset($_GET['pagina']) && is_numeric($_GET['pagina']) ? (int) $_GET['p
 $limite = 10; // Número de perfumes por página
 
 // 🔹 CHAMADA ÚNICA DA FUNÇÃO LISTAR PERFUMES (Pesquisa + Filtros)
-$perfumes = listarPerfumes($termo, $precoMin, $precoMax, $filtroMarcas, $filtroFamilias, $disponibilidade, $pagina, $limite);
+$perfumes = listarPerfumes($termo, $precoMin, $precoMax, $filtroMarcas, $filtroFamilias, $disponibilidade, $pagina);
 
 //paginacao
 $totalPerfumes = contarTotalPerfumes($termo, $precoMin, $precoMax, $filtroMarcas, $filtroFamilias, $disponibilidade);
-$totalPaginas = ceil($totalPerfumes / $limite);
 
 $marcas = buscarMarcasAgrupadas();
 $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
@@ -205,17 +204,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
         <?php endforeach; ?>
     </section>
 
-    <div class="paginacao">
-        <?php if ($pagina > 1): ?>
-            <a href="?pagina=<?php echo $pagina - 1; ?>" class="btn-paginacao">Anterior</a>
-        <?php endif; ?>
-
-        <span>Página <?php echo $pagina; ?> de <?php echo $totalPaginas; ?></span>
-
-        <?php if ($pagina < $totalPaginas): ?>
-            <a href="?pagina=<?php echo $pagina + 1; ?>" class="btn-paginacao">Próximo</a>
-        <?php endif; ?>
-    </div>
+    
 
 
 
@@ -300,8 +289,84 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
         });
     </script>
 
+    <!-- script para paginacao -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            const filtrosAtivosContainer = document.createElement("div");
+            filtrosAtivosContainer.className = "filtros-ativos";
+            filtrosAtivosContainer.innerHTML = "<strong>Filtros ativos:</strong> ";
+            let temFiltros = false;
 
+            // Obtém nomes legíveis de marcas e famílias (a partir do DOM)
+            const mapaMarcas = {};
+            document.querySelectorAll("input[name='marca[]']").forEach(cb => {
+                mapaMarcas[cb.value] = cb.parentElement.textContent.trim();
+            });
 
+            const mapaFamilias = {};
+            document.querySelectorAll("input[name='familia[]']").forEach(cb => {
+                mapaFamilias[cb.value] = cb.parentElement.textContent.trim();
+            });
+
+            // Mostra os filtros aplicados
+            for (const [key, value] of params.entries()) {
+                if (key === 'pagina' || value === '') continue;
+
+                let label = "";
+                let displayKey = key;
+
+                if (key === "preco_min") {
+                    label = "Preço mínimo: " + parseFloat(value).toFixed(2) + " €";
+                } else if (key === "preco_max") {
+                    label = "Preço máximo: " + parseFloat(value).toFixed(2) + " €";
+                } else if (key === "disponibilidade") {
+                    label = value === "1" ? "Em Estoque" : "Esgotado";
+                } else if (key === "marca[]") {
+                    label = mapaMarcas[value] ?? "Marca #" + value;
+                } else if (key === "familia[]") {
+                    label = mapaFamilias[value] ?? "Família #" + value;
+                } else {
+                    label = `${key}: ${value}`;
+                }
+
+                if (label !== "") {
+                    const badge = document.createElement("span");
+                    badge.className = "filtro-badge";
+                    badge.innerHTML = `${label} <a href="#" data-key="${key}" data-value="${value}" class="remover-filtro">×</a>`;
+                    filtrosAtivosContainer.appendChild(badge);
+                    temFiltros = true;
+                }
+            }
+
+            if (temFiltros) {
+                const containerForm = document.querySelector(".filtro-form");
+                containerForm.parentNode.insertBefore(filtrosAtivosContainer, containerForm.nextSibling);
+
+                document.querySelectorAll(".remover-filtro").forEach(link => {
+                    link.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        const key = this.dataset.key;
+                        const value = this.dataset.value;
+
+                        const newParams = new URLSearchParams(window.location.search);
+
+                        if (key.endsWith("[]")) {
+                            let values = newParams.getAll(key);
+                            values = values.filter(v => v !== value);
+                            newParams.delete(key);
+                            values.forEach(v => newParams.append(key, v));
+                        } else {
+                            newParams.delete(key);
+                        }
+
+                        window.location.search = newParams.toString();
+                    });
+                });
+            }
+        });
+    </script>
 
 </body>
 
