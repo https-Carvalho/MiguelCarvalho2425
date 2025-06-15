@@ -45,9 +45,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     exit; // Encerra a execução para evitar renderizar o restante do HTML
 }
 
-// Atribui a família dominante aos perfumes
-atribuirFamiliaDominante();
-
 
 // Obtém o ID da família da query string
 $id_familia = isset($_GET['id']) ? intval($_GET['id']) : 0;

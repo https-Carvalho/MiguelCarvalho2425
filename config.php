@@ -527,13 +527,7 @@ function logarUtilizador($email, $password) {
     }
 }
 
-function verificarSessao() {
-    if (!isset($_SESSION['id_user'])) {
-        // Redireciona para o login caso o usuário não esteja logado
-        header("Location: login.php");
-        exit();
-    }
-}
+
 
 
 //carrinho
