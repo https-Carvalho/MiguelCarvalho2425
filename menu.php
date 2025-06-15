@@ -91,7 +91,7 @@
                     <?php
                     if (isset($_SESSION['id_user'])) {
                         $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']);
-                        $link_perfil = ($tipo_usuario === 'cliente') ? 'perfil.php' : 'dashboard.php';
+                        $link_perfil = ($tipo_usuario === 'cliente') ? 'perfil.php' : 'dashboard/dashboard.php';
                         ?>
                         <a href="<?php echo $link_perfil; ?>">Meu Perfil</a>
                         <a href="wishlist.php">Minha Wishlist</a>
