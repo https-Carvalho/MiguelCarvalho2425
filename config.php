@@ -1,28 +1,27 @@
 <?php
-// Configurações de sessão 24 horas     
-
+// ==========================================
+// CONFIGURAÇÃO DE BASE DE DADOS
+// ==========================================
 $host = 'localhost';
-$user = 'root';  // Nome de utilizador 
-$password = '';  // Senha
-$dbname = 'perfumes_nicho';  // Nome da base de dados
+$user = 'root';
+$password = '';
+$dbname = 'perfumes_nicho';
 
-// Conectar à base de dados
 $liga = mysqli_connect($host, $user, $password, $dbname);
-
-// Verificar se a conexão foi bem-sucedida
 if (!$liga) {
-    die("Erro na conexão à base de dados: " . mysqli_connect_error());
+    die("Erro na conexão: " . mysqli_connect_error());
 }
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Erro ao conectar ao banco de dados com PDO: " . $e->getMessage());
+    die("Erro PDO: " . $e->getMessage());
 }
 
-// Função para listar perfumes
-// Função de pesquisa de perfumes
+//==========================================
+#region PERFUMES
+
 function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtroMarcas = [], $familias = [], $disponibilidade = null, $ordenacao = '') {
     global $pdo;
 
@@ -124,9 +123,16 @@ function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtro
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function verificarStockProduto($id_produto) {
+    global $pdo;
 
+    $sql = "SELECT stock FROM perfumes WHERE id_perfume = :id_produto";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['id_produto' => $id_produto]);
 
-//contar perfumes pra paginacao
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 function contarTotalPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtroMarcas = [], $familias = [], $disponibilidade = null) {
     global $pdo;
 
@@ -179,8 +185,23 @@ function contarTotalPerfumes($termo = '', $precoMin = null, $precoMax = null, $f
     $stmt->execute($params);
     return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 }
+function inserirPerfume($dados) {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO perfumes (...) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([]);
+}
 
+function editarPerfume($id, $dados) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE perfumes SET ... WHERE id_perfume = ?");
+    $stmt->execute([]);
+}
 
+function eliminarPerfume($id) {
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM perfumes WHERE id_perfume = ?");
+    $stmt->execute([$id]);
+}
 
 function buscarInformacoesComNotas($idPerfume)
 {
@@ -193,7 +214,9 @@ function buscarInformacoesComNotas($idPerfume)
                 perfumes.descricao,
                 perfumes.preco,
                 perfumes.caminho_imagem,
+                perfumes.caminho_imagem_hover,
                 perfumes.stock,
+                marcas.id_marca,
                 marcas.nome AS marca
             FROM 
                 perfumes
@@ -289,164 +312,61 @@ function buscarImagensPerfume($idPerfume)
     return $imagens;
 }
 
-
-function buscarMarcas()
+function buscarImagensPerfumeComId($idPerfume)
 {
     global $liga;
 
-    $sql = "SELECT id_marca, nome FROM marcas ORDER BY nome ASC";
-    $result = mysqli_query($liga, $sql);
-
-    $marcasLista = [];
-    if ($result && mysqli_num_rows($result) > 0) {
-        while ($marca = mysqli_fetch_assoc($result)) {
-            $marcasLista[] = [
-                'id_marca' => $marca['id_marca'],
-                'nome' => $marca['nome']
-            ];
-        }
-    }
-
-    return $marcasLista; // Retorna uma lista simples de marcas
-}
-
-function buscarMarcasAgrupadas()
-{
-    global $liga;
-
-    $sql = "SELECT id_marca, nome, descricao, caminho_imagem FROM marcas ORDER BY nome ASC";
-    $result = mysqli_query($liga, $sql);
-
-    $marcasAgrupadas = [];
-    if ($result && mysqli_num_rows($result) > 0) {
-        while ($marca = mysqli_fetch_assoc($result)) {
-            $inicial = strtoupper($marca['nome'][0]);
-            if (!isset($marcasAgrupadas[$inicial])) {
-                $marcasAgrupadas[$inicial] = [];
-            }
-            $marcasAgrupadas[$inicial][] = [
-                'id_marca' => $marca['id_marca'],
-                'nome' => $marca['nome'],
-                'descricao' => $marca['descricao'],
-                'caminho_imagem' => $marca['caminho_imagem']
-            ];
-        }
-    }
-
-    return $marcasAgrupadas;
-}
-
-function  buscarInformacoesMarca($id_marca)
-{
-    global $liga; // Conexão usando mysqli
-
-    $sql = "SELECT nome, descricao, caminho_imagem FROM marcas WHERE id_marca = ?";
-    $stmt = mysqli_prepare($liga, $sql);
-
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, 'i', $id_marca); // Bind do ID da marca
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-
-        // Retornar os dados da marca se encontrados
-        return mysqli_fetch_assoc($result);
-    } else {
-        return null; // Retornar null em caso de falha
-    }
-}
-
-// Função para obter os perfumes de uma marca
-function getPerfumesPorMarca($id_marca)
-{
-    global $liga; // Usar a conexão mysqli global
-
-    $sql = "SELECT p.id_perfume AS id_perfume, p.nome AS nome, p.caminho_imagem, p.caminho_imagem_hover, 
-    p.preco, p.id_marca, p.stock, m.nome AS marca
-    FROM perfumes p
-    JOIN marcas m ON p.id_marca = m.id_marca
-    WHERE p.id_marca = ?";
-
+    $sql = "SELECT id, caminho_imagem 
+            FROM imagens_perfume 
+            WHERE perfume_id = ?";
 
     $stmt = mysqli_prepare($liga, $sql);
-
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, 'i', $id_marca); // Bind do ID da marca
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-
-        $perfumes = [];
-        while ($row = mysqli_fetch_assoc($result)) {
-            $perfumes[] = $row; // Adicionar cada perfume ao array
-        }
-
-        return $perfumes; // Retornar todos os perfumes da marca
-    } else {
-        return null; // Retornar null em caso de falha
-    }
-}
-
-function buscarFamiliasOlfativas()
-{
-    global $liga; // Usar a conexão global
-
-    // Query para buscar todas as famílias disponíveis
-    $sql = "SELECT id_familia, nome_familia FROM familias_olfativas ORDER BY nome_familia ASC";
-    $result = mysqli_query($liga, $sql);
-
-    $familias = [];
-    if ($result && mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $familias[] = $row; // Adiciona a família ao array
-        }
-    }
-
-    return $familias; // Retorna o array de famílias
-}
-
-function buscarPerfumesPorFamilia($id_familia)
-{
-    global $liga;
-
-    $sql = "
-        SELECT 
-            p.id_perfume, 
-            p.nome, 
-            p.caminho_imagem, 
-            p.preco,
-            p.stock,
-            p.caminho_imagem_hover,
-            m.nome AS nome_marca
-        FROM perfumes p
-        LEFT JOIN marcas m ON p.id_marca = m.id_marca
-        WHERE p.id_familia = ?
-    ";
-
-    // Prepara a query
-    $stmt = mysqli_prepare($liga, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $id_familia);
+    mysqli_stmt_bind_param($stmt, 'i', $idPerfume);
     mysqli_stmt_execute($stmt);
-
-    // Retorna os resultados
-    return mysqli_stmt_get_result($stmt);
-}
-
-// Função para buscar detalhes de uma família
-function buscarDetalhesFamilia($id_familia)
-{
-    global $liga; // Assume que a variável de conexão está definida em outro lugar
-
-    // Consulta SQL para buscar os detalhes da família
-    $sql = "SELECT nome_familia, descricao FROM familias_olfativas WHERE id_familia = ?";
-    $stmt = mysqli_prepare($liga, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $id_familia);
-    mysqli_stmt_execute($stmt);
-
-    // Obter o resultado
     $result = mysqli_stmt_get_result($stmt);
-    $familia = mysqli_fetch_assoc($result);
 
-    mysqli_stmt_close($stmt);
-    return $familia;
+    $imagens = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $imagens[] = [
+            'id' => $row['id'],
+            'caminho_imagem' => $row['caminho_imagem']
+        ];
+    }
+
+    return $imagens;
+}
+
+function guardarImagem($file) {
+    $pasta = 'uploads/';
+    $nomeFinal = $pasta . uniqid() . '_' . basename($file['name']);
+    move_uploaded_file($file['tmp_name'], $nomeFinal);
+    return $nomeFinal;
+}
+
+function inserirImagensAdicionais($id_perfume, $files) {
+    global $pdo;
+    foreach ($files['tmp_name'] as $i => $tmp) {
+        if ($tmp) {
+            $nome = guardarImagem([
+                'name' => $files['name'][$i],
+                'tmp_name' => $tmp
+            ]);
+            $stmt = $pdo->prepare("INSERT INTO imagens_perfume (perfume_id, caminho_imagem) VALUES (?, ?)");
+            $stmt->execute([$id_perfume, $nome]);
+        }
+    }
+}
+
+function atualizarNotasPerfume($id_perfume, $notas) {
+    global $pdo;
+    $pdo->prepare("DELETE FROM perfume_notas WHERE id_perfume = ?")->execute([$id_perfume]);
+
+    foreach ($notas as $tipo => $lista) {
+        foreach ($lista as $id_nota) {
+            $stmt = $pdo->prepare("INSERT INTO perfume_notas (id_perfume, id_nota, tipo_nota) VALUES (?, ?, ?)");
+            $stmt->execute([$id_perfume, $id_nota, $tipo]);
+        }
+    }
 }
 
 function atribuirFamiliaDominante() {
@@ -505,8 +425,274 @@ function atribuirFamiliaDominante() {
     }
 }
 
+#endregion
+//==========================================
+//==========================================
+#region MARCA
 
-//login
+function buscarMarcas()
+{
+    global $liga;
+
+    $sql = "SELECT id_marca, nome FROM marcas ORDER BY nome ASC";
+    $result = mysqli_query($liga, $sql);
+
+    $marcasLista = [];
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($marca = mysqli_fetch_assoc($result)) {
+            $marcasLista[] = [
+                'id_marca' => $marca['id_marca'],
+                'nome' => $marca['nome']
+            ];
+        }
+    }
+
+    return $marcasLista; // Retorna uma lista simples de marcas
+}
+
+function buscarMarcasAgrupadas()
+{
+    global $liga;
+
+    $sql = "SELECT id_marca, nome, descricao, caminho_imagem FROM marcas ORDER BY nome ASC";
+    $result = mysqli_query($liga, $sql);
+
+    $marcasAgrupadas = [];
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($marca = mysqli_fetch_assoc($result)) {
+            $inicial = strtoupper($marca['nome'][0]);
+            if (!isset($marcasAgrupadas[$inicial])) {
+                $marcasAgrupadas[$inicial] = [];
+            }
+            $marcasAgrupadas[$inicial][] = [
+                'id_marca' => $marca['id_marca'],
+                'nome' => $marca['nome'],
+                'descricao' => $marca['descricao'],
+                'caminho_imagem' => $marca['caminho_imagem']
+            ];
+        }
+    }
+
+    return $marcasAgrupadas;
+}
+
+function listarMarcasDashboard() {
+    global $pdo;
+    return $pdo->query("SELECT * FROM marcas ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function inserirMarca($nome, $descricao, $imagem) {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO marcas (nome, descricao, caminho_imagem) VALUES (?, ?, ?)");
+    $stmt->execute([$nome, $descricao, $imagem]);
+}
+
+function editarMarca($id, $nome, $descricao, $imagem) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE marcas SET nome = ?, descricao = ?, caminho_imagem = ? WHERE id_marca = ?");
+    $stmt->execute([$nome, $descricao, $imagem, $id]);
+}
+
+function eliminarMarca($id) {
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM marcas WHERE id_marca = ?");
+    $stmt->execute([$id]);
+}
+
+function getPerfumesPorMarca($id_marca)
+{
+    global $liga; // Usar a conexão mysqli global
+
+    $sql = "SELECT p.id_perfume AS id_perfume, p.nome AS nome, p.caminho_imagem, p.caminho_imagem_hover, 
+    p.preco, p.id_marca, p.stock, m.nome AS marca
+    FROM perfumes p
+    JOIN marcas m ON p.id_marca = m.id_marca
+    WHERE p.id_marca = ?";
+
+
+    $stmt = mysqli_prepare($liga, $sql);
+
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, 'i', $id_marca); // Bind do ID da marca
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        $perfumes = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $perfumes[] = $row; // Adicionar cada perfume ao array
+        }
+
+        return $perfumes; // Retornar todos os perfumes da marca
+    } else {
+        return null; // Retornar null em caso de falha
+    }
+}
+
+function  buscarInformacoesMarca($id_marca)
+{
+    global $liga; // Conexão usando mysqli
+
+    $sql = "SELECT nome, descricao, caminho_imagem FROM marcas WHERE id_marca = ?";
+    $stmt = mysqli_prepare($liga, $sql);
+
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, 'i', $id_marca); // Bind do ID da marca
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        // Retornar os dados da marca se encontrados
+        return mysqli_fetch_assoc($result);
+    } else {
+        return null; // Retornar null em caso de falha
+    }
+}
+
+#endregion
+//==========================================
+//==========================================
+#region FAMÍLIAS
+
+function buscarFamiliasOlfativas()
+{
+    global $liga; // Usar a conexão global
+
+    // Query para buscar todas as famílias disponíveis
+    $sql = "SELECT id_familia, nome_familia FROM familias_olfativas ORDER BY nome_familia ASC";
+    $result = mysqli_query($liga, $sql);
+
+    $familias = [];
+    if ($result && mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $familias[] = $row; // Adiciona a família ao array
+        }
+    }
+
+    return $familias; // Retorna o array de famílias
+}
+
+function buscarPerfumesPorFamilia($id_familia)
+{
+    global $liga;
+
+    $sql = "
+        SELECT 
+            p.id_perfume, 
+            p.nome, 
+            p.caminho_imagem, 
+            p.preco,
+            p.stock,
+            p.caminho_imagem_hover,
+            m.nome AS nome_marca
+        FROM perfumes p
+        LEFT JOIN marcas m ON p.id_marca = m.id_marca
+        WHERE p.id_familia = ?
+    ";
+
+    // Prepara a query
+    $stmt = mysqli_prepare($liga, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id_familia);
+    mysqli_stmt_execute($stmt);
+
+    // Retorna os resultados
+    return mysqli_stmt_get_result($stmt);
+}
+
+function buscarDetalhesFamilia($id_familia)
+{
+    global $liga; // Assume que a variável de conexão está definida em outro lugar
+
+    // Consulta SQL para buscar os detalhes da família
+    $sql = "SELECT nome_familia, descricao FROM familias_olfativas WHERE id_familia = ?";
+    $stmt = mysqli_prepare($liga, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id_familia);
+    mysqli_stmt_execute($stmt);
+
+    // Obter o resultado
+    $result = mysqli_stmt_get_result($stmt);
+    $familia = mysqli_fetch_assoc($result);
+
+    mysqli_stmt_close($stmt);
+    return $familia;
+}
+
+#endregion
+//==========================================
+//==========================================
+#region NOTAS OLFATIVAS
+
+function buscarNotasOlfativas() {
+    global $pdo;
+    $stmt = $pdo->query("SELECT * FROM notas_geral ORDER BY nome_nota ASC");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+#endregion
+// ==========================================
+// ==========================================
+#region ENCOMENDAS
+
+function listarEncomendas($estado = '') {
+    global $pdo;
+    $sql = "SELECT e.*, u.username 
+            FROM encomendas e 
+            JOIN tbl_user u ON e.id_user = u.id_user";
+    if ($estado !== '') {
+        $sql .= " WHERE e.estado = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$estado]);
+    } else {
+        $stmt = $pdo->query($sql);
+    }
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function detalhesEncomenda($id_encomenda) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT ep.*, p.nome AS nome_produto 
+                           FROM encomenda_produtos ep 
+                           JOIN perfumes p ON ep.id_produto = p.id_perfume 
+                           WHERE ep.id_encomenda = ?");
+    $stmt->execute([$id_encomenda]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function alterarEstadoEncomenda($id_encomenda, $novo_estado) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE encomendas SET estado = ? WHERE id_encomenda = ?");
+    $stmt->execute([$novo_estado, $id_encomenda]);
+}
+
+function criarEncomenda($id_user, $total) {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO encomendas (id_user, total, data_encomenda) VALUES (?, ?, NOW())");
+    $stmt->execute([$id_user, $total]);
+    return $pdo->lastInsertId();
+}
+
+function adicionarProdutoEncomenda($id_encomenda, $id_produto, $quantidade, $preco_unitario) {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO encomenda_produtos (id_encomenda, id_produto, quantidade, preco_unitario) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$id_encomenda, $id_produto, $quantidade, $preco_unitario]);
+}
+
+
+function limparCarrinho($id_user) {
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM carrinho WHERE id_usuario = ?");
+    $stmt->execute([$id_user]);
+}
+
+function atualizarStock($id_produto, $quantidadeVendida) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE perfumes SET stock = stock - ? WHERE id_perfume = ?");
+    $stmt->execute([$quantidadeVendida, $id_produto]);
+}
+
+#endregion
+// ==========================================
+// ==========================================
+#region LOGIN E UTILIZADORES
+
 function logarUtilizador($email, $password) {
     global $pdo; // Usar a conexão PDO global
 
@@ -526,11 +712,36 @@ function logarUtilizador($email, $password) {
         return false;
     }
 }
+function verificarTipoUsuario($id_usuario) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT tipo FROM tbl_user WHERE id_user = :id_usuario");
+    $stmt->execute(['id_usuario' => $id_usuario]);
+    return $stmt->fetch(PDO::FETCH_ASSOC)['tipo'] ?? null;
+}
+
+function listarUtilizadores() {
+    global $pdo;
+    return $pdo->query("SELECT id_user, username, email, tipo, criado_em FROM tbl_user ORDER BY criado_em DESC")->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function alterarTipoUtilizador($id_user, $novo_tipo) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE tbl_user SET tipo = ? WHERE id_user = ?");
+    $stmt->execute([$novo_tipo, $id_user]);
+}
+
+function eliminarUtilizador($id_user) {
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM tbl_user WHERE id_user = ?");
+    $stmt->execute([$id_user]);
+}
+
+#endregion
+// ==========================================
+// ==========================================
+#region CARRINHO
 
 
-
-
-//carrinho
 function adicionarAoCarrinho($id_usuario, $id_produto, $quantidade = 1) {
     global $pdo;
 
@@ -626,21 +837,11 @@ function atualizarQuantidadeCarrinho($id_usuario, $id_produto, $quantidade) {
     }
 }
 
-//verifica tipo de user
-function verificarTipoUsuario($id_usuario) {
-    global $pdo;
+#endregion
+// ==========================================
+// ==========================================
+#region FAVORITOS
 
-    $sql = "SELECT tipo FROM tbl_user WHERE id_user = :id_usuario";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_usuario' => $id_usuario]);
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    return $usuario['tipo'] ?? null; // Retorna null se não encontrar o usuário
-}
-
-
-//favoritos
-// Adicionar um produto à wishlist
 function adicionarAosFavoritos($id_user, $id_produto) {
     global $pdo;
 
@@ -674,10 +875,6 @@ function verificarFavorito($id_user, $id_produto) {
     $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
     return $stmt->fetch() ? true : false;
 }
-
-
-
-
     
 function buscarWishlist($id_usuario) {
     global $pdo;
@@ -693,8 +890,10 @@ function buscarWishlist($id_usuario) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-
-//funcoes pra compra
+#endregion
+// ==========================================
+// ==========================================
+#region EMAIL & BASE64
 
 function buscarEmailUsuario($id_user) {
     global $pdo;
@@ -702,35 +901,13 @@ function buscarEmailUsuario($id_user) {
     $stmt->execute([$id_user]);
     return $stmt->fetchColumn();
 }
-function criarEncomenda($id_user, $total) {
-    global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO encomendas (id_user, total, data_encomenda) VALUES (?, ?, NOW())");
-    $stmt->execute([$id_user, $total]);
-    return $pdo->lastInsertId();
-}
 
-function adicionarProdutoEncomenda($id_encomenda, $id_produto, $quantidade, $preco_unitario) {
-    global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO encomenda_produtos (id_encomenda, id_produto, quantidade, preco_unitario) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$id_encomenda, $id_produto, $quantidade, $preco_unitario]);
-}
-
-
-function limparCarrinho($id_user) {
-    global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM carrinho WHERE id_usuario = ?");
-    $stmt->execute([$id_user]);
-}
-
-function atualizarStock($id_produto, $quantidadeVendida) {
-    global $pdo;
-    $stmt = $pdo->prepare("UPDATE perfumes SET stock = stock - ? WHERE id_perfume = ?");
-    $stmt->execute([$quantidadeVendida, $id_produto]);
-}
-
-//imagem pros emails
 function imgToBase64($path) {
     $type = pathinfo($path, PATHINFO_EXTENSION);
     $data = file_get_contents($path);
     return 'data:image/' . $type . ';base64,' . base64_encode($data);
 }
+
+#endregion
+// ==========================================
+?>

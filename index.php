@@ -6,6 +6,18 @@ include('config.php'); // Inclui a configuração da base de dados
 $id_usuario = $_SESSION['id_user'] ?? null;
 $tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
 $totalCarrinho = $id_usuario ? contarItensCarrinho($id_usuario) : 0;
+// Define a variável de controle
+$mostrar_carrinho = true;
+
+// Verifica se o usuário está logado
+if (isset($_SESSION['id_user'])) {
+    $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']); // Obtém o tipo do usuário
+
+    // Se for admin ou trabalhador, oculta o carrinho
+    if ($tipo_usuario === "admin" || $tipo_usuario === "trabalhador") {
+        $mostrar_carrinho = false;
+    }
+}
 
 //funcao de busca
 if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
@@ -32,20 +44,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     exit; // Encerra a execução para evitar renderizar o restante do HTML
 }
 
-
-// Define a variável de controle
-$mostrar_carrinho = true;
-
-// Verifica se o usuário está logado
-if (isset($_SESSION['id_user'])) {
-    $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']); // Obtém o tipo do usuário
-
-    // Se for admin ou trabalhador, oculta o carrinho
-    if ($tipo_usuario === "admin" || $tipo_usuario === "trabalhador") {
-        $mostrar_carrinho = false;
-    }
-}
-
 // Captura os filtros do GET
 $termo = isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '';
 $precoMin = $_GET['preco_min'] ?? null;
@@ -63,7 +61,7 @@ $perfumes = listarPerfumes($termo, $precoMin, $precoMax, $filtroMarcas, $filtroF
 
 //paginacao
 $totalPerfumes = contarTotalPerfumes($termo, $precoMin, $precoMax, $filtroMarcas, $filtroFamilias, $disponibilidade);
-
+//marcas e familias
 $marcas = buscarMarcasAgrupadas();
 $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
 

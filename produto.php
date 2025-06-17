@@ -99,7 +99,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                     </div>
                     <div class="buttons">
                         <button id="prev">
-                            << /button>
+                            <</button>
                                 <button id="next">></button>
                     </div>
                     <ul class="dots">

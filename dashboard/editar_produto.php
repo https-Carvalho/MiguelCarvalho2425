@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('config.php');
+include('../config.php');
 
 $id_usuario = $_SESSION['id_user'] ?? null;
 $tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
@@ -16,7 +16,7 @@ if ($id_perfume <= 0) {
 }
 
 $perfume = buscarInformacoesComNotas($id_perfume);
-$imagens = buscarImagensPerfume($id_perfume);
+$imagens = buscarImagensPerfumeComId($id_perfume); // com ID
 $notas_gerais = buscarNotasOlfativas();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Editar Perfume</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">   
 </head>
 <body>
 
@@ -90,22 +90,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endforeach; ?>
             </select>
 
-            <label>Imagem Principal:</label>
-            <input type="file" name="imagem">
-
-            <label>Imagem Hover:</label>
-            <input type="file" name="imagem_hover">
-
-            <label>Imagens Adicionais (Slide):</label>
-            <input type="file" name="imagens_adicionais[]" multiple>
-
-            <div class="galeria-editar">
-                <?php foreach ($imagens as $img): ?>
-                    <div class="galeria-item">
-                        <img src="<?= htmlspecialchars($img['caminho_imagem']) ?>" alt="Imagem adicional">
-                        <a class="btn-remover-imagem" href="remover_imagem.php?id=<?= $img['id'] ?>&id_perfume=<?= $id_perfume ?>" onclick="return confirm('Remover imagem?')">×</a>
+            <div class="galeria-container">
+                <!-- Galeria de Imagens -->
+                <label>Imagem Principal:</label>
+                <?php if (!empty($perfume['caminho_imagem'])): ?>
+                    <div class="galeria-item principal">
+                        <img src="<?= htmlspecialchars($perfume['caminho_imagem']) ?>" alt="Imagem principal">
+                        <span class="tipo-imagem">Principal</span>
                     </div>
-                <?php endforeach; ?>
+                <?php endif; ?>
+                <input type="file" name="imagem">
+
+                <label>Imagem Hover:</label>
+                <?php if (!empty($perfume['caminho_imagem_hover'])): ?>
+                    <div class="galeria-item hover">
+                        <img src="<?= htmlspecialchars($perfume['caminho_imagem_hover']) ?>" alt="Imagem hover">
+                        <span class="tipo-imagem">Hover</span>
+                    </div>
+                <?php endif; ?>
+                <input type="file" name="imagem_hover">
+
+                <label>Imagens Adicionais (até 3):</label>
+                <div class="galeria-container">
+                    <?php foreach (array_slice($imagens, 0, 3) as $img): ?>
+                        <label><?php print($img ) ?></label>
+                        <div class="galeria-item adicional">
+                            <img src="<?= htmlspecialchars($img['caminho_imagem']) ?>" alt="Imagem adicional">
+                            <a href="remover_imagem.php?id=<?= $img['id'] ?>&id_perfume=<?= $id_perfume ?>" class="btn-remover-imagem" onclick="return confirm('Remover esta imagem?')">×</a>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php if (count($imagens) < 3): ?>
+                    <input type="file" name="imagens_adicionais[]" multiple accept="image/*">
+                <?php endif; ?>
             </div>
 
             <fieldset>
