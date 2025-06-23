@@ -65,7 +65,6 @@ $marcas = buscarMarcasAgrupadas();
 // Obter os perfumes da marca
 $perfumes = getPerfumesPorMarca(id_marca: $id_marca);
 $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
-
 ?>
 
 <!DOCTYPE html>
@@ -85,7 +84,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
 
     <header class="marca-header">
         <div class="marca-banner"
-            style="background-image: url('<?php echo htmlspecialchars($marca['caminho_imagem']); ?>');"></div>
+            style="background-image: url('<?php echo htmlspecialchars(string: $marca['caminho_imagem']); ?>');"></div>
         <div class="marca-descricao">
             <img src="<?php echo htmlspecialchars($marca['caminho_imagem']); ?>" alt="">
             <h1><?php echo htmlspecialchars($marca['nome']); ?></h1>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 22-Abr-2025 às 06:35
+-- Tempo de geração: 24-Jun-2025 às 01:17
 -- Versão do servidor: 10.4.32-MariaDB
 -- versão do PHP: 8.2.12
 
@@ -34,13 +34,6 @@ CREATE TABLE `carrinho` (
   `quantidade` int(11) NOT NULL DEFAULT 1,
   `adicionado_em` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Extraindo dados da tabela `carrinho`
---
-
-INSERT INTO `carrinho` (`id_item`, `id_usuario`, `id_produto`, `quantidade`, `adicionado_em`) VALUES
-(13, 1, 3, 3, '2025-04-08 08:39:16');
 
 -- --------------------------------------------------------
 
@@ -110,7 +103,10 @@ INSERT INTO `encomendas` (`id_encomenda`, `id_user`, `data_encomenda`, `total`, 
 (47, 3, '2025-04-22 04:47:44', 230.00, 'Pendente'),
 (48, 3, '2025-04-22 04:47:56', 230.00, 'Pendente'),
 (49, 3, '2025-04-22 05:08:36', 230.00, 'Pendente'),
-(50, 3, '2025-04-22 05:08:56', 230.00, 'Pendente');
+(50, 3, '2025-04-22 05:08:56', 230.00, 'Pendente'),
+(51, 3, '2025-05-08 20:38:05', 0.00, 'Pendente'),
+(52, 3, '2025-05-08 21:02:36', 300.00, 'Pendente'),
+(53, 3, '2025-05-08 21:03:06', 300.00, 'Pendente');
 
 -- --------------------------------------------------------
 
@@ -174,7 +170,9 @@ INSERT INTO `encomenda_produtos` (`id`, `id_encomenda`, `id_produto`, `quantidad
 (41, 47, 1, 1, 230.00),
 (42, 48, 1, 1, 230.00),
 (43, 49, 1, 1, 230.00),
-(44, 50, 1, 1, 230.00);
+(44, 50, 1, 1, 230.00),
+(45, 52, 3, 1, 300.00),
+(46, 53, 3, 1, 300.00);
 
 -- --------------------------------------------------------
 
@@ -498,12 +496,12 @@ CREATE TABLE `perfumes` (
 --
 
 INSERT INTO `perfumes` (`id_perfume`, `nome`, `descricao`, `preco`, `caminho_imagem`, `caminho_imagem_hover`, `id_marca`, `id_familia`, `stock`) VALUES
-(1, 'Erba Pura Magica', 'Um perfume com notas orientais e frutadas.', 230.00, 'images/sospiro_erba_pura.jpg', 'images/sospiro_erbapura_hover.jpg', 1, 1, 1),
+(1, 'Erba Pura Magica', 'Um perfume com notas orientais e frutadas.', 230.00, 'images/sospiro_erba_pura.jpg', 'images/sospiro_erbapura_hover.jpg', 1, 10, 1),
 (2, 'Alexandria II', 'Uma fragrância clássica com notas orientais.', 340.00, 'images/alexandria_ii.jpg', 'images/alexandria_ii_hover.jpg', 2, 8, 0),
-(3, 'Accento', 'Uma fragrância cítrica e amadeirada com notas de abacaxi e almíscar.', 300.00, 'images/accento.jpg', 'images/accento_hover.jpg', 2, 3, 10),
+(3, 'Accento', 'Uma fragrância cítrica e amadeirada com notas de abacaxi e almíscar.', 300.00, 'images/accento.jpg', 'images/accento_hover.jpg', 2, 10, 9),
 (4, 'Erba Pura', 'Uma fragrância oriental fresca e frutada com notas de âmbar.', 320.00, 'images/erba_pura.jpg', 'images/erba_pura_hover.jpg', 2, 1, 15),
 (5, 'Renaissance', 'Uma fragrância fresca com toques cítricos e de menta.', 280.00, 'images/renaissance.jpg', 'images/renaissance_hover.jpg', 2, 1, 19),
-(6, 'La Capitale', 'Uma fragrância gourmand com notas de morango e baunilha.', 350.00, 'images/la_capitale.jpg', 'images/la_capitale_hover.jpg', 2, 2, 10),
+(6, 'La Capitale', 'Uma fragrância gourmand com notas de morango e baunilha.', 350.00, 'images/la_capitale.jpg', 'images/la_capitale_hover.jpg', 2, 10, 10),
 (7, 'Tabac Rose', 'Uma fragrância floral oriental com toques de tabaco e rosa.', 280.00, 'images/tabac_rose.jpg', 'images/tabac_rose_hover.jpg', 3, NULL, 15),
 (8, 'Velvet Tonka', 'Um perfume gourmand com toques de fava tonka e baunilha.', 240.00, 'images/velvet_tonka.jpg', 'images/velvet_tonka_hover.jpg', 3, NULL, 8),
 (9, 'Dahab', 'Uma fragrância frutada com maçã verde e frutas exóticas.', 270.00, 'images/dahab.jpg', 'images/dahab_hover.jpg', 4, NULL, 18),
@@ -533,16 +531,6 @@ CREATE TABLE `perfume_notas` (
 --
 
 INSERT INTO `perfume_notas` (`id_perfume_nota`, `id_perfume`, `id_nota`, `tipo_nota`) VALUES
-(1, 1, 1, 'topo'),
-(2, 1, 2, 'topo'),
-(3, 1, 3, 'topo'),
-(4, 1, 4, 'topo'),
-(5, 1, 5, 'coracao'),
-(6, 1, 6, 'coracao'),
-(7, 1, 7, 'base'),
-(8, 1, 8, 'base'),
-(9, 1, 9, 'base'),
-(10, 1, 10, 'base'),
 (11, 2, 11, 'topo'),
 (12, 2, 12, 'topo'),
 (13, 2, 13, 'topo'),
@@ -592,7 +580,17 @@ INSERT INTO `perfume_notas` (`id_perfume_nota`, `id_perfume`, `id_nota`, `tipo_n
 (57, 6, 34, 'coracao'),
 (58, 6, 15, 'coracao'),
 (59, 6, 38, 'base'),
-(60, 6, 37, 'base');
+(60, 6, 37, 'base'),
+(61, 1, 3, 'topo'),
+(62, 1, 4, 'topo'),
+(63, 1, 2, 'topo'),
+(64, 1, 1, 'topo'),
+(65, 1, 5, 'coracao'),
+(66, 1, 6, 'coracao'),
+(67, 1, 7, 'base'),
+(68, 1, 8, 'base'),
+(69, 1, 9, 'base'),
+(70, 1, 10, 'base');
 
 -- --------------------------------------------------------
 
@@ -741,19 +739,19 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT de tabela `carrinho`
 --
 ALTER TABLE `carrinho`
-  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de tabela `encomendas`
 --
 ALTER TABLE `encomendas`
-  MODIFY `id_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT de tabela `encomenda_produtos`
 --
 ALTER TABLE `encomenda_produtos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT de tabela `familias_olfativas`
@@ -795,7 +793,7 @@ ALTER TABLE `perfumes`
 -- AUTO_INCREMENT de tabela `perfume_notas`
 --
 ALTER TABLE `perfume_notas`
-  MODIFY `id_perfume_nota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id_perfume_nota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT de tabela `tbl_user`
@@ -807,7 +805,7 @@ ALTER TABLE `tbl_user`
 -- AUTO_INCREMENT de tabela `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- Restrições para despejos de tabelas

@@ -1,4 +1,4 @@
-        <nav class="menu">
+<nav class="menu">
     <div class="logo">
         <a href="index.php">LuxFragrance</a>
     </div>
@@ -15,10 +15,10 @@
                     <?php foreach ($marcas as $inicial => $grupoMarcas): ?>
                         <div class="column">
                             <h3><?php echo htmlspecialchars($inicial); ?></h3>
-                            <?php foreach ($grupoMarcas as $marca): ?>
+                            <?php foreach ($grupoMarcas as $item_marca): ?>
                                 <p>
-                                    <a href="marca.php?id=<?php echo htmlspecialchars($marca['id_marca']); ?>">
-                                        <?php echo htmlspecialchars($marca['nome']); ?>
+                                    <a href="marca.php?id=<?php echo htmlspecialchars($item_marca['id_marca']); ?>">
+                                        <?php echo htmlspecialchars($item_marca['nome']); ?>
                                     </a>
                                 </p>
                             <?php endforeach; ?>
@@ -32,12 +32,12 @@
             <div class="dropdown-content_under">
                 <div class="dropdown-content">
                     <?php if (!empty($familias)): ?>
-                        <?php foreach ($familias as $familia): ?>
+                        <?php foreach ($familias as $item_familia): ?>
                             <div class="column">
                                 <p>
                                     <a class="familia"
-                                        href="familia.php?id=<?php echo htmlspecialchars($familia['id_familia']); ?>">
-                                        <?php echo htmlspecialchars($familia['nome_familia']); ?>
+                                        href="familia.php?id=<?php echo htmlspecialchars($item_familia['id_familia']); ?>">
+                                        <?php echo htmlspecialchars($item_familia['nome_familia']); ?>
                                     </a>
                                 </p>
                             </div>

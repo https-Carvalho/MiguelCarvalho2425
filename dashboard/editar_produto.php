@@ -54,10 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: produtos.php");
     exit();
 }
+
 ?>
 
 <!DOCTYPE html>
 <html lang="pt">
+<script>
+    const familiaNotas = <?= json_encode(buscarFamiliaPorNota()) ?>;
+</script>
+
 <head>
     <meta charset="UTF-8">
     <title>Editar Perfume</title>
@@ -68,7 +73,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="main-content">
         <h1>Editar Perfume: <?= htmlspecialchars($perfume['nome']) ?></h1>
 
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" class="form-container">
+
+    <!-- LINHA SUPERIOR COM INFO E NOTAS -->
+
+    <div class="linha-superior">
+
+        <!-- COLUNA ESQUERDA: INFO GERAL -->
+        <div class="form-left">
             <label>Nome:</label>
             <input type="text" name="nome" value="<?= htmlspecialchars($perfume['nome']) ?>" required>
 
@@ -89,41 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </option>
                 <?php endforeach; ?>
             </select>
+        </div>
 
-            <div class="galeria-container">
-                <!-- Galeria de Imagens -->
-                <label>Imagem Principal:</label>
-                <?php if (!empty($perfume['caminho_imagem'])): ?>
-                    <div class="galeria-item principal">
-                        <img src="<?= htmlspecialchars($perfume['caminho_imagem']) ?>" alt="Imagem principal">
-                        <span class="tipo-imagem">Principal</span>
-                    </div>
-                <?php endif; ?>
-                <input type="file" name="imagem">
-
-                <label>Imagem Hover:</label>
-                <?php if (!empty($perfume['caminho_imagem_hover'])): ?>
-                    <div class="galeria-item hover">
-                        <img src="<?= htmlspecialchars($perfume['caminho_imagem_hover']) ?>" alt="Imagem hover">
-                        <span class="tipo-imagem">Hover</span>
-                    </div>
-                <?php endif; ?>
-                <input type="file" name="imagem_hover">
-
-                <label>Imagens Adicionais (até 3):</label>
-                <div class="galeria-container">
-                    <?php foreach (array_slice($imagens, 0, 3) as $img): ?>
-                        <label><?php print($img ) ?></label>
-                        <div class="galeria-item adicional">
-                            <img src="<?= htmlspecialchars($img['caminho_imagem']) ?>" alt="Imagem adicional">
-                            <a href="remover_imagem.php?id=<?= $img['id'] ?>&id_perfume=<?= $id_perfume ?>" class="btn-remover-imagem" onclick="return confirm('Remover esta imagem?')">×</a>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <?php if (count($imagens) < 3): ?>
-                    <input type="file" name="imagens_adicionais[]" multiple accept="image/*">
-                <?php endif; ?>
-            </div>
+        <!-- COLUNA DIREITA: NOTAS OLFACTIVAS -->
+        <div class="form-right">
 
             <fieldset>
                 <legend>Notas Olfativas</legend>
@@ -166,21 +147,123 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endforeach; ?>
                     </div>
                 </div>
+
             </fieldset>
 
             <div class="familia-info">
-                Família Olfativa Atual: <?= htmlspecialchars($perfume['nome_familia'] ?? 'Desconhecida') ?>
+                Família Olfativa Atual: <span id="nome-familia"><?= htmlspecialchars($perfume['nome_familia'] ?? 'Desconhecida') ?></span>
             </div>
 
-            <button type="submit">Guardar Alterações</button>
-        </form>
+        </div>
     </div>
 
+    <!-- ÁREA DE IMAGENS (ABAIXO DE TUDO) -->
+    <div class="imagens-section">
+
+        <div class="imagem-bloco">
+            <label>Imagem Principal:</label>
+            <?php if (!empty($perfume['caminho_imagem'])): ?>
+                <div class="galeria-item">
+                    <img src="<?= '../' .htmlspecialchars($perfume['caminho_imagem']) ?>" alt="Imagem principal">
+                    <span class="tipo-imagem">Principal</span>
+                    <a href="#" class="btn-remover-imagem">×</a>
+                </div>
+            <?php else: ?>
+                <input type="file" name="imagem">
+            <?php endif; ?>
+        </div>
+
+        <div class="imagem-bloco">
+            <label>Imagem Hover:</label>
+            <?php if (!empty($perfume['caminho_imagem_hover'])): ?>
+                <div class="galeria-item">
+                    <img src="<?= '../' .htmlspecialchars($perfume['caminho_imagem_hover']) ?>" alt="Imagem hover">
+                    <span class="tipo-imagem">Hover</span>
+                    <a href="#" class="btn-remover-imagem">×</a>
+                </div>
+            <?php else: ?>
+                <input type="file" name="imagem_hover">
+            <?php endif; ?>
+        </div>
+
+        <div class="imagem-bloco">
+            <label>Imagens Adicionais (até 3):</label>
+            <div class="galeria-container">
+                <?php foreach (array_slice($imagens, 0, 3) as $img): ?>
+                    <div class="galeria-item">
+                        <img src="<?= '../' . htmlspecialchars($img['caminho_imagem']) ?>" alt="Imagem adicional">
+                        <a href="#" class="btn-remover-imagem">×</a>
+                    </div>
+                <?php endforeach; ?>
+                <?php if (count($imagens) < 3): ?>
+                    <input type="file" name="imagens_adicionais[]" multiple accept="image/*">
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </div>
+
+    <button type="submit">Guardar Alterações</button>
+
+</form>
+
     <script>
-    function toggleDropdown(tipo) {
-        document.getElementById('dropdown-' + tipo).classList.toggle('active');
+        function toggleDropdown(tipo) {
+            document.getElementById('dropdown-' + tipo).classList.toggle('active');
+        }
+
+        document.querySelectorAll('input[type="checkbox"][name^="notas_"]').forEach(cb => {
+            cb.addEventListener('change', atualizarFamiliaPrevista);
+        });
+
+        function atualizarFamiliaPrevista() {
+            const selecionadas = [...document.querySelectorAll('input[type="checkbox"][name^="notas_"]:checked')];
+            const contagem = {}; // id_familia => contador
+            const nomes = {};    // id_familia => nome
+
+            selecionadas.forEach(cb => {
+                const idNota = cb.value;
+                const familia = familiaNotas[idNota];
+                if (familia) {
+                    const id = familia.id_familia;
+                    contagem[id] = (contagem[id] || 0) + 1;
+                    nomes[id] = familia.nome_familia;
+                }
+            });
+
+            let familiaDominante = 'Desconhecida';
+            let max = 0;
+            for (const id in contagem) {
+                if (contagem[id] > max) {
+                    max = contagem[id];
+                    familiaDominante = nomes[id];
+                }
+            }
+
+            document.getElementById('nome-familia').textContent = familiaDominante;
+        }
+
+         function removerImagemPrincipal(e) {
+        e.preventDefault();
+        e.target.closest('.galeria-item').remove();
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = 'imagem';
+        input.accept = 'image/*';
+        e.target.parentElement.parentElement.appendChild(input);
     }
-    </script>
+
+    function removerImagemHover(e) {
+        e.preventDefault();
+        e.target.closest('.galeria-item').remove();
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = 'imagem_hover';
+        input.accept = 'image/*';
+        e.target.parentElement.parentElement.appendChild(input);
+    }
+</script>
+
 
 </body>
 </html>

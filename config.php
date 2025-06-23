@@ -193,9 +193,34 @@ function inserirPerfume($dados) {
 
 function editarPerfume($id, $dados) {
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE perfumes SET ... WHERE id_perfume = ?");
-    $stmt->execute([]);
+
+    $stmt = $pdo->prepare("
+        UPDATE perfumes 
+        SET 
+            nome = :nome,
+            descricao = :descricao,
+            preco = :preco,
+            stock = :stock,
+            id_marca = :id_marca,
+            caminho_imagem = :caminho_imagem,
+            caminho_imagem_hover = :caminho_imagem_hover,
+            id_familia = :id_familia
+        WHERE id_perfume = :id_perfume
+    ");
+
+    $stmt->execute([
+        ':nome' => $dados['nome'],
+        ':descricao' => $dados['descricao'],
+        ':preco' => $dados['preco'],
+        ':stock' => $dados['stock'],
+        ':id_marca' => $dados['id_marca'],
+        ':caminho_imagem' => $dados['caminho_imagem'],
+        ':caminho_imagem_hover' => $dados['caminho_imagem_hover'],
+        ':id_familia' => $dados['id_familia'],
+        ':id_perfume' => $id
+    ]);
 }
+
 
 function eliminarPerfume($id) {
     global $pdo;
@@ -207,7 +232,6 @@ function buscarInformacoesComNotas($idPerfume)
 {
     global $liga;
 
-    // Query principal para obter detalhes do perfume
     $sql = "SELECT 
                 perfumes.id_perfume,
                 perfumes.nome, 
@@ -216,12 +240,16 @@ function buscarInformacoesComNotas($idPerfume)
                 perfumes.caminho_imagem,
                 perfumes.caminho_imagem_hover,
                 perfumes.stock,
+                perfumes.id_familia,
                 marcas.id_marca,
-                marcas.nome AS marca
+                marcas.nome AS marca,
+                familias_olfativas.nome_familia
             FROM 
                 perfumes
             JOIN 
                 marcas ON perfumes.id_marca = marcas.id_marca
+            LEFT JOIN 
+                familias_olfativas ON perfumes.id_familia = familias_olfativas.id_familia
             WHERE 
                 perfumes.id_perfume = ?";
 
@@ -241,11 +269,12 @@ function buscarInformacoesComNotas($idPerfume)
     $perfume = mysqli_fetch_assoc($result);
 
     if (!$perfume) {
-        return null; // Retorna null se o perfume não for encontrado
+        return null;
     }
 
-    // Query para buscar as notas olfativas organizadas por tipo
+    // Agora vamos buscar as notas como já tinhas
     $sqlNotas = "SELECT 
+                    notas_geral.id_nota,
                     notas_geral.nome_nota,
                     perfume_notas.tipo_nota
                 FROM 
@@ -270,26 +299,28 @@ function buscarInformacoesComNotas($idPerfume)
         die("Erro na execução da query de notas: " . mysqli_error($liga));
     }
 
-    // Inicializa os arrays para cada tipo de nota
     $notas = [
         'topo' => [],
         'coracao' => [],
         'base' => []
     ];
 
-    // Organiza as notas por tipo
     while ($nota = mysqli_fetch_assoc($resultNotas)) {
-        $tipoNota = strtolower($nota['tipo_nota']); // Certifique-se de que o tipo de nota é consistente
+        $tipoNota = strtolower($nota['tipo_nota']);
         if (isset($notas[$tipoNota])) {
-            $notas[$tipoNota][] = $nota['nome_nota'];
+            $notas[$tipoNota][] = [
+                'id_nota' => (int)$nota['id_nota'],
+                'nome_nota' => $nota['nome_nota']
+            ];
         }
     }
 
-    // Adiciona as notas ao array do perfume
     $perfume['notas'] = $notas;
 
     return $perfume;
 }
+
+
 
 function buscarImagensPerfume($idPerfume)
 {
@@ -569,6 +600,23 @@ function buscarFamiliasOlfativas()
 
     return $familias; // Retorna o array de famílias
 }
+
+function buscarFamiliaPorNota() {
+    global $liga;
+    $sql = "SELECT fn.id_nota, f.id_familia, f.nome_familia
+            FROM familia_notas fn
+            JOIN familias_olfativas f ON f.id_familia = fn.id_familia";
+    $res = mysqli_query($liga, $sql);
+    $mapa = [];
+    while ($row = mysqli_fetch_assoc($res)) {
+        $mapa[$row['id_nota']] = [
+            'id_familia' => $row['id_familia'],
+            'nome_familia' => $row['nome_familia']
+        ];
+    }
+    return $mapa;
+}
+
 
 function buscarPerfumesPorFamilia($id_familia)
 {
