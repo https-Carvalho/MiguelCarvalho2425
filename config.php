@@ -187,9 +187,24 @@ function contarTotalPerfumes($termo = '', $precoMin = null, $precoMax = null, $f
 }
 function inserirPerfume($dados) {
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO perfumes (...) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([]);
+    $sql = "INSERT INTO perfumes 
+            (nome, descricao, preco, stock, id_marca, caminho_imagem, caminho_imagem_hover, id_familia) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        $dados['nome'],
+        $dados['descricao'],
+        $dados['preco'],
+        $dados['stock'],
+        $dados['id_marca'],
+        $dados['caminho_imagem'],
+        $dados['caminho_imagem_hover'],
+        $dados['id_familia']
+    ]);
+    
+    return $pdo->lastInsertId(); // devolve o ID do perfume inserido, caso precises
 }
+
 
 function editarPerfume($id, $dados) {
     global $pdo;

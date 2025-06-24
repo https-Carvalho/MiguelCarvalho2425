@@ -71,10 +71,6 @@ body {
 /*#endregion*/
 
 /*#region TABELA DE PRODUTOS */
-.main-content h1 {
-    margin-bottom: 20px;
-}
-
 .main-content a[href*="adicionar_produto"] {
     display: inline-block;
     margin-bottom: 20px;
@@ -128,7 +124,7 @@ td a:hover {
 }
 /*#endregion*/
 
-/* #region MODAL */
+/*#region MODAL */
 .modal {
     display: none;
     position: fixed;
@@ -171,8 +167,9 @@ td a:hover {
 #confirmNo {
     background-color: #bdc3c7;
 }
-/* #endregion */
+/*#endregion*/
 
+/*#region FORMULÁRIO */
 .form-container {
     display: flex;
     flex-direction: column;
@@ -183,6 +180,7 @@ td a:hover {
     display: flex;
     gap: 50px;
     align-items: flex-start;
+    justify-content: space-between;
 }
 
 .form-left, .form-right {
@@ -209,11 +207,10 @@ select {
     font-size: 15px;
 }
 
-button[type="submit"] {
-    margin-top: 30px;
+button[type="submit"], .botao-submit {
     padding: 12px 30px;
     background-color: #27ae60;
-    color: #fff;
+    color: white;
     border: none;
     border-radius: 6px;
     font-weight: bold;
@@ -222,8 +219,13 @@ button[type="submit"] {
     transition: background 0.3s;
 }
 
-button[type="submit"]:hover {
+button[type="submit"]:hover, .botao-submit:hover {
     background-color: #219150;
+}
+
+.botao-submit {
+    margin-top: 30px;
+    margin-bottom: 50px;
 }
 /*#endregion*/
 
@@ -313,7 +315,6 @@ legend {
 
 .dropdown-notas {
     margin-bottom: 20px;
-    position: relative;
 }
 
 .dropdown-notas button {
@@ -324,20 +325,20 @@ legend {
     font-weight: bold;
     border-radius: 6px;
     font-size: 14px;
+    width: 100%;
+    text-align: left;
 }
 
 .dropdown-list {
     display: none;
-    position: absolute;
+    margin-top: 10px;
     background: #fff;
     border: 1px solid #ccc;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 10;
+    border-radius: 6px;
     padding: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .dropdown-list.active {
@@ -359,68 +360,5 @@ legend {
     font-style: italic;
     font-size: 15px;
     color: #333;
-}
-/*#endregion*/
-/*#region NOTAS E FAMÍLIA */
-.dropdown-notas {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.dropdown-notas button {
-    padding: 8px 12px;
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 4px;
-}
-
-.dropdown-list {
-    display: none;
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 10;
-    padding: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
-}
-
-.dropdown-list.active {
-    display: block;
-}
-
-.dropdown-list label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.familia-info {
-    background: #eef;
-    padding: 10px;
-    margin-top: 15px;
-    border-left: 5px solid #339;
-    border-radius: 4px;
-    font-style: italic;
-    font-size: 14px;
-}
-
-button[type="submit"] {
-    padding: 10px 20px;
-    background: #27ae60;
-    color: white;
-    border: none;
-    margin-top: 20px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-button[type="submit"]:hover {
-    background-color: #219150;
 }
 /*#endregion*/
