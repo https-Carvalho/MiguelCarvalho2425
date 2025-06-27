@@ -1,4 +1,5 @@
 <?php
+session_start(); // <-- esta linha estava em falta!
 include('config.php');
 
 if (!isset($_SESSION['id_user'])) {

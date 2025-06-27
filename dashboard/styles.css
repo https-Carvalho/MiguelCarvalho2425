@@ -241,12 +241,25 @@ button[type="submit"]:hover, .botao-submit:hover {
     flex: 1 1 250px;
 }
 
-.galeria-container {
+.imagem-bloco-adicionais {
     display: flex;
+    gap: 12px;
     flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 15px;
+    align-items: flex-start;
 }
+
+.imagem-bloco-adicionais .slot {
+    display: flex 1 1 250px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.imagem-bloco-adicionais.slot.galeria-item {
+    width: 150px;
+    height: auto;
+    position: relative;
+}
+
 
 .galeria-item {
     position: relative;

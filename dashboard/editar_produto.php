@@ -161,74 +161,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- ÁREA DE IMAGENS (ABAIXO DE TUDO) -->
             <div class="imagens-section">
 
+                <!-- IMAGEM PRINCIPAL -->
                 <div class="imagem-bloco">
                     <label>Imagem Principal:</label>
 
                     <?php if (!empty($perfume['caminho_imagem'])): ?>
                         <div class="galeria-item">
-                            <img id="preview-principal" src="<?= '../' . htmlspecialchars($perfume['caminho_imagem']) ?>"
-                                alt="Imagem principal">
+                            <img src="<?= '../' . htmlspecialchars($perfume['caminho_imagem']) ?>" alt="Imagem principal">
                             <span class="tipo-imagem">Principal</span>
                             <a href="#" class="btn-remover-imagem">×</a>
                         </div>
-                        <input type="file" name="imagem" id="imagem-principal" style="display: none;">
+                        <input type="file" name="imagem" style="display: none;" accept="image/*">
                     <?php else: ?>
-                        <input type="file" name="imagem" id="imagem-principal">
+                        <input type="file" name="imagem" accept="image/*">
                         <div class="galeria-item" style="display: none;">
-                            <img id="preview-principal" src="" alt="Imagem principal">
+                            <img src="" alt="Imagem principal">
                             <span class="tipo-imagem">Principal</span>
                             <a href="#" class="btn-remover-imagem">×</a>
                         </div>
                     <?php endif; ?>
                 </div>
 
-
+                <!-- IMAGEM HOVER -->
                 <div class="imagem-bloco">
                     <label>Imagem Hover:</label>
 
                     <?php if (!empty($perfume['caminho_imagem_hover'])): ?>
                         <div class="galeria-item">
-                            <img id="preview-hover" src="<?= '../' . htmlspecialchars($perfume['caminho_imagem_hover']) ?>"
-                                alt="Imagem hover">
+                            <img src="<?= '../' . htmlspecialchars($perfume['caminho_imagem_hover']) ?>" alt="Imagem hover">
                             <span class="tipo-imagem">Hover</span>
                             <a href="#" class="btn-remover-imagem">×</a>
                         </div>
-                        <input type="file" name="imagem_hover" id="imagem-hover" style="display: none;">
+                        <input type="file" name="imagem_hover" style="display: none;" accept="image/*">
                     <?php else: ?>
-                        <input type="file" name="imagem_hover" id="imagem-hover">
+                        <input type="file" name="imagem_hover" accept="image/*">
                         <div class="galeria-item" style="display: none;">
-                            <img id="preview-hover" src="" alt="Imagem hover">
+                            <img src="" alt="Imagem hover">
                             <span class="tipo-imagem">Hover</span>
                             <a href="#" class="btn-remover-imagem">×</a>
                         </div>
                     <?php endif; ?>
                 </div>
 
-
-                <div class="imagem-bloco">
+                <div class="imagem-bloco-adicionais-wrapper">
                     <label>Imagens Adicionais (até 3):</label>
-                    <div class="galeria-container" id="galeria-adicionais">
-                        <?php foreach ($imagens as $index => $img): ?>
-                            <div class="galeria-item">
-                                <img src="<?= '../' . htmlspecialchars($img['caminho_imagem']) ?>" alt="Imagem adicional">
-                                <span class="tipo-imagem">Adicional</span>
-                                <a href="#" class="btn-remover-imagem">×</a>
-                            </div>
-                        <?php endforeach; ?>
-
-                        <?php if (count($imagens) < 3): ?>
-                            <input type="file" name="imagens_adicionais[]" class="input-adicional" accept="image/*"
-                                style="margin-top:10px;">
-                        <?php endif; ?>
+                    <div class="imagem-bloco-adicionais">
+                        <div class="imagem-bloco-adicionais">
+                            <?php for ($i = 0; $i < 3; $i++): ?>
+                                <div class="slot">
+                                    <?php if (!empty($imagens[$i]['caminho_imagem'])): ?>
+                                        <div class="galeria-item">
+                                            <img src="<?= '../' . htmlspecialchars($imagens[$i]['caminho_imagem']) ?>"
+                                                alt="Imagem adicional">
+                                            <span class="tipo-imagem">Adicional</span>
+                                            <a href="#" class="btn-remover-imagem">×</a>
+                                        </div>
+                                        <input type="file" name="imagens_adicionais[]" style="display: none;" accept="image/*">
+                                    <?php else: ?>
+                                        <input type="file" name="imagens_adicionais[]" accept="image/*">
+                                        <div class="galeria-item" style="display: none;">
+                                            <img src="" alt="Imagem adicional">
+                                            <span class="tipo-imagem">Adicional</span>
+                                            <a href="#" class="btn-remover-imagem">×</a>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
                     </div>
                 </div>
-
-
             </div>
             <button type="submit">Guardar Alterações</button>
         </form>
     </div>
-
     <script>
         function toggleDropdown(tipo) {
             document.getElementById('dropdown-' + tipo).classList.toggle('active');
@@ -268,119 +273,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // -------------------------------
         // GESTÃO DAS IMAGENS ADICIONAIS
         // -------------------------------
-        document.addEventListener('DOMContentLoaded', function () {
-            const galeriaContainer = document.getElementById('galeria-adicionais');
-
-            function atualizarInputAdicionais() {
-                const galeriaItemsVisiveis = [...galeriaContainer.querySelectorAll('.galeria-item')]
-                    .filter(item => item.offsetParent !== null).length;
-
-                let inputExistente = galeriaContainer.querySelector('input[type="file"]');
-
-                if (galeriaItemsVisiveis < 3) {
-                    if (!inputExistente) {
-                        inputExistente = document.createElement('input');
-                        inputExistente.type = 'file';
-                        inputExistente.name = 'imagens_adicionais[]';
-                        inputExistente.accept = 'image/*';
-                        inputExistente.multiple = true;
-                        inputExistente.style.marginTop = '10px';
-                        galeriaContainer.appendChild(inputExistente);
-                    }
-
-                    // Adiciona o listener novamente (caso tenha sido recriado)
-                    inputExistente.addEventListener('change', function (e) {
-                        const ficheiros = e.target.files;
-                        let existentes = [...galeriaContainer.querySelectorAll('.galeria-item')]
-                            .filter(item => item.offsetParent !== null).length;
-
-                        for (let i = 0; i < ficheiros.length && existentes < 3; i++, existentes++) {
-                            const reader = new FileReader();
-                            const file = ficheiros[i];
-
-                            reader.onload = function (event) {
-                                const novoItem = document.createElement('div');
-                                novoItem.className = 'galeria-item';
-                                novoItem.innerHTML = `<img src="${event.target.result}" alt="Imagem adicional">
-                                                      <span class="tipo-imagem">Adicional</span>
-                                                      <a href="#" class="btn-remover-imagem">×</a>`;
-                                galeriaContainer.insertBefore(novoItem, galeriaContainer.querySelector('input[type="file"]'));
-                                adicionarListenerRemover(novoItem.querySelector('.btn-remover-imagem'));
-                                atualizarInputAdicionais();
-                            };
-
-                            reader.readAsDataURL(file);
-                        }
-
-                        e.target.remove(); // remove o input após o uso
-                    });
-
-                } else if (galeriaItemsVisiveis >= 3 && inputExistente) {
-                    inputExistente.remove();
-                }
-            }
-
-
-            function adicionarListenerRemover(btn) {
+        document.addEventListener('DOMContentLoaded', () => {
+            // REMOVER imagem
+            document.querySelectorAll('.btn-remover-imagem').forEach(btn => {
                 if (!btn.dataset.listener) {
-                    btn.addEventListener('click', function (e) {
+                    btn.addEventListener('click', e => {
                         e.preventDefault();
                         if (confirm("Tem a certeza que deseja remover esta imagem?")) {
                             const galeriaItem = e.target.closest('.galeria-item');
-                            galeriaItem.remove();
-                            atualizarInputAdicionais();
+                            const blocoImagem = galeriaItem.closest('.slot') || galeriaItem.closest('.imagem-bloco');
+                            galeriaItem.style.display = 'none';
+
+                            const inputFile = blocoImagem.querySelector('input[type="file"]');
+                            if (inputFile) {
+                                inputFile.style.display = 'block';
+                                inputFile.value = '';
+                            }
                         }
                     });
-                    btn.dataset.listener = 'true'; // evita duplicações
+                    btn.dataset.listener = 'true';
                 }
-            }
+            });
 
-            // Ativar remover para imagens existentes
-            galeriaContainer.querySelectorAll('.btn-remover-imagem').forEach(adicionarListenerRemover);
-            atualizarInputAdicionais();
-        });
+            // PREVIEW ao selecionar nova imagem
+            document.querySelectorAll('input[type="file"]').forEach(input => {
+                input.addEventListener('change', event => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const blocoImagem = input.closest('.slot') || input.closest('.imagem-bloco');
+                        const galeriaItem = blocoImagem.querySelector('.galeria-item');
+                        const imgPreview = galeriaItem?.querySelector('img');
 
-        // -------------------------------
-        // GESTÃO DAS IMAGENS PRINCIPAL / HOVER
-        // -------------------------------
-        document.querySelectorAll('.btn-remover-imagem').forEach(btn => {
-            if (!btn.dataset.listener) {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (confirm("Tem a certeza que deseja remover esta imagem?")) {
-                        const galeriaItem = e.target.closest('.galeria-item');
-                        const blocoImagem = galeriaItem.closest('.imagem-bloco');
-                        galeriaItem.style.display = 'none';
-
-                        const inputFile = blocoImagem.querySelector('input[type="file"]');
-                        if (inputFile) {
-                            inputFile.style.display = 'block';
-                            inputFile.value = '';
+                        if (imgPreview) {
+                            imgPreview.src = URL.createObjectURL(file);
+                            galeriaItem.style.display = 'block';
+                            input.style.display = 'none';
                         }
                     }
                 });
-                btn.dataset.listener = 'true';
-            }
-        });
-
-        document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', function (event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const blocoImagem = input.closest('.imagem-bloco');
-                    const galeriaItem = blocoImagem.querySelector('.galeria-item');
-                    const imgPreview = galeriaItem?.querySelector('img');
-
-                    if (imgPreview) {
-                        imgPreview.src = URL.createObjectURL(file);
-                        galeriaItem.style.display = 'block';
-                        input.style.display = 'none';
-                    }
-                }
             });
         });
-    </script>
 
+    </script>
 </body>
 
 </html>
