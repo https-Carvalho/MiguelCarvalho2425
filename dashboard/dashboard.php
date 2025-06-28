@@ -2,7 +2,7 @@
 session_start();
 include('../config.php');
 
-// Verifica se o utilizador tem permissão de admin
+// Verifica permissões
 $id_usuario = $_SESSION['id_user'] ?? null;
 $tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
 $nome = $_SESSION['username'] ?? 'Desconhecido';
@@ -12,38 +12,72 @@ if ($tipo_usuario !== 'Admin') {
     exit();
 }
 
+// ✅ Usa funções da region DASHBOARD
+$total_perfumes = contarPerfumes();
+$total_marcas = contarMarcas();
+$total_encomendas = contarEncomendas();
+$total_utilizadores = contarUtilizadores();
+$total_vendas = somarTotalVendas();
 
+$encomendasPorMes = encomendasUltimosMeses();
+$labels = array_reverse(array_column($encomendasPorMes, 'mes'));
+$valores = array_reverse(array_column($encomendasPorMes, 'total'));
 ?>
 
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <title>Painel de Administração</title>
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <div class="sidebar">
-        <h2>Admin - <?php echo htmlspecialchars($nome); ?></h2>
-        <ul>
-            <li><a href="dashboard.php">📊 Painel</a></li>
-            <li><a href="produtos.php">📦 Produtos</a></li>
-            <li><a href="marcas.php">🏷️ Marcas</a></li>
-            <li><a href="encomendas.php">📑 Encomendas</a></li>
-            <li><a href="contas.php">👤 Contas</a></li>
-            <li><a href="../index.php">← Voltar à Loja</a></li>
-        </ul>
-    </div>
+    <?php include('admin_layout.php'); ?>
+
 
     <div class="main-content">
         <h1>Bem-vindo ao Painel</h1>
         <p>Utilize o menu lateral para gerir a loja.</p>
-        <div class="cards">
-            <a href="produtos.php" class="card">Gerir Produtos</a>
-            <a href="marcas.php" class="card">Gerir Marcas</a>
-            <a href="encomendas.php" class="card">Ver Encomendas</a>
-            <a href="contas.php" class="card">Contas de Utilizadores</a>
+
+        <div class="estatisticas">
+            <div class="box"><strong><?= $total_perfumes ?></strong><br>Perfumes</div>
+            <div class="box"><strong><?= $total_marcas ?></strong><br>Marcas</div>
+            <div class="box"><strong><?= $total_utilizadores ?></strong><br>Utilizadores</div>
+            <div class="box"><strong><?= $total_encomendas ?></strong><br>Encomendas</div>
+            <div class="box"><strong><?= number_format($total_vendas, 2) ?> €</strong><br>Total Vendido</div>
         </div>
+
+        <div class="grafico-container">
+            <canvas id="graficoEncomendas"></canvas>
+        </div>
+
+        <script>
+            const ctx = document.getElementById('graficoEncomendas').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($labels) ?>,
+                    datasets: [{
+                        label: 'Encomendas por Mês',
+                        data: <?= json_encode($valores) ?>,
+                        backgroundColor: '#4e73df'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stepSize: 1
+                        }
+                    }
+                }
+            });
+        </script>
     </div>
 </body>
+
 </html>

@@ -20,9 +20,10 @@ try {
 }
 
 //==========================================
-#region PERFUMES
+#region PERFUMES    
 
-function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtroMarcas = [], $familias = [], $disponibilidade = null, $ordenacao = '') {
+function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtroMarcas = [], $familias = [], $disponibilidade = null, $ordenacao = '')
+{
     global $pdo;
 
     // Query base com JOIN para trazer o nome da marca
@@ -42,10 +43,12 @@ function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtro
         foreach ($termos as $index => $palavra) {
             $palavra = trim($palavra);
             if (!empty($palavra)) {
+                $like = $index === 0 ? "$palavra%" : "%$palavra%"; // primeira palavra = começa com
                 $condicoes[] = "(marcas.nome LIKE :termo$index OR perfumes.nome LIKE :termo$index)";
-                $params[":termo$index"] = $palavra . "%"; // Começa com o termo digitado
+                $params[":termo$index"] = $like;
             }
         }
+
 
         if (!empty($condicoes)) {
             $sql .= ' AND (' . implode(' AND ', $condicoes) . ')';
@@ -106,8 +109,14 @@ function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtro
             case 'preco_maior':
                 $sql .= " ORDER BY perfumes.preco DESC";
                 break;
+            default:
+                $sql .= " ORDER BY perfumes.id_perfume ASC";
+                break;
         }
+    } else {
+        $sql .= " ORDER BY perfumes.id_perfume ASC"; // <-- fallback
     }
+
 
     // 🔹 NÃO ADICIONA `LIMIT` e `OFFSET`, pois a paginação será feita via JavaScript.
 
@@ -123,7 +132,8 @@ function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtro
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function verificarStockProduto($id_produto) {
+function verificarStockProduto($id_produto)
+{
     global $pdo;
 
     $sql = "SELECT stock FROM perfumes WHERE id_perfume = :id_produto";
@@ -133,7 +143,8 @@ function verificarStockProduto($id_produto) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function contarTotalPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtroMarcas = [], $familias = [], $disponibilidade = null) {
+function contarTotalPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtroMarcas = [], $familias = [], $disponibilidade = null)
+{
     global $pdo;
 
     $sql = "SELECT COUNT(*) AS total FROM perfumes JOIN marcas ON perfumes.id_marca = marcas.id_marca WHERE 1=1";
@@ -185,7 +196,8 @@ function contarTotalPerfumes($termo = '', $precoMin = null, $precoMax = null, $f
     $stmt->execute($params);
     return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 }
-function inserirPerfume($dados) {
+function inserirPerfume($dados)
+{
     global $pdo;
     $sql = "INSERT INTO perfumes 
             (nome, descricao, preco, stock, id_marca, caminho_imagem, caminho_imagem_hover, id_familia) 
@@ -201,12 +213,13 @@ function inserirPerfume($dados) {
         $dados['caminho_imagem_hover'],
         $dados['id_familia']
     ]);
-    
+
     return $pdo->lastInsertId(); // devolve o ID do perfume inserido, caso precises
 }
 
 
-function editarPerfume($id, $dados) {
+function editarPerfume($id, $dados)
+{
     global $pdo;
 
     $stmt = $pdo->prepare("
@@ -237,7 +250,8 @@ function editarPerfume($id, $dados) {
 }
 
 
-function eliminarPerfume($id) {
+function eliminarPerfume($id)
+{
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM perfumes WHERE id_perfume = ?");
     $stmt->execute([$id]);
@@ -324,7 +338,7 @@ function buscarInformacoesComNotas($idPerfume)
         $tipoNota = strtolower($nota['tipo_nota']);
         if (isset($notas[$tipoNota])) {
             $notas[$tipoNota][] = [
-                'id_nota' => (int)$nota['id_nota'],
+                'id_nota' => (int) $nota['id_nota'],
                 'nome_nota' => $nota['nome_nota']
             ];
         }
@@ -382,14 +396,16 @@ function buscarImagensPerfumeComId($idPerfume)
     return $imagens;
 }
 
-function guardarImagem($file) {
+function guardarImagem($file)
+{
     $pasta = 'uploads/';
     $nomeFinal = $pasta . uniqid() . '_' . basename($file['name']);
     move_uploaded_file($file['tmp_name'], $nomeFinal);
     return $nomeFinal;
 }
 
-function inserirImagensAdicionais($id_perfume, $files) {
+function inserirImagensAdicionais($id_perfume, $files)
+{
     global $pdo;
     foreach ($files['tmp_name'] as $i => $tmp) {
         if ($tmp) {
@@ -403,7 +419,8 @@ function inserirImagensAdicionais($id_perfume, $files) {
     }
 }
 
-function atualizarNotasPerfume($id_perfume, $notas) {
+function atualizarNotasPerfume($id_perfume, $notas)
+{
     global $pdo;
     $pdo->prepare("DELETE FROM perfume_notas WHERE id_perfume = ?")->execute([$id_perfume]);
 
@@ -415,7 +432,8 @@ function atualizarNotasPerfume($id_perfume, $notas) {
     }
 }
 
-function atribuirFamiliaDominante() {
+function atribuirFamiliaDominante()
+{
     global $liga; // Conexão mysqli global
 
     // Busca todos os perfumes
@@ -522,24 +540,36 @@ function buscarMarcasAgrupadas()
     return $marcasAgrupadas;
 }
 
-function listarMarcasDashboard() {
+function listarMarcasDashboard()
+{
     global $pdo;
-    return $pdo->query("SELECT * FROM marcas ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
+    return $pdo->query("SELECT * FROM marcas ORDER BY id_marca")->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function inserirMarca($nome, $descricao, $imagem) {
+function inserirMarca($dados)
+{
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO marcas (nome, descricao, caminho_imagem) VALUES (?, ?, ?)");
-    $stmt->execute([$nome, $descricao, $imagem]);
+    $sql = "INSERT INTO marcas (nome, descricao, caminho_imagem) VALUES (?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        $dados['nome'],
+        $dados['descricao'],
+        $dados['caminho_imagem']
+    ]);
+
+    return $pdo->lastInsertId(); // devolve o ID da marca inserida
 }
 
-function editarMarca($id, $nome, $descricao, $imagem) {
+
+function editarMarca($id, $nome, $descricao, $imagem)
+{
     global $pdo;
     $stmt = $pdo->prepare("UPDATE marcas SET nome = ?, descricao = ?, caminho_imagem = ? WHERE id_marca = ?");
     $stmt->execute([$nome, $descricao, $imagem, $id]);
 }
 
-function eliminarMarca($id) {
+function eliminarMarca($id)
+{
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM marcas WHERE id_marca = ?");
     $stmt->execute([$id]);
@@ -574,7 +604,7 @@ function getPerfumesPorMarca($id_marca)
     }
 }
 
-function  buscarInformacoesMarca($id_marca)
+function buscarInformacoesMarca($id_marca)
 {
     global $liga; // Conexão usando mysqli
 
@@ -616,7 +646,8 @@ function buscarFamiliasOlfativas()
     return $familias; // Retorna o array de famílias
 }
 
-function buscarFamiliaPorNota() {
+function buscarFamiliaPorNota()
+{
     global $liga;
     $sql = "SELECT fn.id_nota, f.id_familia, f.nome_familia
             FROM familia_notas fn
@@ -683,7 +714,8 @@ function buscarDetalhesFamilia($id_familia)
 //==========================================
 #region NOTAS OLFATIVAS
 
-function buscarNotasOlfativas() {
+function buscarNotasOlfativas()
+{
     global $pdo;
     $stmt = $pdo->query("SELECT * FROM notas_geral ORDER BY nome_nota ASC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -694,7 +726,8 @@ function buscarNotasOlfativas() {
 // ==========================================
 #region ENCOMENDAS
 
-function listarEncomendas($estado = '') {
+function listarEncomendas($estado = '')
+{
     global $pdo;
     $sql = "SELECT e.*, u.username 
             FROM encomendas e 
@@ -709,7 +742,8 @@ function listarEncomendas($estado = '') {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function detalhesEncomenda($id_encomenda) {
+function detalhesEncomenda($id_encomenda)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT ep.*, p.nome AS nome_produto 
                            FROM encomenda_produtos ep 
@@ -719,33 +753,38 @@ function detalhesEncomenda($id_encomenda) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function alterarEstadoEncomenda($id_encomenda, $novo_estado) {
+function alterarEstadoEncomenda($id_encomenda, $novo_estado)
+{
     global $pdo;
     $stmt = $pdo->prepare("UPDATE encomendas SET estado = ? WHERE id_encomenda = ?");
     $stmt->execute([$novo_estado, $id_encomenda]);
 }
 
-function criarEncomenda($id_user, $total) {
+function criarEncomenda($id_user, $total)
+{
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO encomendas (id_user, total, data_encomenda) VALUES (?, ?, NOW())");
     $stmt->execute([$id_user, $total]);
     return $pdo->lastInsertId();
 }
 
-function adicionarProdutoEncomenda($id_encomenda, $id_produto, $quantidade, $preco_unitario) {
+function adicionarProdutoEncomenda($id_encomenda, $id_produto, $quantidade, $preco_unitario)
+{
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO encomenda_produtos (id_encomenda, id_produto, quantidade, preco_unitario) VALUES (?, ?, ?, ?)");
     $stmt->execute([$id_encomenda, $id_produto, $quantidade, $preco_unitario]);
 }
 
 
-function limparCarrinho($id_user) {
+function limparCarrinho($id_user)
+{
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM carrinho WHERE id_usuario = ?");
     $stmt->execute([$id_user]);
 }
 
-function atualizarStock($id_produto, $quantidadeVendida) {
+function atualizarStock($id_produto, $quantidadeVendida)
+{
     global $pdo;
     $stmt = $pdo->prepare("UPDATE perfumes SET stock = stock - ? WHERE id_perfume = ?");
     $stmt->execute([$quantidadeVendida, $id_produto]);
@@ -756,7 +795,8 @@ function atualizarStock($id_produto, $quantidadeVendida) {
 // ==========================================
 #region LOGIN E UTILIZADORES
 
-function logarUtilizador($email, $password) {
+function logarUtilizador($email, $password)
+{
     global $pdo; // Usar a conexão PDO global
 
     try {
@@ -775,25 +815,29 @@ function logarUtilizador($email, $password) {
         return false;
     }
 }
-function verificarTipoUsuario($id_usuario) {
+function verificarTipoUsuario($id_usuario)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT tipo FROM tbl_user WHERE id_user = :id_usuario");
     $stmt->execute(['id_usuario' => $id_usuario]);
     return $stmt->fetch(PDO::FETCH_ASSOC)['tipo'] ?? null;
 }
 
-function listarUtilizadores() {
+function listarUtilizadores()
+{
     global $pdo;
     return $pdo->query("SELECT id_user, username, email, tipo, criado_em FROM tbl_user ORDER BY criado_em DESC")->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function alterarTipoUtilizador($id_user, $novo_tipo) {
+function alterarTipoUtilizador($id_user, $novo_tipo)
+{
     global $pdo;
     $stmt = $pdo->prepare("UPDATE tbl_user SET tipo = ? WHERE id_user = ?");
     $stmt->execute([$novo_tipo, $id_user]);
 }
 
-function eliminarUtilizador($id_user) {
+function eliminarUtilizador($id_user)
+{
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM tbl_user WHERE id_user = ?");
     $stmt->execute([$id_user]);
@@ -805,7 +849,8 @@ function eliminarUtilizador($id_user) {
 #region CARRINHO
 
 
-function adicionarAoCarrinho($id_usuario, $id_produto, $quantidade = 1) {
+function adicionarAoCarrinho($id_usuario, $id_produto, $quantidade = 1)
+{
     global $pdo;
 
     // Verifica se o item já está no carrinho do usuário
@@ -829,7 +874,8 @@ function adicionarAoCarrinho($id_usuario, $id_produto, $quantidade = 1) {
 
 
 // Função para remover um item do carrinho
-function removerDoCarrinho($id_usuario, $id_produto) {
+function removerDoCarrinho($id_usuario, $id_produto)
+{
     global $pdo;
     $sql = "DELETE FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
     $stmt = $pdo->prepare($sql);
@@ -840,14 +886,15 @@ function removerDoCarrinho($id_usuario, $id_produto) {
 }
 
 // Função para buscar os itens do carrinho do usuário
-function buscarItensCarrinho($id_usuario) {
+function buscarItensCarrinho($id_usuario)
+{
     global $pdo;
 
     $sql = "SELECT c.id_produto, c.quantidade, p.nome, p.preco, p.caminho_imagem, p.stock
             FROM carrinho c
             JOIN perfumes p ON c.id_produto = p.id_perfume
             WHERE c.id_usuario = :id_usuario";
-    
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id_usuario' => $id_usuario]);
     $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -863,7 +910,8 @@ function buscarItensCarrinho($id_usuario) {
 }
 
 
-function contarItensCarrinho($id_usuario) {
+function contarItensCarrinho($id_usuario)
+{
     global $pdo;
 
     $sql = "SELECT SUM(quantidade) AS total_itens FROM carrinho WHERE id_usuario = :id_usuario";
@@ -874,7 +922,8 @@ function contarItensCarrinho($id_usuario) {
     return $result['total_itens'] ?? 0; // Se não houver itens, retorna 0
 }
 
-function atualizarQuantidadeCarrinho($id_usuario, $id_produto, $quantidade) {
+function atualizarQuantidadeCarrinho($id_usuario, $id_produto, $quantidade)
+{
     global $pdo;
 
     // Verifica se o produto existe no carrinho
@@ -905,7 +954,8 @@ function atualizarQuantidadeCarrinho($id_usuario, $id_produto, $quantidade) {
 // ==========================================
 #region FAVORITOS
 
-function adicionarAosFavoritos($id_user, $id_produto) {
+function adicionarAosFavoritos($id_user, $id_produto)
+{
     global $pdo;
 
     // Verifica se o produto já está na wishlist
@@ -923,7 +973,8 @@ function adicionarAosFavoritos($id_user, $id_produto) {
 }
 
 // Remover um produto da wishlist
-function removerDosFavoritos($id_user, $id_produto) {
+function removerDosFavoritos($id_user, $id_produto)
+{
     global $pdo;
     $sql = "DELETE FROM wishlist WHERE id_user = :id_user AND id_produto = :id_produto";
     $stmt = $pdo->prepare($sql);
@@ -931,23 +982,25 @@ function removerDosFavoritos($id_user, $id_produto) {
 }
 
 // Verificar se um produto está na wishlist
-function verificarFavorito($id_user, $id_produto) {
+function verificarFavorito($id_user, $id_produto)
+{
     global $pdo;
     $sql = "SELECT * FROM wishlist WHERE id_user = :id_user AND id_produto = :id_produto";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
     return $stmt->fetch() ? true : false;
 }
-    
-function buscarWishlist($id_usuario) {
+
+function buscarWishlist($id_usuario)
+{
     global $pdo;
-    
+
     $sql = "SELECT w.id_produto, p.id_perfume, p.nome, p.preco, p.caminho_imagem, p.stock, m.nome AS marca
             FROM wishlist w
             JOIN perfumes p ON w.id_produto = p.id_perfume
             JOIN marcas m ON p.id_marca = m.id_marca
             WHERE w.id_user = :id_usuario";
-    
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id_usuario' => $id_usuario]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -958,14 +1011,16 @@ function buscarWishlist($id_usuario) {
 // ==========================================
 #region EMAIL & BASE64
 
-function buscarEmailUsuario($id_user) {
+function buscarEmailUsuario($id_user)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT email FROM tbl_user WHERE id_user = ?");
     $stmt->execute([$id_user]);
     return $stmt->fetchColumn();
 }
 
-function imgToBase64($path) {
+function imgToBase64($path)
+{
     $type = pathinfo($path, PATHINFO_EXTENSION);
     $data = file_get_contents($path);
     return 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -973,4 +1028,51 @@ function imgToBase64($path) {
 
 #endregion
 // ==========================================
+// ==========================================
+#region DASHBOARD
+
+function contarPerfumes() {
+    global $pdo;
+    return $pdo->query("SELECT COUNT(*) FROM perfumes")->fetchColumn();
+}
+
+function contarMarcas() {
+    global $pdo;
+    return $pdo->query("SELECT COUNT(*) FROM marcas")->fetchColumn();
+}
+
+function contarEncomendas() {
+    global $pdo;
+    return $pdo->query("SELECT COUNT(*) FROM encomendas")->fetchColumn();
+}
+
+function contarUtilizadores() {
+    global $pdo;
+    return $pdo->query("SELECT COUNT(*) FROM tbl_user")->fetchColumn();
+}
+
+function somarTotalVendas() {
+    global $pdo;
+    $total = $pdo->query("SELECT SUM(total) FROM encomendas")->fetchColumn();
+    return $total ?? 0;
+}
+
+function encomendasUltimosMeses($limite = 6) {
+    global $pdo;
+    $sql = "
+        SELECT DATE_FORMAT(data_encomenda, '%Y-%m') AS mes, COUNT(*) AS total
+        FROM encomendas
+        GROUP BY mes
+        ORDER BY mes DESC
+        LIMIT :limite
+    ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+#endregion
+// ==========================================
+
 ?>
