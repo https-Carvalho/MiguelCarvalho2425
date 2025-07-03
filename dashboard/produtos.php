@@ -83,158 +83,156 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <?php include('admin_layout.php'); ?>
 
-    <div class="container-geral">
-        <div class="main-content">
-            <h1>Adicionar Produto</h1>
-            <?php if (!empty($_SESSION['sucesso'])): ?>
-                <div class="alerta sucesso"><?= $_SESSION['sucesso'] ?></div>
-                <?php unset($_SESSION['sucesso']); ?>
-            <?php endif; ?>
+    <div class="main-content">
+        <h1>Adicionar Produto</h1>
+        <?php if (!empty($_SESSION['sucesso'])): ?>
+            <div class="alerta sucesso"><?= $_SESSION['sucesso'] ?></div>
+            <?php unset($_SESSION['sucesso']); ?>
+        <?php endif; ?>
 
-            <?php if (!empty($_SESSION['erro'])): ?>
-                <div class="alerta erro"><?= $_SESSION['erro'] ?></div>
-                <?php unset($_SESSION['erro']); ?>
-            <?php endif; ?>
+        <?php if (!empty($_SESSION['erro'])): ?>
+            <div class="alerta erro"><?= $_SESSION['erro'] ?></div>
+            <?php unset($_SESSION['erro']); ?>
+        <?php endif; ?>
 
-            <form method="post" enctype="multipart/form-data" class="form-container">
-                <div class="linha-superior">
-                    <div class="form-left">
-                        <label>Nome:</label>
-                        <input type="text" name="nome" required>
+        <form method="post" enctype="multipart/form-data" class="form-container">
+            <div class="linha-superior">
+                <div class="form-left">
+                    <label>Nome:</label>
+                    <input type="text" name="nome" required>
 
-                        <label>Descrição:</label>
-                        <textarea name="descricao" required></textarea>
+                    <label>Descrição:</label>
+                    <textarea name="descricao" required></textarea>
 
-                        <label>Preço:</label>
-                        <input type="number" step="0.01" name="preco" required>
+                    <label>Preço:</label>
+                    <input type="number" step="0.01" name="preco" required>
 
-                        <label>Stock:</label>
-                        <input type="number" name="stock" required>
+                    <label>Stock:</label>
+                    <input type="number" name="stock" required>
 
-                        <label>Marca:</label>
-                        <select name="id_marca" required>
-                            <option value="">-- Escolha a Marca --</option>
-                            <?php foreach ($marcas as $marca): ?>
-                                <option value="<?= $marca['id_marca'] ?>"><?= htmlspecialchars($marca['nome']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-right">
-                        <fieldset>
-                            <legend>Notas Olfativas</legend>
-                            <div class="dropdown-notas">
-                                <button type="button" onclick="toggleDropdown('topo')">Notas de Topo</button>
-                                <div class="dropdown-list" id="dropdown-topo">
-                                    <?php foreach ($notas_gerais as $nota): ?>
-                                        <label>
-                                            <input type="checkbox" name="notas_topo[]" value="<?= $nota['id_nota'] ?>">
-                                            <?= htmlspecialchars($nota['nome_nota']) ?>
-                                        </label>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <div class="dropdown-notas">
-                                <button type="button" onclick="toggleDropdown('coracao')">Notas de Coração</button>
-                                <div class="dropdown-list" id="dropdown-coracao">
-                                    <?php foreach ($notas_gerais as $nota): ?>
-                                        <label>
-                                            <input type="checkbox" name="notas_coracao[]" value="<?= $nota['id_nota'] ?>">
-                                            <?= htmlspecialchars($nota['nome_nota']) ?>
-                                        </label>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <div class="dropdown-notas">
-                                <button type="button" onclick="toggleDropdown('base')">Notas de Base</button>
-                                <div class="dropdown-list" id="dropdown-base">
-                                    <?php foreach ($notas_gerais as $nota): ?>
-                                        <label>
-                                            <input type="checkbox" name="notas_base[]" value="<?= $nota['id_nota'] ?>">
-                                            <?= htmlspecialchars($nota['nome_nota']) ?>
-                                        </label>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        </fieldset>
-                        <div class="familia-info">
-                            Família Olfativa Prevista: <span id="nome-familia">Desconhecida</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="imagens-section">
-                    <div class="imagem-bloco">
-                        <label>Imagem Principal:</label>
-                        <input type="file" name="imagem" accept="image/*">
-                        <div class="galeria-item" style="display: none;">
-                            <img src="" alt="Imagem principal">
-                            <span class="tipo-imagem">Principal</span>
-                            <a href="#" class="btn-remover-imagem">×</a>
-                        </div>
-                    </div>
-                    <div class="imagem-bloco">
-                        <label>Imagem Hover:</label>
-                        <input type="file" name="imagem_hover" accept="image/*">
-                        <div class="galeria-item" style="display: none;">
-                            <img src="" alt="Imagem hover">
-                            <span class="tipo-imagem">Hover</span>
-                            <a href="#" class="btn-remover-imagem">×</a>
-                        </div>
-                    </div>
-                    <div class="imagem-bloco-adicionais-wrapper">
-                        <label>Imagens Adicionais (até 3):</label>
-                        <div class="imagem-bloco-adicionais">
-                            <?php for ($i = 0; $i < 3; $i++): ?>
-                                <div class="slot">
-                                    <input type="file" name="imagens_adicionais[]" accept="image/*">
-                                    <div class="galeria-item" style="display: none;">
-                                        <img src="" alt="Imagem adicional">
-                                        <span class="tipo-imagem">Adicional</span>
-                                        <a href="#" class="btn-remover-imagem">×</a>
-                                    </div>
-                                </div>
-                            <?php endfor; ?>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="botao-submit">Adicionar Produto</button>
-            </form>
-
-            <div class="tabela-produtos">
-                <h2>Produtos Existentes</h2>
-                <input type="text" id="pesquisa-produtos" placeholder="Pesquisar produtos..." autocomplete="off"
-                    style="padding: 10px; width: 100%; max-width: 400px; border-radius: 6px; border: 1px solid #ccc;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Preço</th>
-                            <th>Stock</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($produtos as $produto): ?>
-                            <tr>
-                                <td><?= $produto['id_perfume'] ?></td>
-                                <td><?= htmlspecialchars($produto['nome']) ?></td>
-                                <td><?= number_format($produto['preco'], 2) ?> €</td>
-                                <td><?= $produto['stock'] ?></td>
-                                <td>
-                                    <a href="editar_produto.php?id=<?= $produto['id_perfume'] ?>"
-                                        class="editar-link">Editar</a>
-                                    <a href="eliminar_produto.php?id=<?= $produto['id_perfume'] ?>"
-                                        class="eliminar-link">Eliminar</a>
-                                </td>
-                            </tr>
+                    <label>Marca:</label>
+                    <select name="id_marca" required>
+                        <option value="">-- Escolha a Marca --</option>
+                        <?php foreach ($marcas as $marca): ?>
+                            <option value="<?= $marca['id_marca'] ?>"><?= htmlspecialchars($marca['nome']) ?></option>
                         <?php endforeach; ?>
-                    </tbody>
-                </table>
+                    </select>
+                </div>
+
+                <div class="form-right">
+                    <fieldset>
+                        <legend>Notas Olfativas</legend>
+                        <div class="dropdown-notas">
+                            <button type="button" onclick="toggleDropdown('topo')">Notas de Topo</button>
+                            <div class="dropdown-list" id="dropdown-topo">
+                                <?php foreach ($notas_gerais as $nota): ?>
+                                    <label>
+                                        <input type="checkbox" name="notas_topo[]" value="<?= $nota['id_nota'] ?>">
+                                        <?= htmlspecialchars($nota['nome_nota']) ?>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <div class="dropdown-notas">
+                            <button type="button" onclick="toggleDropdown('coracao')">Notas de Coração</button>
+                            <div class="dropdown-list" id="dropdown-coracao">
+                                <?php foreach ($notas_gerais as $nota): ?>
+                                    <label>
+                                        <input type="checkbox" name="notas_coracao[]" value="<?= $nota['id_nota'] ?>">
+                                        <?= htmlspecialchars($nota['nome_nota']) ?>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <div class="dropdown-notas">
+                            <button type="button" onclick="toggleDropdown('base')">Notas de Base</button>
+                            <div class="dropdown-list" id="dropdown-base">
+                                <?php foreach ($notas_gerais as $nota): ?>
+                                    <label>
+                                        <input type="checkbox" name="notas_base[]" value="<?= $nota['id_nota'] ?>">
+                                        <?= htmlspecialchars($nota['nome_nota']) ?>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="familia-info">
+                        Família Olfativa Prevista: <span id="nome-familia">Desconhecida</span>
+                    </div>
+                </div>
             </div>
+
+            <div class="imagens-section">
+                <div class="imagem-bloco">
+                    <label>Imagem Principal:</label>
+                    <input type="file" name="imagem" accept="image/*">
+                    <div class="galeria-item" style="display: none;">
+                        <img src="" alt="Imagem principal">
+                        <span class="tipo-imagem">Principal</span>
+                        <a href="#" class="btn-remover-imagem">×</a>
+                    </div>
+                </div>
+                <div class="imagem-bloco">
+                    <label>Imagem Hover:</label>
+                    <input type="file" name="imagem_hover" accept="image/*">
+                    <div class="galeria-item" style="display: none;">
+                        <img src="" alt="Imagem hover">
+                        <span class="tipo-imagem">Hover</span>
+                        <a href="#" class="btn-remover-imagem">×</a>
+                    </div>
+                </div>
+                <div class="imagem-bloco-adicionais-wrapper">
+                    <label>Imagens Adicionais (até 3):</label>
+                    <div class="imagem-bloco-adicionais">
+                        <?php for ($i = 0; $i < 3; $i++): ?>
+                            <div class="slot">
+                                <input type="file" name="imagens_adicionais[]" accept="image/*">
+                                <div class="galeria-item" style="display: none;">
+                                    <img src="" alt="Imagem adicional">
+                                    <span class="tipo-imagem">Adicional</span>
+                                    <a href="#" class="btn-remover-imagem">×</a>
+                                </div>
+                            </div>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="botao-submit">Adicionar Produto</button>
+        </form>
+
+        <div class="tabela-produtos">
+            <h2>Produtos Existentes</h2>
+            <input type="text" id="pesquisa-produtos" placeholder="Pesquisar produtos..." autocomplete="off"
+                style="padding: 10px; width: 100%; max-width: 400px; border-radius: 6px; border: 1px solid #ccc;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Preço</th>
+                        <th>Stock</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($produtos as $produto): ?>
+                        <tr>
+                            <td><?= $produto['id_perfume'] ?></td>
+                            <td><?= htmlspecialchars($produto['nome']) ?></td>
+                            <td><?= number_format($produto['preco'], 2) ?> €</td>
+                            <td><?= $produto['stock'] ?></td>
+                            <td>
+                                <a href="editar_produto.php?id=<?= $produto['id_perfume'] ?>" class="editar-link">Editar</a>
+                                <a href="eliminar_produto.php?id=<?= $produto['id_perfume'] ?>"
+                                    class="eliminar-link">Eliminar</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
+    </div>
     </div>
 
     <script>

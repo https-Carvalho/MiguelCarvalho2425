@@ -398,10 +398,10 @@ function buscarImagensPerfumeComId($idPerfume)
 
 function guardarImagem($file)
 {
-    $pasta = 'uploads/';
+    $pasta = 'images/'; // Pasta real e visível no frontend
     $nomeFinal = $pasta . uniqid() . '_' . basename($file['name']);
     move_uploaded_file($file['tmp_name'], $nomeFinal);
-    return $nomeFinal;
+    return $nomeFinal; // Caminho a guardar na base de dados
 }
 
 function inserirImagensAdicionais($id_perfume, $files)
@@ -663,6 +663,38 @@ function buscarFamiliaPorNota()
     return $mapa;
 }
 
+function inserirFamilia($nome, $descricao) {
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO familias_olfativas (nome_familia, descricao) VALUES (?, ?)");
+    return $stmt->execute([$nome, $descricao]);
+}
+
+function editarFamilia($id, $nome, $descricao) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE familias_olfativas SET nome_familia = ?, descricao = ? WHERE id_familia = ?");
+    return $stmt->execute([$nome, $descricao, $id]);
+}
+
+function eliminarFamilia($id_familia) {
+    global $pdo;
+    $pdo->prepare("DELETE FROM familia_notas WHERE id_familia = ?")->execute([$id_familia]);
+    return $pdo->prepare("DELETE FROM familias_olfativas WHERE id_familia = ?")->execute([$id_familia]);
+}
+
+function buscarNotasDaFamilia($id_familia) {
+    global $pdo;
+    $stmt = $pdo->prepare("
+        SELECT ng.id_nota, ng.nome_nota
+        FROM familia_notas fn
+        JOIN notas_geral ng ON fn.id_nota = ng.id_nota
+        WHERE fn.id_familia = ?
+        ORDER BY ng.nome_nota
+    ");
+    $stmt->execute([$id_familia]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
 
 function buscarPerfumesPorFamilia($id_familia)
 {
@@ -719,6 +751,49 @@ function buscarNotasOlfativas()
     global $pdo;
     $stmt = $pdo->query("SELECT * FROM notas_geral ORDER BY nome_nota ASC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function inserirNotaEmFamilia($id_familia, $nome)
+{
+    global $pdo;
+    $pdo->beginTransaction();
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO notas_geral (nome_nota) VALUES (?)");
+        $stmt->execute([$nome]);
+        $id_nota = $pdo->lastInsertId();
+
+        $stmt2 = $pdo->prepare("INSERT INTO familia_notas (id_familia, id_nota) VALUES (?, ?)");
+        $stmt2->execute([$id_familia, $id_nota]);
+
+        $pdo->commit();
+        return true;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        return false;
+    }
+}
+
+function editarNotaGeral($id_nota, $novo_nome)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE notas_geral SET nome_nota = ? WHERE id_nota = ?");
+    return $stmt->execute([$novo_nome, $id_nota]);
+}
+
+function removerNotaDeFamilia($id_familia, $id_nota)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("DELETE FROM familia_notas WHERE id_familia = ? AND id_nota = ?");
+    $stmt->execute([$id_familia, $id_nota]);
+
+    // Elimina nota se não estiver em mais nenhuma família
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM familia_notas WHERE id_nota = ?");
+    $stmt->execute([$id_nota]);
+    if ($stmt->fetchColumn() == 0) {
+        $stmt = $pdo->prepare("DELETE FROM notas_geral WHERE id_nota = ?");
+        $stmt->execute([$id_nota]);
+    }
 }
 
 #endregion
