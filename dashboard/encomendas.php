@@ -32,7 +32,7 @@ $encomendas = listarEncomendas(); // usa a função existente no config.php
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Numero</th>
                     <th>Cliente</th>
                     <th>Data</th>
                     <th>Total</th>

@@ -8,6 +8,14 @@ if (!isset($_SESSION['id_user'])) {
 }
 
 $id_usuario = $_SESSION['id_user'];
+$tipo_usuario = verificarTipoUsuario($id_usuario);
+
+// Redireciona se não for cliente ou visitante
+if (!in_array($tipo_usuario, ['cliente', 'visitante'])) {
+    header("Location: index.php");
+    exit();
+}
+
 
 
 // Buscar itens do carrinho

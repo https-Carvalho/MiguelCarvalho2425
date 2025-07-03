@@ -257,7 +257,7 @@ function eliminarPerfume($id)
     $stmt->execute([$id]);
 }
 
-function buscarInformacoesComNotas($idPerfume)
+function buscarInformacoesComNotas($idPerfume, $comIds = false)
 {
     global $liga;
 
@@ -301,9 +301,9 @@ function buscarInformacoesComNotas($idPerfume)
         return null;
     }
 
-    // Agora vamos buscar as notas como já tinhas
+    // Query para buscar as notas (sempre traz nome e tipo, opcionalmente id)
     $sqlNotas = "SELECT 
-                    notas_geral.id_nota,
+                    " . ($comIds ? "notas_geral.id_nota," : "") . "
                     notas_geral.nome_nota,
                     perfume_notas.tipo_nota
                 FROM 
@@ -336,11 +336,15 @@ function buscarInformacoesComNotas($idPerfume)
 
     while ($nota = mysqli_fetch_assoc($resultNotas)) {
         $tipoNota = strtolower($nota['tipo_nota']);
-        if (isset($notas[$tipoNota])) {
+        if (!isset($notas[$tipoNota])) continue;
+
+        if ($comIds) {
             $notas[$tipoNota][] = [
                 'id_nota' => (int) $nota['id_nota'],
                 'nome_nota' => $nota['nome_nota']
             ];
+        } else {
+            $notas[$tipoNota][] = $nota['nome_nota'];
         }
     }
 
@@ -870,26 +874,21 @@ function atualizarStock($id_produto, $quantidadeVendida)
 // ==========================================
 #region LOGIN E UTILIZADORES
 
-function logarUtilizador($email, $password)
-{
-    global $pdo; // Usar a conexão PDO global
+function logarUtilizador($email, $password) {
+    global $liga;
+    $stmt = mysqli_prepare($liga, "SELECT * FROM tbl_user WHERE email = ?");
+    mysqli_stmt_bind_param($stmt, 's', $email);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    $utilizador = mysqli_fetch_assoc($resultado);
 
-    try {
-        // Busca o usuário pelo email e senha
-        $sql = "SELECT * FROM tbl_user WHERE email = :email AND password = :password LIMIT 1";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->bindValue(':password', $password, PDO::PARAM_STR);
-        $stmt->execute();
-
-        // Retorna os dados do usuário se encontrado
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        // Lida com erros no banco de dados
-        error_log("Erro no login: " . $e->getMessage());
-        return false;
+    if ($utilizador && password_verify($password, $utilizador['password'])) {
+        return $utilizador;
     }
+
+    return false;
 }
+
 function verificarTipoUsuario($id_usuario)
 {
     global $pdo;
@@ -916,6 +915,25 @@ function eliminarUtilizador($id_user)
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM tbl_user WHERE id_user = ?");
     $stmt->execute([$id_user]);
+}
+
+function obterUsuarioPorEmail($email) {
+    global $liga;
+    $stmt = mysqli_prepare($liga, "SELECT * FROM tbl_user WHERE email = ?");
+    mysqli_stmt_bind_param($stmt, 's', $email);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($resultado);
+}
+
+
+
+// Atualiza a senha do utilizador
+function atualizarSenhaPorId($id_user, $novaSenhaHash) {
+    global $liga;
+    $stmt = mysqli_prepare($liga, "UPDATE tbl_user SET password = ? WHERE id_user = ?");
+    mysqli_stmt_bind_param($stmt, 'si', $novaSenhaHash, $id_user);
+    mysqli_stmt_execute($stmt);
 }
 
 #endregion
@@ -1149,5 +1167,6 @@ function encomendasUltimosMeses($limite = 6) {
 
 #endregion
 // ==========================================
+
 
 ?>

@@ -1,3 +1,22 @@
+<?php
+
+$totalCarrinho = isset($_SESSION['id_user']) ? contarItensCarrinho($_SESSION['id_user']) : 0;
+
+$mostrar_carrinho = true;
+
+if (isset($_SESSION['id_user'])) {
+    $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']);
+
+    if (in_array($tipo_usuario, ['admin', 'trabalhador'])) {
+        $mostrar_carrinho = false;
+    }
+} else {
+    $tipo_usuario = 'visitante'; // padrão para visitantes
+}
+?>
+
+
+
 <nav class="menu">
     <div class="logo">
         <a href="index.php">LuxFragrance</a>

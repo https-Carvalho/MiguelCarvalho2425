@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Numero</th>
                             <th>Nome</th>
                             <th>Ações</th>
                         </tr>

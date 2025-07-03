@@ -8,6 +8,7 @@ if (!isset($_SESSION['id_user'])) {
     exit();
 }
 
+
 $id_usuario = $_SESSION['id_user'];
 $wishlist = buscarWishlist($id_usuario); // Função que busca os itens da wishlist do usuário
 

@@ -1122,7 +1122,6 @@ body {
 
 /* #endregion */
 
-
 /* #region Responsividade */
 
 @media (max-width: 1024px) {
@@ -1460,7 +1459,6 @@ body {
 }
 
 /* #endregion */
-
 
 /* #region css do icon do perfil */
 .user-dropdown {
@@ -1812,6 +1810,202 @@ body.visitante .carrinho-menu {
     font-size: 16px;
     color: #777;
     margin-top: 20px;
+}
+
+/* #endregion */
+
+/* #region Login Page */
+.form-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+
+.login-box {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
+}
+
+.login-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+.login-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.login-input:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #c59b76;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #a5805f;
+}
+
+.login-error {
+    color: red;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.login-recovery {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.login-recovery a {
+    color: #555;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+.login-recovery a:hover {
+    color: #000;
+}
+/* #endregion */
+
+/* #region Recuperação de Palavra-passe */
+.form-recuperacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.recuperacao-box {
+    background-color: #fff;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    min-width: 280px;
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+}
+
+.recuperacao-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.recuperacao-input {
+    width: 100%;
+    padding: 12px;
+    margin: 12px 0 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border 0.2s;
+}
+
+.recuperacao-input:focus {
+    border-color: #b98c66;
+    outline: none;
+    box-shadow: 0 0 4px rgba(185, 140, 102, 0.3);
+}
+
+.recuperacao-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #c59b76;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.recuperacao-button:hover {
+    background-color: #a87f5d;
+}
+
+.recuperacao-erro {
+    color: #d9534f;
+    background-color: #fcebea;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.recuperacao-sucesso {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+.senha-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.senha-container input {
+    flex: 1;
+}
+
+.toggle-btn {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #555;
+    padding: 0;
 }
 
 /* #endregion */

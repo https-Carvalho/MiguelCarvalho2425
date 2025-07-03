@@ -15,7 +15,7 @@ if ($id_perfume <= 0) {
     exit();
 }
 
-$perfume = buscarInformacoesComNotas($id_perfume);
+$perfume = buscarInformacoesComNotas($id_perfume, true);
 $imagens = buscarImagensPerfumeComId($id_perfume); // com ID
 $notas_gerais = buscarNotasOlfativas();
 

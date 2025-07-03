@@ -29,79 +29,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        form {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        fieldset {
-            border: none;
-        }
-        legend {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #333;
-            text-align: center;
-        }
-        label {
-            font-weight: bold;
-            margin-top: 10px;
-            display: block;
-            color: #333;
-        }
-        input[type="email"],
-        input[type="password"],
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-        .error {
-            color: red;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+
 </head>
+
 <body>
-    <form method="POST" action="login.php">
-        <fieldset>
-            <legend>Login</legend>
+    <form method="POST" action="login.php" class="form-login">
+        <fieldset class="login-box">
+            <legend class="login-title">Login</legend>
+
             <?php if (!empty($erro)): ?>
-                <p class="error"><?php echo htmlspecialchars($erro); ?></p>
+                <p class="login-error"><?php echo htmlspecialchars($erro); ?></p>
             <?php endif; ?>
+
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" required class="login-input">
+
             <label for="password">Senha</label>
-            <input type="password" id="password" name="password" required>
-            <input type="submit" value="Entrar">
+            <input type="password" id="password" name="password" required class="login-input">
+
+            <input type="submit" value="Entrar" class="login-button">
+
+            <p class="login-recovery">
+                <a href="recuperar_password.php">Esqueceu a palavra-passe?</a>
+            </p>
         </fieldset>
     </form>
+
 </body>
+
 </html>

@@ -33,19 +33,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
 }
 
 
-// Define a variável de controle
-$mostrar_carrinho = true;
-
-// Verifica se o usuário está logado
-if (isset($_SESSION['id_user'])) {
-    $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']); // Obtém o tipo do usuário
-
-    // Se for admin ou trabalhador, oculta o carrinho
-    if ($tipo_usuario === "admin" || $tipo_usuario === "trabalhador") {
-        $mostrar_carrinho = false;
-    }
-}
-
 // Verifica se o ID da marca foi passado
 if (!isset($_GET['id'])) {
     die('Marca não especificada.');

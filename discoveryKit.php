@@ -4,23 +4,9 @@ include('config.php'); // Inclui a configuração da base de dados e a função 
 
 // Verifica o tipo do usuário
 $id_usuario = $_SESSION['id_user'] ?? null;
-$tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
+$tipo_usuario = $id_usuario ? verificarTipoUsuario(id_usuario: $id_usuario) : 'visitante';
 
-// Obtém a quantidade de itens no carrinho do usuário logado
-$totalCarrinho = isset($_SESSION['id_user']) ? contarItensCarrinho($_SESSION['id_user']) : 0;
 
-// Define a variável de controle
-$mostrar_carrinho = true;
-
-// Verifica se o usuário está logado
-if (isset($_SESSION['id_user'])) {
-    $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']); // Obtém o tipo do usuário
-
-    // Se for admin ou trabalhador, oculta o carrinho
-    if ($tipo_usuario === "admin" || $tipo_usuario === "trabalhador") {
-        $mostrar_carrinho = false;
-    }
-}
 
 // Função de busca AJAX
 if (isset($_GET['kit_ajax']) && $_GET['kit_ajax'] === '1') {

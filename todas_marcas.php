@@ -2,8 +2,6 @@
 session_start();
 include('config.php'); // Inclui a configuração da base de dados e as funções
 
-$totalCarrinho = isset($_SESSION['id_user']) ? contarItensCarrinho($_SESSION['id_user']) : 0;
-
 if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     $termo = isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '';
     $perfumes = listarPerfumes($termo);
