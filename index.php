@@ -1,11 +1,18 @@
 <?php
 session_start();
-include('config.php'); // Inclui a configuração da base de dados
+include('config.php'); // Conexão com a base de dados
 
-// Obtém a quantidade de itens no carrinho do usuário logado
-$id_usuario = $_SESSION['id_user'] ?? null;
-$tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
+// Autenticação e identificação do utilizador
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
 
+// Carrinho só para cliente
+$totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
+    ? contarItensCarrinho($id_sessao)
+    : 0;
+
+$mostrar_carrinho = !in_array($tipo_utilizador, ['Admin', 'trabalhador']);
 
 //funcao de busca
 if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
@@ -45,7 +52,10 @@ $pagina = isset($_GET['pagina']) && is_numeric($_GET['pagina']) ? (int) $_GET['p
 $limite = 10; // Número de perfumes por página
 
 // 🔹 CHAMADA ÚNICA DA FUNÇÃO LISTAR PERFUMES (Pesquisa + Filtros)
-$perfumes = listarPerfumes($termo, $precoMin, $precoMax, $filtroMarcas, $filtroFamilias, $disponibilidade, $pagina);
+$ordenacao = $_GET['ordenar'] ?? '';
+$perfumes = listarPerfumes($termo, $precoMin, $precoMax, $filtroMarcas, $filtroFamilias, $disponibilidade, $ordenacao);
+
+
 
 //paginacao
 $totalPerfumes = contarTotalPerfumes($termo, $precoMin, $precoMax, $filtroMarcas, $filtroFamilias, $disponibilidade);
@@ -146,19 +156,22 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
             </div>
 
             <!-- Botão de Aplicar Filtros -->
-            <button type="submit">Aplicar Filtros</button>
+            <button class="aplicar-filtros" type="submit">Aplicar Filtros</button>
         </div>
 
         <div class="ordenar-wrapper">
             <label for="ordenar">Ordenar por:</label>
-            <select id="ordenar">
+            <select id="ordenar" name="ordenar" onchange="this.form.submit()">
                 <option value="">Padrão</option>
-                <option value="az">Alfabeticamente, A-Z</option>
-                <option value="za">Alfabeticamente, Z-A</option>
-                <option value="preco_menor">Preço, mais baratos</option>
-                <option value="preco_maior">Preço, mais caros</option>
+                <option value="az" <?= $ordenacao === 'az' ? 'selected' : '' ?>>Alfabeticamente, A-Z</option>
+                <option value="za" <?= $ordenacao === 'za' ? 'selected' : '' ?>>Alfabeticamente, Z-A</option>
+                <option value="preco_menor" <?= $ordenacao === 'preco_menor' ? 'selected' : '' ?>>Preço, mais baratos
+                </option>
+                <option value="preco_maior" <?= $ordenacao === 'preco_maior' ? 'selected' : '' ?>>Preço, mais caros
+                </option>
             </select>
         </div>
+
 
     </form>
 
@@ -348,35 +361,8 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
         });
     </script>
 
-    <!-- script para ordenar Alfabeticamente e por preco -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const selectOrdenar = document.getElementById("ordenar");
-            const listaFragrancias = document.querySelector(".lista-fragrancias");
-            let itensOriginais = Array.from(listaFragrancias.children); // Guarda a ordem original
 
-            selectOrdenar.addEventListener("change", function () {
-                let ordem = selectOrdenar.value;
-                let itens = [...itensOriginais]; // Restaura a ordem original
 
-                if (ordem === "az") {
-                    itens.sort((a, b) => a.querySelector("h2").innerText.toLowerCase().localeCompare(b.querySelector("h2").innerText.toLowerCase()));
-                } else if (ordem === "za") {
-                    itens.sort((a, b) => b.querySelector("h2").innerText.toLowerCase().localeCompare(a.querySelector("h2").innerText.toLowerCase()));
-                } else if (ordem === "preco_menor") {
-                    itens.sort((a, b) => parseFloat(a.querySelector(".preco").innerText.replace(" €", "").replace(",", ".")) -
-                        parseFloat(b.querySelector(".preco").innerText.replace(" €", "").replace(",", ".")));
-                } else if (ordem === "preco_maior") {
-                    itens.sort((a, b) => parseFloat(b.querySelector(".preco").innerText.replace(" €", "").replace(",", ".")) -
-                        parseFloat(a.querySelector(".preco").innerText.replace(" €", "").replace(",", ".")));
-                }
-
-                // Atualiza a lista na tela
-                itens.forEach(item => listaFragrancias.appendChild(item));
-            });
-        });
-    </script>
-    
 </body>
 
 </html>

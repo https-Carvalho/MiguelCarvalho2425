@@ -3,9 +3,17 @@ session_start();
 include('config.php'); // Inclui a configuração da base de dados e a função listarPerfumes
 
 // Verifica o tipo do usuário
-$id_usuario = $_SESSION['id_user'] ?? null;
-$tipo_usuario = $id_usuario ? verificarTipoUsuario(id_usuario: $id_usuario) : 'visitante';
+// Autenticação e identificação do utilizador
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
 
+// Carrinho só para cliente
+$totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
+    ? contarItensCarrinho($id_sessao)
+    : 0;
+
+$mostrar_carrinho = !in_array($tipo_utilizador, ['Admin', 'trabalhador']);
 
 
 // Função de busca AJAX

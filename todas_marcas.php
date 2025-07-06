@@ -2,6 +2,18 @@
 session_start();
 include('config.php'); // Inclui a configuração da base de dados e as funções
 
+// Autenticação e identificação do utilizador
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+
+// Carrinho só para cliente
+$totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
+    ? contarItensCarrinho($id_sessao)
+    : 0;
+
+$mostrar_carrinho = !in_array($tipo_utilizador, ['Admin', 'trabalhador']);
+
 if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
     $termo = isset($_GET['q']) ? htmlspecialchars($_GET['q']) : '';
     $perfumes = listarPerfumes($termo);

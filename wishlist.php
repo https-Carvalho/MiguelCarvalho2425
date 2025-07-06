@@ -2,17 +2,30 @@
 session_start();
 include('config.php'); // Conexão com a base de dados
 
-// Verifica se o usuário está logado
-if (!isset($_SESSION['id_user'])) {
+// ⚠️ Apenas permite clientes
+if (!isset($_SESSION['id_sessao']) || $_SESSION['tipo_utilizador'] !== 'cliente') {
     header("Location: login.php");
     exit();
 }
 
+$id_sessao = $_SESSION['id_sessao'];
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+if ($tipo_utilizador == 'cliente') {
+    $id_cliente = $id_sessao;
+}
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+$totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
+    ? contarItensCarrinho($id_sessao)
+    : 0;
 
-$id_usuario = $_SESSION['id_user'];
-$wishlist = buscarWishlist($id_usuario); // Função que busca os itens da wishlist do usuário
+$mostrar_carrinho = !in_array($tipo_utilizador, ['Admin', 'trabalhador']);
 
-$totalCarrinho = isset($_SESSION['id_user']) ? contarItensCarrinho($_SESSION['id_user']) : 0;
+// Garante que é mesmo cliente
+if ($tipo_utilizador !== 'cliente') {
+    header("Location: index.php");
+    exit();
+}
+$wishlist = buscarWishlist($id_sessao, $tipo_utilizador);
 
 $marcas = buscarMarcasAgrupadas();
 $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famílias olfativas
@@ -32,7 +45,6 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
 <body>
     <!-- Menu de Navegação -->
     <?php include('menu.php'); ?>
-
     <div class="wishlist-container">
         <h1>Minha Wishlist</h1>
         <?php if (!empty($wishlist)): ?>
@@ -47,9 +59,11 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                 <tbody>
                     <?php foreach ($wishlist as $item): ?>
                         <tr>
-                            <td class="wishlist-produto-info">
-                                <img src="<?php echo htmlspecialchars($item['caminho_imagem']); ?>" class="wishlist-imagem">
-                                <div class="wishlist-nome"><?php echo htmlspecialchars($item['nome']); ?></div>
+                            <td>
+                                <div class="wishlist-produto-info">
+                                    <img src="<?php echo htmlspecialchars($item['caminho_imagem']); ?>" class="wishlist-imagem">
+                                    <div class="wishlist-nome"><?php echo htmlspecialchars($item['nome']); ?></div>
+                                </div>
                             </td>
                             <td class="wishlist-preco"><?php echo number_format($item['preco'], 2, ',', ' ') . ' €'; ?></td>
                             <td class="wishlist-acoes">
@@ -65,6 +79,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
             <p class="wishlist-vazia">Sua wishlist está vazia.</p>
         <?php endif; ?>
     </div>
+
 
 
     <!-- Script para Remover da Wishlist e Adicionar ao Carrinho -->

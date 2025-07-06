@@ -1,22 +1,3 @@
-<?php
-
-$totalCarrinho = isset($_SESSION['id_user']) ? contarItensCarrinho($_SESSION['id_user']) : 0;
-
-$mostrar_carrinho = true;
-
-if (isset($_SESSION['id_user'])) {
-    $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']);
-
-    if (in_array($tipo_usuario, ['admin', 'trabalhador'])) {
-        $mostrar_carrinho = false;
-    }
-} else {
-    $tipo_usuario = 'visitante'; // padrão para visitantes
-}
-?>
-
-
-
 <nav class="menu">
     <div class="logo">
         <a href="index.php">LuxFragrance</a>
@@ -89,38 +70,37 @@ if (isset($_SESSION['id_user'])) {
         </div>
 
         <!-- Carrinho -->
-        <li class="carrinho-menu">
-            <a href="carrinho.php" class="carrinho-link">
-                <img src="icones/carrinho.png" alt="Carrinho"
-                    style="width: 20px; vertical-align: middle; margin-right: 8px;">
-                <?php if ($totalCarrinho > 0): ?>
-                    <span class="carrinho-count"><?php echo $totalCarrinho; ?></span>
-                <?php endif; ?>
-            </a>
-        </li>
+        <?php if ($mostrar_carrinho): ?>
+            <li class="carrinho-menu">
+                <a href="carrinho.php" class="carrinho-link">
+                    <img src="icones/carrinho.png" alt="Carrinho"
+                        style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                    <?php if ($totalCarrinho > 0): ?>
+                        <span class="carrinho-count"><?php echo $totalCarrinho; ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+        <?php endif; ?>
 
         <!-- Perfil do usuário -->
         <li class="user-dropdown">
-            <?php if (isset($_SESSION['id_user'])): ?>
+            <?php if ($id_sessao && $tipo_utilizador !== 'visitante'): ?>
                 <button class="user-btn">
-                    <img src="icones/user.png" alt="Perfil" style="width: 20px; vertical-align: middle; margin-right: 8px;">
-                    <span><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                    <img src="icones/user.png" alt="Perfil" style="width: 20px; margin-right: 8px;">
+                    <span><?php echo htmlspecialchars($nome_utilizador); ?></span>
                 </button>
                 <div class="dropdown-content-user">
-                    <?php
-                    if (isset($_SESSION['id_user'])) {
-                        $tipo_usuario = verificarTipoUsuario($_SESSION['id_user']);
-                        $link_perfil = ($tipo_usuario === 'cliente') ? 'perfil.php' : 'dashboard/dashboard.php';
-                        ?>
-                        <a href="<?php echo $link_perfil; ?>">Meu Perfil</a>
+                    <a href="<?php echo ($tipo_utilizador === 'cliente') ? 'perfil.php' : 'dashboard/dashboard.php'; ?>">Meu
+                        Perfil</a>
+                    <?php if ($tipo_utilizador === 'cliente'): ?>
                         <a href="wishlist.php">Minha Wishlist</a>
-                        <a href="logout.php">Sair</a>
-                    <?php } ?>
+                    <?php endif; ?>
+                    <a href="logout.php">Sair</a>
                 </div>
             <?php else: ?>
                 <a href="login.php">
                     <div class="user-btn">
-                        <img src="icones/user.png" alt="Login" style="width: 20px; vertical-align: middle; margin-right: 8px;">
+                        <img src="icones/user.png" alt="Login" style="width: 20px; margin-right: 8px;">
                         <span>Entrar</span>
                     </div>
                 </a>

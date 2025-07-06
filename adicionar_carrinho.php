@@ -1,38 +1,29 @@
 <?php
-session_start(); // <-- esta linha estava em falta!
-include('config.php');
+session_start();
+include("config.php");
 
-if (!isset($_SESSION['id_user'])) {
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $_SESSION['tipo_utilizador'] ?? null;
+
+if ($tipo_utilizador !== 'cliente' || !$id_sessao) {
     header("Location: login.php");
-    exit();
+    exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $id_usuario = $_SESSION['id_user'];
-    $id_produto = (int) ($_POST['id_produto'] ?? 0);
+if (isset($_POST['id_produto'])) {
+    $id_produto = (int) $_POST['id_produto'];
     $quantidade = (int) ($_POST['quantidade'] ?? 1);
 
-    if ($id_produto <= 0 || $quantidade <= 0) {
-        $_SESSION['erro'] = "Produto ou quantidade inválida.";
-        header("Location: produto.php?id=$id_produto");
-        exit();
-    }
-
-    // Usa a nova função para verificar o stock
     $produto = verificarStockProduto($id_produto);
-
     if (!$produto || $produto['stock'] < $quantidade) {
         $_SESSION['erro'] = "Estoque insuficiente!";
         header("Location: produto.php?id=$id_produto");
-        exit();
+        exit;
     }
 
-    adicionarAoCarrinho($id_usuario, $id_produto, $quantidade);
-
+    adicionarAoCarrinho($id_sessao, $id_produto, $quantidade);
     $_SESSION['sucesso'] = "Produto adicionado ao carrinho!";
     header("Location: carrinho.php");
-    exit();
+    exit;
 }
-
 ?>
-    

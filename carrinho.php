@@ -1,26 +1,33 @@
 <?php
 session_start();
 include('config.php');
-
-if (!isset($_SESSION['id_user'])) {
+// ⚠️ Apenas permite clientes
+if (!isset($_SESSION['id_sessao']) || $_SESSION['tipo_utilizador'] !== 'cliente') {
     header("Location: login.php");
     exit();
 }
 
-$id_usuario = $_SESSION['id_user'];
-$tipo_usuario = verificarTipoUsuario($id_usuario);
+$id_sessao = $_SESSION['id_sessao'];
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+if ($tipo_utilizador == 'cliente') {
+    $id_cliente = $id_sessao;
+}
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+$totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
+    ? contarItensCarrinho($id_sessao)
+    : 0;
 
-// Redireciona se não for cliente ou visitante
-if (!in_array($tipo_usuario, ['cliente', 'visitante'])) {
+$mostrar_carrinho = !in_array($tipo_utilizador, ['Admin', 'trabalhador']);
+
+// Garante que é mesmo cliente
+if ($tipo_utilizador !== 'cliente') {
     header("Location: index.php");
     exit();
 }
 
-
-
-// Buscar itens do carrinho
-$itensCarrinho = buscarItensCarrinho($id_usuario);
-$totalCarrinho = contarItensCarrinho($id_usuario);
+// ✅ Aqui sim: usar o nome correto
+$itensCarrinho = buscarItensCarrinho($id_cliente);
+$totalCarrinho = contarItensCarrinho($id_cliente);
 $marcas = buscarMarcasAgrupadas();
 $familias = buscarFamiliasOlfativas();
 ?>

@@ -1,19 +1,19 @@
 <?php
 session_start();
-include('config.php');
+include("config.php");
 
-if (!isset($_SESSION['id_user'])) {
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $_SESSION['tipo_utilizador'] ?? null;
+
+if ($tipo_utilizador !== 'cliente' || !$id_sessao) {
     echo json_encode(["error" => "Usuário não autenticado"]);
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produto'])) {
-    $id_usuario = $_SESSION['id_user'];
     $id_produto = (int) $_POST['id_produto'];
 
-    // Chama a função para remover do carrinho
-    if (removerDoCarrinho($id_usuario, $id_produto)) {
-        header("Location: carrinho.php"); // Redireciona ao carrinho
+    if (removerDoCarrinho($id_sessao, $id_produto)) {
         echo json_encode(["success" => true]);
     } else {
         echo json_encode(["error" => "Erro ao remover o item do carrinho"]);
@@ -22,4 +22,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_produto'])) {
     echo json_encode(["error" => "Requisição inválida"]);
 }
 ?>
-

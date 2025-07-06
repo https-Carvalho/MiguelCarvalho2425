@@ -6,20 +6,28 @@ $mensagem = '';
 $erro = '';
 $etapa = 'solicitar';
 
-// Guardar email em sessão para reusar
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Etapa 1: envio de email com código
     if (isset($_POST['email'])) {
         $email = trim($_POST['email']);
-        $utilizador = obterUsuarioPorEmail($email);
+        $utilizador = obterUsuarioPorEmail($email); // Deve retornar também tipo_login
 
         if ($utilizador) {
             $codigo = rand(100000, 999999);
+            $expiracao = date('Y-m-d H:i:s', time() + 600); // 10 minutos
+
+            $id_user = $utilizador['tipo_login'] === 'admin_worker' ? $utilizador['id_user'] : null;
+            $id_cliente = $utilizador['tipo_login'] === 'cliente' ? $utilizador['id_cliente'] : null;
+
+            guardarCodigoRecuperacao($id_user, $id_cliente, $codigo, $expiracao);
+
+            // Guardar dados na sessão
             $_SESSION['recuperacao_email'] = $email;
             $_SESSION['recuperacao_codigo'] = $codigo;
-            $_SESSION['recuperacao_id'] = $utilizador['id_user'];
-            $_SESSION['recuperacao_expira'] = time() + 600; // 10 min
+            $_SESSION['recuperacao_id_user'] = $id_user;
+            $_SESSION['recuperacao_id_cliente'] = $id_cliente;
 
+            // Enviar email
             $mensagemEmail = "O seu código de recuperação é: <strong>$codigo</strong><br>Expira em 10 minutos.";
             $headers = "MIME-Version: 1.0\r\n";
             $headers .= "Content-type: text/html; charset=UTF-8\r\n";
@@ -38,13 +46,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (isset($_POST['codigo'])) {
         $codigoDigitado = trim($_POST['codigo']);
 
-        if (!isset($_SESSION['recuperacao_codigo']) || time() > $_SESSION['recuperacao_expira']) {
-            $erro = "O código expirou. Solicite novamente.";
-            session_unset();
-        } elseif ($codigoDigitado != $_SESSION['recuperacao_codigo']) {
-            $erro = "Código incorreto.";
+        $codigoValido = validarCodigoRecuperacao(
+            $_SESSION['recuperacao_id_user'],
+            $_SESSION['recuperacao_id_cliente'],
+            $codigoDigitado
+        );
+
+        if (!$codigoValido) {
+            $erro = "Código inválido ou expirado.";
             $etapa = 'codigo';
         } else {
+            $_SESSION['recuperacao_codigo'] = $codigoDigitado;
             $etapa = 'redefinir';
         }
     }
@@ -62,7 +74,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $etapa = 'redefinir';
         } else {
             $senhaHash = password_hash($nova, PASSWORD_DEFAULT);
-            atualizarSenhaPorId($_SESSION['recuperacao_id'], $senhaHash);
+
+            if ($_SESSION['recuperacao_id_user']) {
+                atualizarSenhaPorId($_SESSION['recuperacao_id_user'], $senhaHash, 'admin_worker');
+            } elseif ($_SESSION['recuperacao_id_cliente']) {
+                atualizarSenhaPorId($_SESSION['recuperacao_id_cliente'], $senhaHash, 'cliente');
+            }
+
+            marcarCodigoComoUtilizado(
+                $_SESSION['recuperacao_id_user'],
+                $_SESSION['recuperacao_id_cliente'],
+                $_SESSION['recuperacao_codigo']
+            );
+
             session_unset();
             $mensagem = "Palavra-passe alterada com sucesso. <a href='login.php'>Clique aqui para entrar</a>";
             $etapa = 'completo';
@@ -122,8 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <input type="submit" value="Alterar Senha" class="recuperacao-button">
-
-
 
             <?php elseif ($etapa === 'completo'): ?>
                 <p class="recuperacao-sucesso"><?= $mensagem ?></p>

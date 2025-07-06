@@ -2,28 +2,32 @@
 session_start();
 include('config.php'); // Inclui a configuração da base de dados
 
-// Verifica se o formulário foi enviado
+$erro = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']); // Obtém o email
-    $password = trim($_POST['password']); // Obtém a senha
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
-    // Chama a função de login
-    $user = logarUtilizador($email, $password);
+    $login = logarUtilizador($email, $password);
 
-    if ($user) {
-        // Login bem-sucedido, cria a sessão
-        $_SESSION['id_user'] = $user['id_user'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['email'] = $user['email'];
-        $_SESSION['tipo'] = $user['tipo'];
+    if ($login) {
+        $_SESSION['id_sessao'] = $login['id_sessao'];
+        $_SESSION['tipo_utilizador'] = $login['tipo_utilizador'];
+        $_SESSION['email'] = $login['email'];
 
-        // Redireciona para a página inicial
+        if ($login['tipo_utilizador'] === 'cliente') {
+            $_SESSION['nome_cliente'] = $login['nome_cliente'];
+        } else {
+            $_SESSION['username'] = $login['username']; // Admin ou trabalhador
+        }
+
         header("Location: index.php");
-        exit();
+        exit;
     } else {
-        $erro = "Email ou senha inválidos.";
+        $erro = "Email ou palavra-passe inválidos.";
     }
 }
+
 ?>
 
 

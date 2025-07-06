@@ -2,13 +2,13 @@
 session_start();
 include('config.php');
 
-if (!isset($_SESSION['id_user'])) {
+if ($_SESSION['tipo_login'] !== 'cliente') {
     header("Location: login.php");
-    exit();
+    exit;
 }
 
-$id_usuario = $_SESSION['id_user'];
-$itens = buscarItensCarrinho($id_usuario);
+$id_cliente = $_SESSION['id_cliente'];
+$itens = buscarItensCarrinho($id_cliente);
 $total = 0;
 
 foreach ($itens as $item) {

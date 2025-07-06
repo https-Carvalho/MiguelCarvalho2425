@@ -2,9 +2,10 @@
 session_start();
 include('../config.php');
 
-// Verifica permissões
-$id_usuario = $_SESSION['id_user'] ?? null;
+$id_usuario = $_SESSION['id_user'] ?? $_SESSION['id_cliente'] ?? null;
+$tipo_login = $_SESSION['tipo_login'] ?? 'visitante';
 $tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
+
 if ($tipo_usuario !== 'Admin') {
     header('Location: ../index.php');
     exit();

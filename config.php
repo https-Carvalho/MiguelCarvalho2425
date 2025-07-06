@@ -97,10 +97,10 @@ function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtro
     /** 🔹 ORDENAR DINAMICAMENTE SE FOR DEFINIDO **/
     if (!empty($ordenacao)) {
         switch ($ordenacao) {
-            case 'nome_asc':
+            case 'az':
                 $sql .= " ORDER BY perfumes.nome ASC";
                 break;
-            case 'nome_desc':
+            case 'za':
                 $sql .= " ORDER BY perfumes.nome DESC";
                 break;
             case 'preco_menor':
@@ -116,9 +116,6 @@ function listarPerfumes($termo = '', $precoMin = null, $precoMax = null, $filtro
     } else {
         $sql .= " ORDER BY perfumes.id_perfume ASC"; // <-- fallback
     }
-
-
-    // 🔹 NÃO ADICIONA `LIMIT` e `OFFSET`, pois a paginação será feita via JavaScript.
 
     // Preparar e executar a query
     $stmt = $pdo->prepare($sql);
@@ -336,7 +333,8 @@ function buscarInformacoesComNotas($idPerfume, $comIds = false)
 
     while ($nota = mysqli_fetch_assoc($resultNotas)) {
         $tipoNota = strtolower($nota['tipo_nota']);
-        if (!isset($notas[$tipoNota])) continue;
+        if (!isset($notas[$tipoNota]))
+            continue;
 
         if ($comIds) {
             $notas[$tipoNota][] = [
@@ -352,8 +350,6 @@ function buscarInformacoesComNotas($idPerfume, $comIds = false)
 
     return $perfume;
 }
-
-
 
 function buscarImagensPerfume($idPerfume)
 {
@@ -667,25 +663,29 @@ function buscarFamiliaPorNota()
     return $mapa;
 }
 
-function inserirFamilia($nome, $descricao) {
+function inserirFamilia($nome, $descricao)
+{
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO familias_olfativas (nome_familia, descricao) VALUES (?, ?)");
     return $stmt->execute([$nome, $descricao]);
 }
 
-function editarFamilia($id, $nome, $descricao) {
+function editarFamilia($id, $nome, $descricao)
+{
     global $pdo;
     $stmt = $pdo->prepare("UPDATE familias_olfativas SET nome_familia = ?, descricao = ? WHERE id_familia = ?");
     return $stmt->execute([$nome, $descricao, $id]);
 }
 
-function eliminarFamilia($id_familia) {
+function eliminarFamilia($id_familia)
+{
     global $pdo;
     $pdo->prepare("DELETE FROM familia_notas WHERE id_familia = ?")->execute([$id_familia]);
     return $pdo->prepare("DELETE FROM familias_olfativas WHERE id_familia = ?")->execute([$id_familia]);
 }
 
-function buscarNotasDaFamilia($id_familia) {
+function buscarNotasDaFamilia($id_familia)
+{
     global $pdo;
     $stmt = $pdo->prepare("
         SELECT ng.id_nota, ng.nome_nota
@@ -697,8 +697,6 @@ function buscarNotasDaFamilia($id_familia) {
     $stmt->execute([$id_familia]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-
 
 function buscarPerfumesPorFamilia($id_familia)
 {
@@ -808,9 +806,10 @@ function removerNotaDeFamilia($id_familia, $id_nota)
 function listarEncomendas($estado = '')
 {
     global $pdo;
-    $sql = "SELECT e.*, u.username 
+    $sql = "SELECT e.*, c.nome_completo 
             FROM encomendas e 
-            JOIN tbl_user u ON e.id_user = u.id_user";
+            JOIN clientes c ON e.id_cliente = c.id_cliente";
+    
     if ($estado !== '') {
         $sql .= " WHERE e.estado = ?";
         $stmt = $pdo->prepare($sql);
@@ -818,6 +817,7 @@ function listarEncomendas($estado = '')
     } else {
         $stmt = $pdo->query($sql);
     }
+
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -839,11 +839,11 @@ function alterarEstadoEncomenda($id_encomenda, $novo_estado)
     $stmt->execute([$novo_estado, $id_encomenda]);
 }
 
-function criarEncomenda($id_user, $total)
+function criarEncomenda($id_cliente, $total)
 {
     global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO encomendas (id_user, total, data_encomenda) VALUES (?, ?, NOW())");
-    $stmt->execute([$id_user, $total]);
+    $stmt = $pdo->prepare("INSERT INTO encomendas (id_cliente, total, data_encomenda) VALUES (?, ?, NOW())");
+    $stmt->execute([$id_cliente, $total]);
     return $pdo->lastInsertId();
 }
 
@@ -855,11 +855,11 @@ function adicionarProdutoEncomenda($id_encomenda, $id_produto, $quantidade, $pre
 }
 
 
-function limparCarrinho($id_user)
+function limparCarrinho($id_cliente)
 {
     global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM carrinho WHERE id_usuario = ?");
-    $stmt->execute([$id_user]);
+    $stmt = $pdo->prepare("DELETE FROM carrinho WHERE id_cliente = ?");
+    $stmt->execute([$id_cliente]);
 }
 
 function atualizarStock($id_produto, $quantidadeVendida)
@@ -874,67 +874,199 @@ function atualizarStock($id_produto, $quantidadeVendida)
 // ==========================================
 #region LOGIN E UTILIZADORES
 
-function logarUtilizador($email, $password) {
+function logarUtilizador($email, $password)
+{
     global $liga;
+
+    // 1️⃣ Tenta login como admin ou trabalhador
     $stmt = mysqli_prepare($liga, "SELECT * FROM tbl_user WHERE email = ?");
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
-    $utilizador = mysqli_fetch_assoc($resultado);
+    $res = mysqli_stmt_get_result($stmt);
+    $admin = mysqli_fetch_assoc($res);
 
-    if ($utilizador && password_verify($password, $utilizador['password'])) {
-        return $utilizador;
+    if ($admin && password_verify($password, $admin['password'])) {
+        return [
+            'id_sessao' => $admin['id_user'],
+            'tipo_utilizador' => $admin['tipo'], // Admin ou trabalhador
+            'username' => $admin['username'],
+            'email' => $admin['email']
+        ];
     }
 
+    // 2️⃣ Tenta login como cliente
+    $stmt = mysqli_prepare($liga, "SELECT * FROM clientes WHERE email = ?");
+    mysqli_stmt_bind_param($stmt, 's', $email);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $cliente = mysqli_fetch_assoc($res);
+
+    if ($cliente && password_verify($password, $cliente['password'])) {
+        return [
+            'id_sessao' => $cliente['id_cliente'],
+            'tipo_utilizador' => 'cliente',
+            'nome_cliente' => $cliente['nome_completo'],
+            'email' => $cliente['email']
+        ];
+    }
+
+    // 3️⃣ Falha no login
     return false;
 }
 
-function verificarTipoUsuario($id_usuario)
+
+
+function verificarTipoUsuario($id_sessao)
 {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT tipo FROM tbl_user WHERE id_user = :id_usuario");
-    $stmt->execute(['id_usuario' => $id_usuario]);
-    return $stmt->fetch(PDO::FETCH_ASSOC)['tipo'] ?? null;
+
+    $tipo = $_SESSION['tipo_utilizador'] ?? null;
+
+    if ($tipo === 'Admin' || $tipo === 'trabalhador') {
+        // Confirmar que existe na tbl_user
+        $stmt = $pdo->prepare("SELECT tipo FROM tbl_user WHERE id_user = :id");
+        $stmt->execute(['id' => $id_sessao]);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $res['tipo'] ?? 'visitante';
+    }
+
+    if ($tipo === 'cliente') {
+        // Confirmar que existe na tabela clientes
+        $stmt = $pdo->prepare("SELECT id_cliente FROM clientes WHERE id_cliente = :id");
+        $stmt->execute(['id' => $id_sessao]);
+        if ($stmt->fetch()) {
+            return 'cliente';
+        }
+    }
+
+    return 'visitante';
 }
 
 function listarUtilizadores()
 {
     global $pdo;
-    return $pdo->query("SELECT id_user, username, email, tipo, criado_em FROM tbl_user ORDER BY criado_em DESC")->fetchAll(PDO::FETCH_ASSOC);
+
+    // Lista admins e trabalhadores
+    $stmt1 = $pdo->query("SELECT id_user AS id, username, email, tipo, criado_em, 'admin_worker' AS origem FROM tbl_user");
+
+    // Lista clientes
+    $stmt2 = $pdo->query("SELECT id_cliente AS id, nome_completo AS username, email, 'cliente' AS tipo, NULL AS criado_em, 'cliente' AS origem FROM clientes");
+
+    $lista1 = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+    $lista2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+    return array_merge($lista1, $lista2);
 }
 
-function alterarTipoUtilizador($id_user, $novo_tipo)
+function alterarTipoUtilizador($id, $novo_tipo, $tipo_login)
 {
     global $pdo;
-    $stmt = $pdo->prepare("UPDATE tbl_user SET tipo = ? WHERE id_user = ?");
-    $stmt->execute([$novo_tipo, $id_user]);
+
+    if ($tipo_login === 'admin_worker') {
+        $stmt = $pdo->prepare("UPDATE tbl_user SET tipo = ? WHERE id_user = ?");
+        $stmt->execute([$novo_tipo, $id]);
+    }
+    // Clientes não têm tipo
 }
 
-function eliminarUtilizador($id_user)
+function eliminarUtilizador($id, $tipo_login)
 {
     global $pdo;
-    $stmt = $pdo->prepare("DELETE FROM tbl_user WHERE id_user = ?");
-    $stmt->execute([$id_user]);
+
+    if ($tipo_login === 'admin_worker') {
+        $stmt = $pdo->prepare("DELETE FROM tbl_user WHERE id_user = ?");
+    } else {
+        $stmt = $pdo->prepare("DELETE FROM clientes WHERE id_cliente = ?");
+    }
+
+    $stmt->execute([$id]);
 }
 
-function obterUsuarioPorEmail($email) {
+function obterUsuarioPorEmail($email)
+{
     global $liga;
-    $stmt = mysqli_prepare($liga, "SELECT * FROM tbl_user WHERE email = ?");
+
+    // Tenta buscar na tbl_user
+    $stmt = mysqli_prepare($liga, "SELECT *, 'admin_worker' AS tipo_login FROM tbl_user WHERE email = ?");
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
-    return mysqli_fetch_assoc($resultado);
+    $res = mysqli_stmt_get_result($stmt);
+    $utilizador = mysqli_fetch_assoc($res);
+
+    if ($utilizador) return $utilizador;
+
+    // Tenta buscar em clientes
+    $stmt = mysqli_prepare($liga, "SELECT *, 'cliente' AS tipo_login FROM clientes WHERE email = ?");
+    mysqli_stmt_bind_param($stmt, 's', $email);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($res);
 }
 
+
+function guardarCodigoRecuperacao($id_user, $id_cliente, $codigo, $expiracao)
+{
+    global $liga;
+
+    $stmt = mysqli_prepare($liga, "INSERT INTO recuperacao_senhas (id_user, id_cliente, token, expiracao, utilizado, criado_em) VALUES (?, ?, ?, ?, 0, NOW())");
+    mysqli_stmt_bind_param($stmt, 'iiss', $id_user, $id_cliente, $codigo, $expiracao);
+    mysqli_stmt_execute($stmt);
+}
+
+function validarCodigoRecuperacao($id_user, $id_cliente, $codigo)
+{
+    global $liga;
+
+    if ($id_user !== null) {
+        $stmt = mysqli_prepare($liga, "SELECT * FROM recuperacao_senhas WHERE id_user = ? AND token = ? AND utilizado = 0 AND expiracao > NOW()");
+        mysqli_stmt_bind_param($stmt, 'is', $id_user, $codigo);
+    } elseif ($id_cliente !== null) {
+        $stmt = mysqli_prepare($liga, "SELECT * FROM recuperacao_senhas WHERE id_cliente = ? AND token = ? AND utilizado = 0 AND expiracao > NOW()");
+        mysqli_stmt_bind_param($stmt, 'is', $id_cliente, $codigo);
+    } else {
+        return false;
+    }
+
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($res);
+}
+
+function marcarCodigoComoUtilizado($id_user, $id_cliente, $codigo)
+{
+    global $liga;
+
+    if ($id_user !== null) {
+        $stmt = mysqli_prepare($liga, "UPDATE recuperacao_senhas SET utilizado = 1 WHERE id_user = ? AND token = ?");
+        mysqli_stmt_bind_param($stmt, 'is', $id_user, $codigo);
+    } elseif ($id_cliente !== null) {
+        $stmt = mysqli_prepare($liga, "UPDATE recuperacao_senhas SET utilizado = 1 WHERE id_cliente = ? AND token = ?");
+        mysqli_stmt_bind_param($stmt, 'is', $id_cliente, $codigo);
+    } else {
+        return false;
+    }
+
+    mysqli_stmt_execute($stmt);
+}
 
 
 // Atualiza a senha do utilizador
-function atualizarSenhaPorId($id_user, $novaSenhaHash) {
+function atualizarSenhaPorId($id_sessao, $novaSenhaHash, $tipo_login)
+{
     global $liga;
-    $stmt = mysqli_prepare($liga, "UPDATE tbl_user SET password = ? WHERE id_user = ?");
-    mysqli_stmt_bind_param($stmt, 'si', $novaSenhaHash, $id_user);
-    mysqli_stmt_execute($stmt);
+
+    if ($tipo_login === 'admin_worker') {
+        $stmt = mysqli_prepare($liga, "UPDATE tbl_user SET password = ? WHERE id_user = ?");
+    } elseif ($tipo_login === 'cliente') {
+        $stmt = mysqli_prepare($liga, "UPDATE clientes SET password = ? WHERE id_cliente = ?");
+    } else {
+        return false;
+    }
+
+    mysqli_stmt_bind_param($stmt, 'si', $novaSenhaHash, $id_sessao);
+    return mysqli_stmt_execute($stmt);
 }
+
 
 #endregion
 // ==========================================
@@ -942,54 +1074,54 @@ function atualizarSenhaPorId($id_user, $novaSenhaHash) {
 #region CARRINHO
 
 
-function adicionarAoCarrinho($id_usuario, $id_produto, $quantidade = 1)
+function adicionarAoCarrinho($id_cliente, $id_produto, $quantidade = 1)
 {
     global $pdo;
 
     // Verifica se o item já está no carrinho do usuário
-    $sql = "SELECT * FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+    $sql = "SELECT * FROM carrinho WHERE id_cliente = :id_cliente AND id_produto = :id_produto";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+    $stmt->execute(['id_cliente' => $id_cliente, 'id_produto' => $id_produto]);
     $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($item) {
         // Atualiza a quantidade caso o item já exista
-        $sql = "UPDATE carrinho SET quantidade = quantidade + :quantidade WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+        $sql = "UPDATE carrinho SET quantidade = quantidade + :quantidade WHERE id_cliente = :id_cliente AND id_produto = :id_produto";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(['quantidade' => $quantidade, 'id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+        $stmt->execute(['quantidade' => $quantidade, 'id_cliente' => $id_cliente, 'id_produto' => $id_produto]);
     } else {
         // Insere um novo item no carrinho
-        $sql = "INSERT INTO carrinho (id_usuario, id_produto, quantidade) VALUES (:id_usuario, :id_produto, :quantidade)";
+        $sql = "INSERT INTO carrinho (id_cliente, id_produto, quantidade) VALUES (:id_cliente, :id_produto, :quantidade)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto, 'quantidade' => $quantidade]);
+        $stmt->execute(['id_cliente' => $id_cliente, 'id_produto' => $id_produto, 'quantidade' => $quantidade]);
     }
 }
 
 
 // Função para remover um item do carrinho
-function removerDoCarrinho($id_usuario, $id_produto)
+function removerDoCarrinho($id_cliente, $id_produto)
 {
     global $pdo;
-    $sql = "DELETE FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+    $sql = "DELETE FROM carrinho WHERE id_cliente = :id_cliente AND id_produto = :id_produto";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+    $stmt->execute(['id_cliente' => $id_cliente, 'id_produto' => $id_produto]);
 
     // Retorna true se pelo menos 1 linha foi afetada
     return $stmt->rowCount() > 0;
 }
 
 // Função para buscar os itens do carrinho do usuário
-function buscarItensCarrinho($id_usuario)
+function buscarItensCarrinho($id_cliente)
 {
     global $pdo;
 
     $sql = "SELECT c.id_produto, c.quantidade, p.nome, p.preco, p.caminho_imagem, p.stock
             FROM carrinho c
             JOIN perfumes p ON c.id_produto = p.id_perfume
-            WHERE c.id_usuario = :id_usuario";
+            WHERE c.id_cliente = :id_cliente";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_usuario' => $id_usuario]);
+    $stmt->execute(['id_cliente' => $id_cliente]);
     $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Verificar se a quantidade no carrinho excede o stock disponível
@@ -1003,26 +1135,26 @@ function buscarItensCarrinho($id_usuario)
 }
 
 
-function contarItensCarrinho($id_usuario)
+function contarItensCarrinho($id_cliente)
 {
     global $pdo;
 
-    $sql = "SELECT SUM(quantidade) AS total_itens FROM carrinho WHERE id_usuario = :id_usuario";
+    $sql = "SELECT SUM(quantidade) AS total_itens FROM carrinho WHERE id_cliente = :id_cliente";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_usuario' => $id_usuario]);
+    $stmt->execute(['id_cliente' => $id_cliente]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     return $result['total_itens'] ?? 0; // Se não houver itens, retorna 0
 }
 
-function atualizarQuantidadeCarrinho($id_usuario, $id_produto, $quantidade)
+function atualizarQuantidadeCarrinho($id_cliente, $id_produto, $quantidade)
 {
     global $pdo;
 
     // Verifica se o produto existe no carrinho
-    $sql = "SELECT quantidade FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+    $sql = "SELECT quantidade FROM carrinho WHERE id_cliente = :id_cliente AND id_produto = :id_produto";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+    $stmt->execute(['id_cliente' => $id_cliente, 'id_produto' => $id_produto]);
     $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($item) {
@@ -1030,14 +1162,14 @@ function atualizarQuantidadeCarrinho($id_usuario, $id_produto, $quantidade)
 
         if ($novaQuantidade > 0) {
             // Atualiza a quantidade no carrinho
-            $sql = "UPDATE carrinho SET quantidade = :quantidade WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+            $sql = "UPDATE carrinho SET quantidade = :quantidade WHERE id_cliente = :id_cliente AND id_produto = :id_produto";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute(['quantidade' => $novaQuantidade, 'id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+            $stmt->execute(['quantidade' => $novaQuantidade, 'id_cliente' => $id_cliente, 'id_produto' => $id_produto]);
         } else {
             // Remove o produto se a quantidade chegar a zero
-            $sql = "DELETE FROM carrinho WHERE id_usuario = :id_usuario AND id_produto = :id_produto";
+            $sql = "DELETE FROM carrinho WHERE id_cliente = :id_cliente AND id_produto = :id_produto";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute(['id_usuario' => $id_usuario, 'id_produto' => $id_produto]);
+            $stmt->execute(['id_cliente' => $id_cliente, 'id_produto' => $id_produto]);
         }
     }
 }
@@ -1046,58 +1178,56 @@ function atualizarQuantidadeCarrinho($id_usuario, $id_produto, $quantidade)
 // ==========================================
 // ==========================================
 #region FAVORITOS
-
-function adicionarAosFavoritos($id_user, $id_produto)
+function removerDosFavoritos($id_sessao, $id_produto, $tipo_utilizador)
 {
     global $pdo;
 
-    // Verifica se o produto já está na wishlist
-    $sql = "SELECT * FROM wishlist WHERE id_user = :id_user AND id_produto = :id_produto";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
+    $coluna = ($tipo_utilizador === 'cliente') ? 'id_cliente' : 'id_user';
+    $stmt = $pdo->prepare("DELETE FROM wishlist WHERE $coluna = :id AND id_produto = :id_produto");
+    return $stmt->execute(['id' => $id_sessao, 'id_produto' => $id_produto]);
+}
 
-    if (!$stmt->fetch()) {
-        // Insere se não existir
-        $sql = "INSERT INTO wishlist (id_user, id_produto) VALUES (:id_user, :id_produto)";
-        $stmt = $pdo->prepare($sql);
-        return $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
+function verificarFavorito($id_sessao, $id_produto, $tipo_utilizador)
+{
+    global $pdo;
+
+    $coluna = ($tipo_utilizador === 'cliente') ? 'id_cliente' : 'id_user';
+    $stmt = $pdo->prepare("SELECT 1 FROM wishlist WHERE $coluna = :id AND id_produto = :id_produto");
+    $stmt->execute(['id' => $id_sessao, 'id_produto' => $id_produto]);
+    return (bool) $stmt->fetch();
+}
+
+function adicionarAosFavoritos($id_sessao, $id_produto, $tipo_utilizador)
+{
+    global $pdo;
+
+    if (verificarFavorito($id_sessao, $id_produto, $tipo_utilizador)) {
+        return false;
     }
-    return false;
+
+    $coluna = ($tipo_utilizador === 'cliente') ? 'id_cliente' : 'id_user';
+    $stmt = $pdo->prepare("INSERT INTO wishlist ($coluna, id_produto) VALUES (:id, :id_produto)");
+    return $stmt->execute(['id' => $id_sessao, 'id_produto' => $id_produto]);
 }
 
-// Remover um produto da wishlist
-function removerDosFavoritos($id_user, $id_produto)
+function buscarWishlist($id_sessao, $tipo_utilizador)
 {
     global $pdo;
-    $sql = "DELETE FROM wishlist WHERE id_user = :id_user AND id_produto = :id_produto";
-    $stmt = $pdo->prepare($sql);
-    return $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
-}
 
-// Verificar se um produto está na wishlist
-function verificarFavorito($id_user, $id_produto)
-{
-    global $pdo;
-    $sql = "SELECT * FROM wishlist WHERE id_user = :id_user AND id_produto = :id_produto";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_user' => $id_user, 'id_produto' => $id_produto]);
-    return $stmt->fetch() ? true : false;
-}
-
-function buscarWishlist($id_usuario)
-{
-    global $pdo;
+    $coluna = ($tipo_utilizador === 'cliente') ? 'w.id_cliente' : 'w.id_user';
 
     $sql = "SELECT w.id_produto, p.id_perfume, p.nome, p.preco, p.caminho_imagem, p.stock, m.nome AS marca
             FROM wishlist w
             JOIN perfumes p ON w.id_produto = p.id_perfume
             JOIN marcas m ON p.id_marca = m.id_marca
-            WHERE w.id_user = :id_usuario";
+            WHERE $coluna = :id";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id_usuario' => $id_usuario]);
+    $stmt->execute(['id' => $id_sessao]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+
 
 #endregion
 // ==========================================
@@ -1124,33 +1254,39 @@ function imgToBase64($path)
 // ==========================================
 #region DASHBOARD
 
-function contarPerfumes() {
+function contarPerfumes()
+{
     global $pdo;
     return $pdo->query("SELECT COUNT(*) FROM perfumes")->fetchColumn();
 }
 
-function contarMarcas() {
+function contarMarcas()
+{
     global $pdo;
     return $pdo->query("SELECT COUNT(*) FROM marcas")->fetchColumn();
 }
 
-function contarEncomendas() {
+function contarEncomendas()
+{
     global $pdo;
     return $pdo->query("SELECT COUNT(*) FROM encomendas")->fetchColumn();
 }
 
-function contarUtilizadores() {
+function contarUtilizadores()
+{
     global $pdo;
     return $pdo->query("SELECT COUNT(*) FROM tbl_user")->fetchColumn();
 }
 
-function somarTotalVendas() {
+function somarTotalVendas()
+{
     global $pdo;
     $total = $pdo->query("SELECT SUM(total) FROM encomendas")->fetchColumn();
     return $total ?? 0;
 }
 
-function encomendasUltimosMeses($limite = 6) {
+function encomendasUltimosMeses($limite = 6)
+{
     global $pdo;
     $sql = "
         SELECT DATE_FORMAT(data_encomenda, '%Y-%m') AS mes, COUNT(*) AS total
@@ -1160,7 +1296,7 @@ function encomendasUltimosMeses($limite = 6) {
         LIMIT :limite
     ";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
+    $stmt->bindValue(':limite', (int) $limite, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

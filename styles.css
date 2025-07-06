@@ -74,8 +74,7 @@
 }
 
 .menu ul li:hover {
-    text-decoration: underline;
-    transition: .3s
+    transition: .1s
 }
 
 .menu ul li a {
@@ -86,16 +85,10 @@
 }
 
 .menu ul li a:hover {
-    text-decoration: underline;
+    color: #c49e78;
     /* Adiciona sublinhado ao passar o mouse */
     transition: .3s;
 }
-
-.menu ul li a:visited {
-    color: rgb(0, 0, 0);
-    /* Garante que a cor não muda após o clique */
-}
-
 /* #endregion---------- MENU GERAL ---------- */
 
 /* #region dropdown */
@@ -207,21 +200,21 @@
     /* Cor cinza para os textos */
 }
 
+.column p :hover {
+    color: #c49e78;
+    /* Adiciona sublinhado ao passar o mouse */
+    transition: .3s;
+}
+
 .column p a {
     text-decoration: none;
     /* Remove sublinhado */
-    color: inherit;
+    color: black;
     /* Herda a cor do pai */
     transition: color 0.3s ease;
     /* Transição suave */
 }
 
-.column p a:hover {
-    color: #000;
-    /* Escurece o texto ao passar o mouse */
-    text-decoration: underline;
-    /* Sublinha o texto ao passar o mouse */
-}
 
 
 /* ---------- BOTÃO "VER TODAS AS MARCAS" ---------- */
@@ -258,8 +251,7 @@
 }
 
 .view-all a:hover {
-    background-color: #b38762;
-    /* Cor mais escura ao passar o mouse */
+    color: #000 !important;
     transform: translateY(-2px);
     /* Efeito de "subir" ao passar o mouse */
 }
@@ -408,7 +400,10 @@ a {
     gap: 15px;
     flex-wrap: wrap;
 }
-
+.aplicar-filtros:hover {
+    color: #c49e78;
+    transition: 0.1s;
+}
 .filtros-ativos {
     margin: 20px;
     display: flex;
@@ -446,7 +441,8 @@ a {
 }
 
 .dropbtn:hover {
-    color: #555;
+    color: #c49e78;
+    transition: 0.1s;
 }
 
 .dropdown-filtro {
@@ -470,7 +466,7 @@ a {
 .dropdown-content-filtro label {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     font-size: 14px;
     padding: 5px;
     cursor: pointer;
@@ -481,33 +477,35 @@ a {
 }
 
 .filtro-form button {
-    background-color: #333;
-    color: white;
+    background-color: #ffffff;
+    color: black;
     border: none;
     padding: 8px 12px;
     cursor: pointer;
     border-radius: 5px;
     font-size: 14px;
+    text-decoration: none;
 }
 
 .filtro-form button:hover {
-    background-color: #555;
+    background-color: #fffefe;
 }
 
 /* Alinhamento da ordenação */
-.ordenar-container {
+.ordenar-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 10px;
 }
 
-.ordenar-container label {
+.ordenar-wrapper label {
     font-size: 14px;
     color: #333;
     font-weight: bold;
 }
 
-.ordenar-container select {
+.ordenar-wrapper select {
     border: 1px solid #ccc;
     padding: 5px 10px;
     font-size: 14px;
@@ -523,9 +521,8 @@ a {
         flex-direction: column;
         align-items: flex-start;
     }
-    
-    .ordenar-container {
-        margin-top: 10px;
+
+    .ordenar-wrapper {
         width: 100%;
         justify-content: flex-start;
     }
@@ -1488,28 +1485,33 @@ body {
     display: none;
     position: absolute;
     background-color: white;
-    min-width: 150px;
-    height:max-content;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    transform: translateX(-25%);
-    z-index: 1;
+    min-width: 160px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 10px 0;
+    top: 80%;
     right: 0;
-    top: 100%; /* Faz com que o dropdown apareça abaixo do botão sem alterar a altura do menu */
+    z-index: 1000;
+    transform: translateY(10px);
 }
 
+/* Mostrar dropdown ao passar por cima do botão */
+.user-dropdown:hover .dropdown-content-user {
+    display: block;
+}
+
+/* Estilo dos links dentro do dropdown */
 .dropdown-content-user a {
     display: block;
-    padding: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: #222;
     text-decoration: none;
-    color: black;
-    transition: background 0.3s;
+    transition: background-color 0.2s ease;
 }
 
-
 .dropdown-content-user a:hover {
-    background-color: #f1f1f1;
-    text-decoration: none;
+    background-color: #f0f0f0;
 }
 
 /* Exibir dropdown ao passar o mouse */
@@ -1699,8 +1701,6 @@ body.visitante .carrinho-menu {
 
 /* #endregion */
 
-/* #region css da wishlist */
-
 /* Container da Wishlist */
 .wishlist-container {
     width: 90%;
@@ -1712,107 +1712,100 @@ body.visitante .carrinho-menu {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilização da tabela */
+/* Tabela */
 .wishlist-tabela {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
 }
 
-.wishlist-tabela th {
-    text-align: left;
-    padding: 12px;
-    font-size: 14px;
-    font-weight: bold;
-    background-color: #f8f8f8;
-    border-bottom: 2px solid #ddd;
-}
-
-.wishlist-tabela td {
-    padding: 15px;
+.wishlist-tabela th,
+.wishlist-tabela td,
+.wishlist-tabela tr {
+    border: none;
+    padding: 12px 10px;
     vertical-align: middle;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
 }
 
-/* Estiliza a coluna do produto */
+/* Produto */
 .wishlist-produto-info {
     display: flex;
     align-items: center;
     gap: 15px;
-    height: max-content;
 }
+
 
 .wishlist-imagem {
     width: 60px;
     height: 60px;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: 4px;
     border: 1px solid #ddd;
 }
 
 .wishlist-nome {
-    font-size: 16px;
-    font-weight: bold;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* Estiliza preço unitário */
+
+/* Preço */
 .wishlist-preco {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Ações */
+.wishlist-acoes {
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    height: inherit;
+}
+
+/* Botões */
+.wishlist-acoes button {
+    padding: 8px 12px;
     font-size: 14px;
     font-weight: bold;
-    color: #333;
-    text-align: center;
-    white-space: nowrap;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+    color: #fff;
 }
 
-/* Estiliza as ações */
-.wishlist-acoes {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-/* Botão de adicionar ao carrinho */
+/* Adicionar ao carrinho */
 .btn-wishlist-adicionar {
     background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
 }
-
 .btn-wishlist-adicionar:hover {
-    background-color: #218838;
+    background-color: #d4af37;
+    color: #000;
 }
 
-/* Botão de remover da wishlist */
+/* Remover da wishlist */
 .btn-wishlist-remover {
     background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
 }
-
 .btn-wishlist-remover:hover {
-    background-color: #c82333;
+    background-color: #d4af37;
+    color: #000;
 }
 
-/* Mensagem de wishlist vazia */
+/* Wishlist vazia */
 .wishlist-vazia {
     text-align: center;
     font-size: 16px;
     color: #777;
     margin-top: 20px;
 }
-
-/* #endregion */
 
 /* #region Login Page */
 .form-login {
@@ -1980,7 +1973,7 @@ body.visitante .carrinho-menu {
     margin-bottom: 20px;
 }
 
-label {
+.form-recuperacao .label {
     display: block;
     font-weight: bold;
     color: #555;

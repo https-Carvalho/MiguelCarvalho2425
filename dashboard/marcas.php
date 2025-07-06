@@ -3,13 +3,14 @@ session_start();
 include('../config.php');
 
 // Verifica permissões
-$id_usuario = $_SESSION['id_user'] ?? null;
-$tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
-if ($tipo_usuario !== 'Admin') {
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+
+if ($tipo_utilizador !== 'Admin') {
     header('Location: ../index.php');
     exit();
 }
-
 $marcas = listarMarcasDashboard();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

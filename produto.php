@@ -2,9 +2,17 @@
 session_start();
 include('config.php'); // Inclui a configuração da base de dados e as funções
 
-// Verifica o tipo do usuário
-$id_usuario = $_SESSION['id_user'] ?? null;
-$tipo_usuario = $id_usuario ? verificarTipoUsuario(id_usuario: $id_usuario) : 'visitante';
+// Autenticação e identificação do utilizador
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+
+// Carrinho só para cliente
+$totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
+    ? contarItensCarrinho($id_sessao)
+    : 0;
+
+$mostrar_carrinho = !in_array($tipo_utilizador, ['Admin', 'trabalhador']);
 
 
 //funcao de busca
@@ -84,7 +92,7 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                     </div>
                     <div class="buttons">
                         <button id="prev">
-                            <</button>
+                            << /button>
                                 <button id="next">></button>
                     </div>
                     <ul class="dots">
@@ -160,8 +168,8 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                     </form>
 
 
-                    <?php if (isset($_SESSION['id_user'])):
-                        $estadoFavorito = verificarFavorito($_SESSION['id_user'], $perfume['id_perfume']) ? 'remover' : 'adicionar';
+                    <?php if ($id_sessao && $tipo_utilizador === 'cliente'):
+                        $estadoFavorito = verificarFavorito($id_sessao, $perfume['id_perfume'], $tipo_utilizador) ? 'remover' : 'adicionar';
                         $textoFavorito = ($estadoFavorito === 'remover') ? '❤️ Remover dos Favoritos' : '🤍 Adicionar aos Favoritos';
                         ?>
                         <button class="favorito-btn" data-id="<?php echo $perfume['id_perfume']; ?>"
@@ -171,7 +179,6 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
                     <?php else: ?>
                         <a href="login.php" class="favorito-btn">🤍 Entrar para Favoritar</a>
                     <?php endif; ?>
-
                 </div>
             </div>
         </div>

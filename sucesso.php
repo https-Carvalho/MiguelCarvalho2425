@@ -6,15 +6,14 @@ ini_set("sendmail_from", "noreply@luxfragrance.com");
 session_start();
 include('config.php');
 
-if (!isset($_SESSION['id_user'])) {
+if ($_SESSION['tipo_login'] !== 'cliente') {
     header("Location: login.php");
-    exit();
+    exit;
 }
 
-$id_usuario = $_SESSION['id_user'];
-$userEmail = buscarEmailUsuario($id_usuario);
-$itensCarrinho = buscarItensCarrinho($id_usuario);
-
+$id_cliente = $_SESSION['id_cliente'];
+$userEmail = buscarEmailUsuario($id_cliente); // Usa função para clientes
+$itensCarrinho = buscarItensCarrinho($id_cliente);
 $total = 0;
 
 // 1. Calcula o total antes de criar a encomenda
@@ -23,7 +22,7 @@ foreach ($itensCarrinho as $item) {
 }
 
 // 2. Agora sim cria a encomenda com o total já certo
-$id_encomenda = criarEncomenda($id_usuario, $total);
+$id_encomenda = criarEncomenda($id_cliente, $total);
 
 // 3. Regista os produtos e atualiza stock
 foreach ($itensCarrinho as $item) {
@@ -32,7 +31,7 @@ foreach ($itensCarrinho as $item) {
 }
 
 // Limpa o carrinho
-limparCarrinho($id_usuario);
+limparCarrinho($id_cliente);
 
 // Envia email
 // Conteúdo HTML do email

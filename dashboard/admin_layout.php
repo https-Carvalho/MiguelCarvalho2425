@@ -1,17 +1,4 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-$id_usuario = $_SESSION['id_user'] ?? null;
-$tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
-$nome = $_SESSION['username'] ?? 'Desconhecido';
-
-if ($tipo_usuario !== 'Admin') {
-    header('Location: ../index.php');
-    exit();
-}
-?>
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -22,7 +9,7 @@ if ($tipo_usuario !== 'Admin') {
 <body>
 
 <div class="sidebar">
-    <h2>Admin - <?= htmlspecialchars($nome) ?></h2>
+    <h2>Admin - <?= htmlspecialchars($nome_utilizador) ?></h2>
     <ul>
         <li><a href="dashboard.php">📊 Painel</a></li>
         <li><a href="produtos.php">📦 Produtos</a></li>
