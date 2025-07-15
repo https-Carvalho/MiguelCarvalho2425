@@ -5,7 +5,7 @@ include('config.php'); // Conexão com a base de dados
 // Autenticação e identificação do utilizador
 $id_sessao = $_SESSION['id_sessao'] ?? null;
 $tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
-$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['clientname'] ?? 'Conta';
 
 // Carrinho só para cliente
 $totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
@@ -75,7 +75,6 @@ $familias = buscarFamiliasOlfativas(); // Chama a função para buscar as famíl
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="<?php echo strtolower($tipo_usuario); ?>">
     <!-- Menu de Navegação -->
     <?php include('menu.php'); ?>
 

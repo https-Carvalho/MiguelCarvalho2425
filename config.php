@@ -398,26 +398,40 @@ function buscarImagensPerfumeComId($idPerfume)
 
 function guardarImagem($file)
 {
-    $pasta = 'images/'; // Pasta real e visível no frontend
-    $nomeFinal = $pasta . uniqid() . '_' . basename($file['name']);
-    move_uploaded_file($file['tmp_name'], $nomeFinal);
-    return $nomeFinal; // Caminho a guardar na base de dados
+    $pasta = __DIR__ . '/../images/'; // Caminho físico absoluto
+    $nomeOriginal = basename($file['name']);
+    $caminhoFinal = $pasta . $nomeOriginal;
+
+    move_uploaded_file($file['tmp_name'], $caminhoFinal);
+
+    return 'images/' . $nomeOriginal; // Caminho que fica na base de dados
 }
+
+
 
 function inserirImagensAdicionais($id_perfume, $files)
 {
     global $pdo;
+
     foreach ($files['tmp_name'] as $i => $tmp) {
-        if ($tmp) {
-            $nome = guardarImagem([
+        if ($tmp && is_uploaded_file($tmp)) {
+            // Montar array completo para compatibilidade com guardarImagem()
+            $fileCompleto = [
                 'name' => $files['name'][$i],
-                'tmp_name' => $tmp
-            ]);
+                'tmp_name' => $tmp,
+                'type' => $files['type'][$i],
+                'error' => $files['error'][$i],
+                'size' => $files['size'][$i]
+            ];
+
+            $caminho = guardarImagem($fileCompleto);
+
             $stmt = $pdo->prepare("INSERT INTO imagens_perfume (perfume_id, caminho_imagem) VALUES (?, ?)");
-            $stmt->execute([$id_perfume, $nome]);
+            $stmt->execute([$id_perfume, $caminho]);
         }
     }
 }
+
 
 function atualizarNotasPerfume($id_perfume, $notas)
 {
@@ -799,7 +813,7 @@ function removerNotaDeFamilia($id_familia, $id_nota)
 }
 
 #endregion
-// ==========================================
+// ==========================================mo
 // ==========================================
 #region ENCOMENDAS
 
@@ -809,7 +823,7 @@ function listarEncomendas($estado = '')
     $sql = "SELECT e.*, c.nome_completo 
             FROM encomendas e 
             JOIN clientes c ON e.id_cliente = c.id_cliente";
-    
+
     if ($estado !== '') {
         $sql .= " WHERE e.estado = ?";
         $stmt = $pdo->prepare($sql);
@@ -872,7 +886,7 @@ function atualizarStock($id_produto, $quantidadeVendida)
 #endregion
 // ==========================================
 // ==========================================
-#region LOGIN E UTILIZADORES
+#region LOGIN E Clientes e Admins
 
 function logarUtilizador($email, $password)
 {
@@ -906,6 +920,7 @@ function logarUtilizador($email, $password)
             'id_sessao' => $cliente['id_cliente'],
             'tipo_utilizador' => 'cliente',
             'nome_cliente' => $cliente['nome_completo'],
+            'clientname' => $cliente['username'],
             'email' => $cliente['email']
         ];
     }
@@ -993,7 +1008,8 @@ function obterUsuarioPorEmail($email)
     $res = mysqli_stmt_get_result($stmt);
     $utilizador = mysqli_fetch_assoc($res);
 
-    if ($utilizador) return $utilizador;
+    if ($utilizador)
+        return $utilizador;
 
     // Tenta buscar em clientes
     $stmt = mysqli_prepare($liga, "SELECT *, 'cliente' AS tipo_login FROM clientes WHERE email = ?");
@@ -1064,6 +1080,156 @@ function atualizarSenhaPorId($id_sessao, $novaSenhaHash, $tipo_login)
     }
 
     mysqli_stmt_bind_param($stmt, 'si', $novaSenhaHash, $id_sessao);
+    return mysqli_stmt_execute($stmt);
+}
+
+// Verifica se já existe email na tabela clientes OU clientes_temp
+function verificarEmailExistente($email)
+{
+    global $liga;
+
+    $stmt = mysqli_prepare($liga, "SELECT 1 FROM clientes WHERE email = ? UNION SELECT 1 FROM clientes_temp WHERE email = ?");
+    mysqli_stmt_bind_param($stmt, 'ss', $email, $email);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_store_result($stmt);
+    return mysqli_stmt_num_rows($stmt) > 0;
+}
+
+// Guarda registo temporário com token
+function guardarClienteTemporario($nome, $username, $email, $senhaHash, $token, $expira)
+{
+    global $liga;
+
+    $stmt = mysqli_prepare($liga, "INSERT INTO clientes_temp (nome_completo, username, email, password, token, expiracao) VALUES (?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, 'ssssss', $nome, $username, $email, $senhaHash, $token, $expira);
+    return mysqli_stmt_execute($stmt);
+}
+
+
+// Valida se token existe e ainda é válido
+function validarTokenClienteTemp($token)
+{
+    global $liga;
+
+    $stmt = mysqli_prepare($liga, "SELECT * FROM clientes_temp WHERE token = ? AND expiracao > NOW()");
+    mysqli_stmt_bind_param($stmt, 's', $token);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($res);
+}
+
+// Insere cliente definitivo
+function confirmarClienteDefinitivo($dadosTemp)
+{
+    global $liga;
+
+    $stmt = mysqli_prepare($liga, "INSERT INTO clientes (nome_completo, username, email, password) VALUES (?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, 'ssss', $dadosTemp['nome_completo'], $dadosTemp['username'], $dadosTemp['email'], $dadosTemp['password']);
+    return mysqli_stmt_execute($stmt);
+}
+
+
+// Elimina o registo temporário
+function eliminarClienteTemporario($token)
+{
+    global $liga;
+
+    $stmt = mysqli_prepare($liga, "DELETE FROM clientes_temp WHERE token = ?");
+    mysqli_stmt_bind_param($stmt, 's', $token);
+    mysqli_stmt_execute($stmt);
+}
+
+// Obter dados do cliente
+function obterDadosCliente($id_cliente)
+{
+    global $liga;
+
+    // Busca dados básicos do cliente
+    $stmt = mysqli_prepare($liga, "SELECT nome_completo, username, email, telefone FROM clientes WHERE id_cliente = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $id_cliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $cliente = mysqli_fetch_assoc($res);
+
+    // Busca moradas associadas
+    $cliente['moradas'] = buscarMoradasCliente($id_cliente);
+
+    return $cliente;
+}
+
+//atualizar dados do cliente
+function atualizarDadosCliente($id_cliente, $nome, $username, $email, $telefone, $morada)
+{
+    global $liga;
+
+    // Atualiza dados pessoais
+    $stmt1 = mysqli_prepare($liga, "UPDATE clientes SET nome_completo = ?, username = ?, email = ?, telefone = ? WHERE id_cliente = ?");
+    mysqli_stmt_bind_param($stmt1, 'ssssi', $nome, $username, $email, $telefone, $id_cliente);
+    if (!mysqli_stmt_execute($stmt1))
+        return false;
+
+    // Verifica se existe morada antes de tentar atualizar
+    $stmt2 = mysqli_prepare($liga, "SELECT id_morada FROM moradas_cliente WHERE id_cliente = ?");
+    mysqli_stmt_bind_param($stmt2, 'i', $id_cliente);
+    mysqli_stmt_execute($stmt2);
+    $res = mysqli_stmt_get_result($stmt2);
+
+    if ($morada_existente = mysqli_fetch_assoc($res)) {
+        // Apenas atualiza se existir
+        $stmt3 = mysqli_prepare($liga, "UPDATE moradas_cliente SET endereco = ?, andar = ?, porta = ?, codigo_postal = ?, cidade = ?, pais = ? WHERE id_cliente = ?");
+        mysqli_stmt_bind_param($stmt3, 'ssssssi', $morada['endereco'], $morada['andar'], $morada['porta'], $morada['codigo_postal'], $morada['cidade'], $morada['pais'], $id_cliente);
+        return mysqli_stmt_execute($stmt3);
+    }
+
+    // Se não existir morada, não faz nada (uso da função guardarMoradaCliente é externo)
+    return true;
+}
+
+// Obter encomendas do cliente
+function obterEncomendasCliente($id_cliente)
+{
+    global $liga;
+
+    $stmt = mysqli_prepare($liga, "SELECT id_encomenda, data_encomenda, total, estado FROM encomendas WHERE id_cliente = ? ORDER BY data_encomenda DESC");
+    mysqli_stmt_bind_param($stmt, 'i', $id_cliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_all($res, MYSQLI_ASSOC);
+}
+
+function buscarMoradasCliente($id_cliente)
+{
+    global $liga;
+    $stmt = mysqli_prepare($liga, "SELECT * FROM moradas_cliente WHERE id_cliente = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $id_cliente);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_all($res, MYSQLI_ASSOC);
+}
+
+function buscarMoradaPorId($id_morada)
+{
+    global $liga;
+    $stmt = mysqli_prepare($liga, "SELECT * FROM moradas_cliente WHERE id_morada = ?");
+    mysqli_stmt_bind_param($stmt, 'i', $id_morada);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    return mysqli_fetch_assoc($res);
+}
+
+function guardarMoradaCliente($id_cliente, $dados)
+{
+    global $liga;
+    $stmt = mysqli_prepare($liga, "INSERT INTO moradas_cliente (id_cliente, endereco, andar, porta, codigo_postal, cidade, pais) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, 'issssss', $id_cliente, $dados['endereco'], $dados['andar'], $dados['porta'], $dados['codigo_postal'], $dados['cidade'], $dados['pais']);
+    return mysqli_stmt_execute($stmt);
+}
+
+function eliminarMoradaCliente($id_morada, $id_cliente)
+{
+    global $liga;
+    $stmt = mysqli_prepare($liga, "DELETE FROM moradas_cliente WHERE id_morada = ? AND id_cliente = ?");
+    mysqli_stmt_bind_param($stmt, 'ii', $id_morada, $id_cliente);
     return mysqli_stmt_execute($stmt);
 }
 

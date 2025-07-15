@@ -5,7 +5,7 @@ include('config.php'); // Configurações da base de dados
 // Autenticação e identificação do utilizador
 $id_sessao = $_SESSION['id_sessao'] ?? null;
 $tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
-$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['clientname'] ?? 'Conta';
 
 // Carrinho só para cliente
 $totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)

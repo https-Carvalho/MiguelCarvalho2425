@@ -6,7 +6,7 @@
         <li><a href="index.php">Início</a></li>
         <li><a href="discoveryKit.php">Discovery Kit</a></li>
         <li class="dropdown">
-            <a href="#">Marcas</a>
+            <a href="#" class="trigger">Marcas</a>
             <div class="dropdown-content_under">
                 <div class="dropdown-content">
                     <div class="view-all">

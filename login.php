@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['email'] = $login['email'];
 
         if ($login['tipo_utilizador'] === 'cliente') {
-            $_SESSION['nome_cliente'] = $login['nome_cliente'];
+            $_SESSION['clientname'] = $login['clientname'];
         } else {
             $_SESSION['username'] = $login['username']; // Admin ou trabalhador
         }
@@ -54,16 +54,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required class="login-input">
 
-            <label for="password">Senha</label>
-            <input type="password" id="password" name="password" required class="login-input">
-
+            <label for="password">Palavra-passe</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" name="password" required class="login-input">
+                <img src="icones/eye-close.png" alt="Ver senha" id="togglePassword" class="ver-senha">
+            </div>
             <input type="submit" value="Entrar" class="login-button">
 
-            <p class="login-recovery">
+            <div class="login-links">
+                <a href="registo.php">Não tem conta? Criar conta</a>
                 <a href="recuperar_password.php">Esqueceu a palavra-passe?</a>
-            </p>
+            </div>
         </fieldset>
     </form>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+
+        togglePassword.addEventListener('click', () => {
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+            togglePassword.src = isHidden ? 'icones/eye-open.png' : 'icones/eye-close.png';
+        });
+    </script>
 
 </body>
 

@@ -6,7 +6,10 @@ ini_set("sendmail_from", "noreply@luxfragrance.com");
 session_start();
 include('config.php');
 
-if ($_SESSION['tipo_login'] !== 'cliente') {
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+
+if (!$id_sessao || $tipo_utilizador !== 'cliente') {
     header("Location: login.php");
     exit;
 }

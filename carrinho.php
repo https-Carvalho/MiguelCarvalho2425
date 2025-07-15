@@ -1,6 +1,14 @@
 <?php
 session_start();
 include('config.php');
+
+// garante que nao de para ir o resumo sem ter passado pelo carrinho
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_compra'])) {
+    $_SESSION['acesso_morada'] = true;
+    header("Location: selecionar_morada.php");
+    exit;
+}
+
 // ⚠️ Apenas permite clientes
 if (!isset($_SESSION['id_sessao']) || $_SESSION['tipo_utilizador'] !== 'cliente') {
     header("Location: login.php");
@@ -12,7 +20,7 @@ $tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
 if ($tipo_utilizador == 'cliente') {
     $id_cliente = $id_sessao;
 }
-$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['clientname'] ?? 'Conta';
 $totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
     ? contarItensCarrinho($id_sessao)
     : 0;
@@ -80,10 +88,8 @@ $familias = buscarFamiliasOlfativas();
                                 <?php echo number_format($subtotal, 2, ',', ' ') . ' €'; ?>
                             </td>
                             <td>
-                                <form action="remover_carrinho.php" method="post" style="display:inline;">
-                                    <input type="hidden" name="id_produto" value="<?php echo $item['id_produto']; ?>">
-                                    <button type="submit" class="remove-item">X</button>
-                                </form>
+                                <button class="remove-item" data-id="<?php echo $item['id_produto']; ?>">X</button>
+
                             </td>
                         </tr>
                         <?php $totalCompra += $subtotal; ?>
@@ -96,7 +102,8 @@ $familias = buscarFamiliasOlfativas();
                     <span>Total:</span>
                     <span class="total-valor"><?php echo number_format($totalCompra, 2, ',', ' ') . ' €'; ?></span>
                 </div>
-                <form action="checkout.php" method="POST">
+                <form method="POST" action="">
+                    <input type="hidden" name="finalizar_compra" value="1">
                     <button type="submit" class="checkout-button">Finalizar Compra</button>
                 </form>
             </div>

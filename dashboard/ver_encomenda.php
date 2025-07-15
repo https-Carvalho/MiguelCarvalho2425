@@ -2,11 +2,11 @@
 session_start();
 include('../config.php');
 
-$id_usuario = $_SESSION['id_user'] ?? $_SESSION['id_cliente'] ?? null;
-$tipo_login = $_SESSION['tipo_login'] ?? 'visitante';
-$tipo_usuario = $id_usuario ? verificarTipoUsuario($id_usuario) : 'visitante';
+$id_sessao = $_SESSION['id_sessao'] ?? null;
+$tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
 
-if ($tipo_usuario !== 'Admin') {
+if ($tipo_utilizador !== 'Admin') {
     header('Location: ../index.php');
     exit();
 }
@@ -56,7 +56,7 @@ $produtos = detalhesEncomenda($id_encomenda);
 <div class="main-content">
     <h1>Encomenda #<?= $encomenda['id_encomenda'] ?></h1>
 
-    <p><strong>Cliente:</strong> <?= htmlspecialchars($encomenda['username']) ?></p>
+    <p><strong>Cliente:</strong> <?= htmlspecialchars($encomenda['nome_completo']) ?></p>
     <p><strong>Data:</strong> <?= date('d/m/Y H:i', strtotime($encomenda['data_encomenda'])) ?></p>
     <p><strong>Total:</strong> <?= number_format($encomenda['total'], 2) ?> €</p>
 
@@ -67,7 +67,7 @@ $produtos = detalhesEncomenda($id_encomenda);
             $estados = ['Pendente', 'Processada', 'Enviada', 'Cancelada', 'Concluída'];
             foreach ($estados as $estado):
             ?>
-                <option value="<?= $estado ?>" <?= ($encomenda['status'] === $estado ? 'selected' : '') ?>>
+                <option value="<?= $estado ?>" <?= ($encomenda['estado'] === $estado ? 'selected' : '') ?>>
                     <?= $estado ?>
                 </option>
             <?php endforeach; ?>

@@ -604,31 +604,3 @@ legend {
 }
 
 /*#endregion */
-
-
-/*#region PERFIL */
-.perfil-container {
-    max-width: 700px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.perfil-container h1 {
-    font-size: 26px;
-    margin-bottom: 25px;
-    color: #2c3e50;
-}
-
-.perfil-bloco p {
-    font-size: 16px;
-    margin-bottom: 12px;
-    color: #444;
-}
-
-.perfil-bloco strong {
-    color: #000;
-}
-/*#endregion*/

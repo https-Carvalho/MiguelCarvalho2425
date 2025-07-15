@@ -13,7 +13,7 @@ $tipo_utilizador = $id_sessao ? verificarTipoUsuario($id_sessao) : 'visitante';
 if ($tipo_utilizador == 'cliente') {
     $id_cliente = $id_sessao;
 }
-$nome_utilizador = $_SESSION['username'] ?? $_SESSION['nome_cliente'] ?? 'Conta';
+$nome_utilizador = $_SESSION['username'] ?? $_SESSION['clientname'] ?? 'Conta';
 $totalCarrinho = ($tipo_utilizador === 'cliente' && $id_sessao)
     ? contarItensCarrinho($id_sessao)
     : 0;

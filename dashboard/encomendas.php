@@ -44,14 +44,12 @@ $encomendas = listarEncomendas(); // usa a função existente no config.php
                 <?php foreach ($encomendas as $enc): ?>
                     <tr>
                         <td><?= $enc['id_encomenda'] ?></td>
-                        <td><?= htmlspecialchars($enc['username']) ?></td>
+                        <td><?= htmlspecialchars($enc['nome_completo']) ?></td>
                         <td><?= date('d/m/Y H:i', strtotime($enc['data_encomenda'])) ?></td>
                         <td><?= number_format($enc['total'], 2) ?> €</td>
-                        <td><?= htmlspecialchars($enc['status']) ?></td>
+                        <td><?= htmlspecialchars($enc['estado']) ?></td>
                         <td>
-                            <a href="ver_encomenda.php?id=<?= $enc['id_encomenda'] ?>" class="editar-link">Ver Detalhes</a>
-                            <a href="alterar_estado.php?id=<?= $enc['id_encomenda'] ?>" class="eliminar-link">Alterar Estado</a>
-                        </td>
+                            <a href="ver_encomenda.php?id=<?= $enc['id_encomenda'] ?>" class="editar-link">Ver Detalhes</a>                        </td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if (empty($encomendas)): ?>
