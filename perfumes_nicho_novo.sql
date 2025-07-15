@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 24-Jun-2025 às 01:17
+-- Tempo de geração: 15-Jul-2025 às 21:12
 -- Versão do servidor: 10.4.32-MariaDB
--- versão do PHP: 8.2.12
+-- versão do PHP: 8.1.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,10 +29,57 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `carrinho` (
   `id_item` int(11) NOT NULL,
-  `id_usuario` int(11) NOT NULL,
+  `id_cliente` int(11) DEFAULT NULL,
   `id_produto` int(11) NOT NULL,
   `quantidade` int(11) NOT NULL DEFAULT 1,
   `adicionado_em` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `carrinho`
+--
+
+INSERT INTO `carrinho` (`id_item`, `id_cliente`, `id_produto`, `quantidade`, `adicionado_em`) VALUES
+(36, 3, 3, 1, '2025-07-13 15:42:08');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `clientes`
+--
+
+CREATE TABLE `clientes` (
+  `id_cliente` int(11) NOT NULL,
+  `nome_completo` varchar(255) DEFAULT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefone` varchar(20) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `clientes`
+--
+
+INSERT INTO `clientes` (`id_cliente`, `nome_completo`, `username`, `email`, `telefone`, `password`, `criado_em`) VALUES
+(3, 'Miguel Carvalho', 'miguel', 'carvalhomiguel319@gmail.com', '', '$2y$10$SE.j2s1UlVx7miDsvzWWDeC/BO7qeQoaaFvAcDSHALVchemZrq.Q.', '2025-07-12 16:27:29');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `clientes_temp`
+--
+
+CREATE TABLE `clientes_temp` (
+  `id_temp` int(11) NOT NULL,
+  `nome_completo` varchar(100) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `expiracao` datetime NOT NULL,
+  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -43,70 +90,22 @@ CREATE TABLE `carrinho` (
 
 CREATE TABLE `encomendas` (
   `id_encomenda` int(11) NOT NULL,
-  `id_user` int(11) NOT NULL,
+  `id_cliente` int(11) DEFAULT NULL,
   `data_encomenda` datetime DEFAULT current_timestamp(),
   `total` decimal(10,2) NOT NULL,
-  `status` varchar(50) DEFAULT 'Pendente'
+  `estado` varchar(50) DEFAULT 'Pendente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Extraindo dados da tabela `encomendas`
 --
 
-INSERT INTO `encomendas` (`id_encomenda`, `id_user`, `data_encomenda`, `total`, `status`) VALUES
-(1, 3, '2025-04-21 23:31:34', 1840.00, 'Pendente'),
-(2, 3, '2025-04-21 23:31:49', 300.00, 'Pendente'),
-(3, 3, '2025-04-21 23:34:09', 300.00, 'Pendente'),
-(4, 3, '2025-04-22 00:19:35', 300.00, 'Pendente'),
-(5, 3, '2025-04-22 00:20:21', 300.00, 'Pendente'),
-(6, 3, '2025-04-22 00:29:30', 300.00, 'Pendente'),
-(7, 3, '2025-04-22 00:30:18', 300.00, 'Pendente'),
-(8, 3, '2025-04-22 00:30:53', 300.00, 'Pendente'),
-(9, 3, '2025-04-22 00:32:46', 300.00, 'Pendente'),
-(10, 3, '2025-04-22 00:32:59', 300.00, 'Pendente'),
-(11, 3, '2025-04-22 00:34:09', 300.00, 'Pendente'),
-(12, 3, '2025-04-22 00:36:31', 300.00, 'Pendente'),
-(13, 3, '2025-04-22 00:46:27', 0.00, 'Pendente'),
-(14, 3, '2025-04-22 01:11:41', 230.00, 'Pendente'),
-(15, 3, '2025-04-22 01:11:59', 230.00, 'Pendente'),
-(16, 3, '2025-04-22 01:14:27', 230.00, 'Pendente'),
-(17, 3, '2025-04-22 01:14:56', 230.00, 'Pendente'),
-(18, 3, '2025-04-22 01:15:52', 230.00, 'Pendente'),
-(19, 3, '2025-04-22 01:17:01', 230.00, 'Pendente'),
-(20, 3, '2025-04-22 01:18:52', 230.00, 'Pendente'),
-(21, 3, '2025-04-22 01:23:56', 230.00, 'Pendente'),
-(22, 3, '2025-04-22 01:24:08', 230.00, 'Pendente'),
-(23, 3, '2025-04-22 01:24:30', 230.00, 'Pendente'),
-(24, 3, '2025-04-22 01:37:02', 230.00, 'Pendente'),
-(25, 3, '2025-04-22 01:37:04', 230.00, 'Pendente'),
-(26, 3, '2025-04-22 01:37:32', 230.00, 'Pendente'),
-(27, 3, '2025-04-22 01:56:23', 230.00, 'Pendente'),
-(28, 3, '2025-04-22 01:57:17', 230.00, 'Pendente'),
-(29, 3, '2025-04-22 03:00:42', 230.00, 'Pendente'),
-(30, 3, '2025-04-22 03:01:07', 230.00, 'Pendente'),
-(31, 3, '2025-04-22 03:06:25', 0.00, 'Pendente'),
-(32, 3, '2025-04-22 03:07:17', 0.00, 'Pendente'),
-(33, 3, '2025-04-22 03:08:21', 0.00, 'Pendente'),
-(34, 3, '2025-04-22 03:09:19', 0.00, 'Pendente'),
-(35, 3, '2025-04-22 03:09:52', 0.00, 'Pendente'),
-(36, 3, '2025-04-22 03:27:54', 0.00, 'Pendente'),
-(37, 3, '2025-04-22 03:28:50', 0.00, 'Pendente'),
-(38, 3, '2025-04-22 03:30:18', 0.00, 'Pendente'),
-(39, 3, '2025-04-22 03:30:51', 230.00, 'Pendente'),
-(40, 3, '2025-04-22 03:32:11', 230.00, 'Pendente'),
-(41, 3, '2025-04-22 04:12:31', 970.00, 'Pendente'),
-(42, 3, '2025-04-22 04:13:17', 970.00, 'Pendente'),
-(43, 3, '2025-04-22 04:13:49', 0.00, 'Pendente'),
-(44, 3, '2025-04-22 04:42:22', 530.00, 'Pendente'),
-(45, 3, '2025-04-22 04:42:49', 530.00, 'Pendente'),
-(46, 3, '2025-04-22 04:47:22', 0.00, 'Pendente'),
-(47, 3, '2025-04-22 04:47:44', 230.00, 'Pendente'),
-(48, 3, '2025-04-22 04:47:56', 230.00, 'Pendente'),
-(49, 3, '2025-04-22 05:08:36', 230.00, 'Pendente'),
-(50, 3, '2025-04-22 05:08:56', 230.00, 'Pendente'),
-(51, 3, '2025-05-08 20:38:05', 0.00, 'Pendente'),
-(52, 3, '2025-05-08 21:02:36', 300.00, 'Pendente'),
-(53, 3, '2025-05-08 21:03:06', 300.00, 'Pendente');
+INSERT INTO `encomendas` (`id_encomenda`, `id_cliente`, `data_encomenda`, `total`, `estado`) VALUES
+(1, 3, '2025-07-14 17:12:45', 300.00, 'Enviada'),
+(2, 3, '2025-07-14 17:45:40', 300.00, 'Pendente'),
+(3, 3, '2025-07-14 22:05:38', 300.00, 'Pendente'),
+(4, 3, '2025-07-15 00:32:32', 300.00, 'Pendente'),
+(5, 3, '2025-07-15 13:58:56', 300.00, 'Pendente');
 
 -- --------------------------------------------------------
 
@@ -172,7 +171,17 @@ INSERT INTO `encomenda_produtos` (`id`, `id_encomenda`, `id_produto`, `quantidad
 (43, 49, 1, 1, 230.00),
 (44, 50, 1, 1, 230.00),
 (45, 52, 3, 1, 300.00),
-(46, 53, 3, 1, 300.00);
+(46, 53, 3, 1, 300.00),
+(47, 54, 4, 1, 320.00),
+(48, 55, 4, 1, 320.00),
+(49, 56, 4, 1, 320.00),
+(50, 57, 4, 1, 320.00),
+(51, 58, 4, 1, 320.00),
+(52, 1, 3, 1, 300.00),
+(53, 2, 3, 1, 300.00),
+(54, 3, 3, 1, 300.00),
+(55, 4, 3, 1, 300.00),
+(56, 5, 3, 1, 300.00);
 
 -- --------------------------------------------------------
 
@@ -337,7 +346,13 @@ INSERT INTO `imagens_perfume` (`id`, `perfume_id`, `caminho_imagem`) VALUES
 (3, 1, 'images/sospiro_erbapura3.jpg'),
 (4, 2, 'images/xerjoff_alexandria1.jpg'),
 (5, 2, 'images/xerjoff_alexandria2.jpg'),
-(6, 2, 'images/xerjoff_alexandria3.jpg');
+(6, 2, 'images/xerjoff_alexandria3.jpg'),
+(7, 17, 'images/dolcesonata_1.png'),
+(8, 17, 'images/dolcesonata_hover.png'),
+(9, 17, 'images/dolcesonata_hover.png'),
+(10, 18, 'images/asp_netparte9.jpg.png'),
+(11, 18, 'images/dolcesonata_1.png'),
+(12, 18, 'images/dolcesonata_1.png');
 
 -- --------------------------------------------------------
 
@@ -364,6 +379,30 @@ INSERT INTO `marcas` (`id_marca`, `nome`, `caminho_imagem`, `descricao`) VALUES
 (5, 'Stephane Humbert Lucas', 'images/StephaneHumbertLucas.jpg', 'tephane Humbert Lucas é uma marca francesa de perfumaria de nicho que se destaca por sua criatividade e ousadia. Suas fragrâncias intensas e únicas são criadas sem limites, sempre com uma abordagem inovadora e artística. A marca é conhecida por explorar temas complexos e emocionais, oferecendo perfumes que capturam a essência de momentos especiais e histórias inesquecíveis. Cada perfume é uma expressão autêntica da visão olfativa do criador.'),
 (6, 'Creed', 'images/creed.jpg', 'Creed é uma marca de luxo com tradição em criar fragrâncias icônicas e atemporais.'),
 (7, 'Maison Margiela', 'images/maison_margiela.jpg', 'Maison Margiela é conhecida pela sua linha Replica, que recria momentos e memórias através de fragrâncias.');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `moradas_cliente`
+--
+
+CREATE TABLE `moradas_cliente` (
+  `id_morada` int(11) NOT NULL,
+  `id_cliente` int(11) NOT NULL,
+  `endereco` varchar(255) DEFAULT NULL,
+  `andar` varchar(10) DEFAULT NULL,
+  `porta` varchar(10) DEFAULT NULL,
+  `codigo_postal` varchar(20) DEFAULT NULL,
+  `cidade` varchar(100) DEFAULT NULL,
+  `pais` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `moradas_cliente`
+--
+
+INSERT INTO `moradas_cliente` (`id_morada`, `id_cliente`, `endereco`, `andar`, `porta`, `codigo_postal`, `cidade`, `pais`) VALUES
+(1, 3, 'Praceta Humberto Delgado', '1º', 'D', '2745-318', 'Monte Abraao', 'Portugal');
 
 -- --------------------------------------------------------
 
@@ -497,11 +536,11 @@ CREATE TABLE `perfumes` (
 
 INSERT INTO `perfumes` (`id_perfume`, `nome`, `descricao`, `preco`, `caminho_imagem`, `caminho_imagem_hover`, `id_marca`, `id_familia`, `stock`) VALUES
 (1, 'Erba Pura Magica', 'Um perfume com notas orientais e frutadas.', 230.00, 'images/sospiro_erba_pura.jpg', 'images/sospiro_erbapura_hover.jpg', 1, 10, 1),
-(2, 'Alexandria II', 'Uma fragrância clássica com notas orientais.', 340.00, 'images/alexandria_ii.jpg', 'images/alexandria_ii_hover.jpg', 2, 8, 0),
+(2, 'Alexandria II', 'Uma fragrância clássica com notas orientais.', 340.00, 'images/alexandria_ii.jpg', 'images/alexandria_ii_hover.jpg', 2, 8, 2),
 (3, 'Accento', 'Uma fragrância cítrica e amadeirada com notas de abacaxi e almíscar.', 300.00, 'images/accento.jpg', 'images/accento_hover.jpg', 2, 10, 9),
-(4, 'Erba Pura', 'Uma fragrância oriental fresca e frutada com notas de âmbar.', 320.00, 'images/erba_pura.jpg', 'images/erba_pura_hover.jpg', 2, 1, 15),
+(4, 'Erba Pura', 'Uma fragrância oriental fresca e frutada com notas de âmbar.', 320.00, 'images/erba_pura.jpg', 'images/erba_pura_hover.jpg', 2, 1, 14),
 (5, 'Renaissance', 'Uma fragrância fresca com toques cítricos e de menta.', 280.00, 'images/renaissance.jpg', 'images/renaissance_hover.jpg', 2, 1, 19),
-(6, 'La Capitale', 'Uma fragrância gourmand com notas de morango e baunilha.', 350.00, 'images/la_capitale.jpg', 'images/la_capitale_hover.jpg', 2, 10, 10),
+(6, 'La Capitale', 'Uma fragrância gourmand com notas de morango e baunilha.', 350.00, 'images/la_capitale.jpg', 'images/la_capitale_hover.jpg', 2, 9, 10),
 (7, 'Tabac Rose', 'Uma fragrância floral oriental com toques de tabaco e rosa.', 280.00, 'images/tabac_rose.jpg', 'images/tabac_rose_hover.jpg', 3, NULL, 15),
 (8, 'Velvet Tonka', 'Um perfume gourmand com toques de fava tonka e baunilha.', 240.00, 'images/velvet_tonka.jpg', 'images/velvet_tonka_hover.jpg', 3, NULL, 8),
 (9, 'Dahab', 'Uma fragrância frutada com maçã verde e frutas exóticas.', 270.00, 'images/dahab.jpg', 'images/dahab_hover.jpg', 4, NULL, 18),
@@ -511,7 +550,9 @@ INSERT INTO `perfumes` (`id_perfume`, `nome`, `descricao`, `preco`, `caminho_ima
 (13, 'Himalaya', 'Uma fragrância fresca com toques de limão e almíscar.', 400.00, 'images/himalaya.jpg', 'images/himalaya_hover.jpg', 6, NULL, 15),
 (14, 'Viking', 'Uma fragrância amadeirada com notas de especiarias.', 420.00, 'images/viking.jpg', 'images/viking_hover.jpg', 6, NULL, 12),
 (15, 'Beach Walk', 'Uma fragrância fresca com toques de limão e coco.', 190.00, 'images/beach_walk.jpg', 'images/beach_walk_hover.jpg', 7, NULL, 25),
-(16, 'Jazz Club', 'Uma fragrância amadeirada com toques de rum e tabaco.', 210.00, 'images/jazz_club.jpg', 'images/jazz_club_hover.jpg', 7, NULL, 18);
+(16, 'Jazz Club', 'Uma fragrância amadeirada com toques de rum e tabaco.', 210.00, 'images/jazz_club.jpg', 'images/jazz_club_hover.jpg', 7, NULL, 18),
+(17, 'AAAAA', 'nsei', 23.00, 'images/687652d6846ad_asp_netparte9.jpg.png', 'images/687652d68530e_dolcesonata_1.png', 2, 11, 4),
+(18, 'aSAS', 'SDF', 23.00, 'images/dolcesonata_1.png', 'images/dolcesonata_principal.png', 1, 2, 234);
 
 -- --------------------------------------------------------
 
@@ -531,18 +572,6 @@ CREATE TABLE `perfume_notas` (
 --
 
 INSERT INTO `perfume_notas` (`id_perfume_nota`, `id_perfume`, `id_nota`, `tipo_nota`) VALUES
-(11, 2, 11, 'topo'),
-(12, 2, 12, 'topo'),
-(13, 2, 13, 'topo'),
-(14, 2, 14, 'topo'),
-(15, 2, 15, 'coracao'),
-(16, 2, 10, 'coracao'),
-(17, 2, 16, 'coracao'),
-(18, 2, 17, 'base'),
-(19, 2, 18, 'base'),
-(20, 2, 8, 'base'),
-(21, 2, 19, 'base'),
-(22, 2, 7, 'base'),
 (23, 3, 20, 'topo'),
 (24, 3, 21, 'topo'),
 (25, 3, 22, 'coracao'),
@@ -581,16 +610,62 @@ INSERT INTO `perfume_notas` (`id_perfume_nota`, `id_perfume`, `id_nota`, `tipo_n
 (58, 6, 15, 'coracao'),
 (59, 6, 38, 'base'),
 (60, 6, 37, 'base'),
-(61, 1, 3, 'topo'),
-(62, 1, 4, 'topo'),
-(63, 1, 2, 'topo'),
-(64, 1, 1, 'topo'),
-(65, 1, 5, 'coracao'),
-(66, 1, 6, 'coracao'),
-(67, 1, 7, 'base'),
-(68, 1, 8, 'base'),
-(69, 1, 9, 'base'),
-(70, 1, 10, 'base');
+(91, 1, 3, 'topo'),
+(92, 1, 4, 'topo'),
+(93, 1, 2, 'topo'),
+(94, 1, 1, 'topo'),
+(95, 1, 5, 'coracao'),
+(96, 1, 6, 'coracao'),
+(97, 1, 7, 'base'),
+(98, 1, 8, 'base'),
+(99, 1, 9, 'base'),
+(100, 1, 10, 'base'),
+(125, 2, 13, 'topo'),
+(126, 2, 11, 'topo'),
+(127, 2, 12, 'topo'),
+(128, 2, 14, 'topo'),
+(129, 2, 10, 'coracao'),
+(130, 2, 16, 'coracao'),
+(131, 2, 15, 'coracao'),
+(132, 2, 17, 'base'),
+(133, 2, 7, 'base'),
+(134, 2, 8, 'base'),
+(135, 2, 19, 'base'),
+(136, 2, 18, 'base'),
+(137, 17, 82, 'topo'),
+(138, 17, 82, 'coracao'),
+(139, 17, 35, 'base'),
+(140, 18, 20, 'topo'),
+(141, 18, 82, 'coracao'),
+(142, 18, 20, 'base');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `recuperacao_senhas`
+--
+
+CREATE TABLE `recuperacao_senhas` (
+  `id` int(11) NOT NULL,
+  `id_user` int(11) DEFAULT NULL,
+  `id_cliente` int(11) DEFAULT NULL,
+  `token` varchar(100) NOT NULL,
+  `expiracao` datetime NOT NULL,
+  `utilizado` tinyint(1) DEFAULT 0,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `recuperacao_senhas`
+--
+
+INSERT INTO `recuperacao_senhas` (`id`, `id_user`, `id_cliente`, `token`, `expiracao`, `utilizado`, `criado_em`) VALUES
+(1, NULL, 1, '787344', '2025-07-08 16:29:04', 0, '2025-07-08 15:19:04'),
+(2, NULL, 1, '154603', '2025-07-08 16:29:15', 1, '2025-07-08 15:19:15'),
+(3, NULL, 3, '331303', '2025-07-12 19:04:35', 1, '2025-07-12 17:54:35'),
+(4, 1, NULL, '310552', '2025-07-12 19:49:24', 0, '2025-07-12 18:39:24'),
+(5, 1, NULL, '580745', '2025-07-12 19:50:17', 1, '2025-07-12 18:40:17'),
+(6, 1, NULL, '358936', '2025-07-15 15:09:50', 1, '2025-07-15 13:59:50');
 
 -- --------------------------------------------------------
 
@@ -603,7 +678,7 @@ CREATE TABLE `tbl_user` (
   `username` varchar(50) NOT NULL,
   `password` varchar(220) NOT NULL,
   `email` varchar(150) NOT NULL,
-  `tipo` enum('Admin','trabalhador','cliente') NOT NULL,
+  `tipo` enum('Admin','trabalhador') NOT NULL,
   `criado_em` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -612,9 +687,8 @@ CREATE TABLE `tbl_user` (
 --
 
 INSERT INTO `tbl_user` (`id_user`, `username`, `password`, `email`, `tipo`, `criado_em`) VALUES
-(1, 'admin', 'admin', 'admin@example.com', 'Admin', '2025-01-26 22:50:33'),
-(2, 'trabalhador1', 'trabalhador', 'trabalhador@example.com', 'trabalhador', '2025-01-26 22:50:33'),
-(3, 'cliente1', 'cliente', 'mcmaluco07@outlook.pt', 'cliente', '2025-01-26 22:50:33');
+(1, 'admin', '$2y$10$UymjCBtug.wvbqiY4supBOiKm7.9ci6MomNVUbB4/zY3b/0iMGrK2', 'mcmaluco07@outlook.pt', 'Admin', '2025-01-26 22:50:33'),
+(2, 'trabalhador1', 'trabalhador', 'trabalhador@example.com', 'trabalhador', '2025-01-26 22:50:33');
 
 -- --------------------------------------------------------
 
@@ -624,18 +698,19 @@ INSERT INTO `tbl_user` (`id_user`, `username`, `password`, `email`, `tipo`, `cri
 
 CREATE TABLE `wishlist` (
   `id` int(11) NOT NULL,
-  `id_user` int(11) NOT NULL,
+  `id_user` int(11) DEFAULT NULL,
   `id_produto` int(11) NOT NULL,
-  `data_adicionado` timestamp NOT NULL DEFAULT current_timestamp()
+  `data_adicionado` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id_cliente` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Extraindo dados da tabela `wishlist`
 --
 
-INSERT INTO `wishlist` (`id`, `id_user`, `id_produto`, `data_adicionado`) VALUES
-(36, 3, 1, '2025-02-19 14:42:42'),
-(40, 3, 3, '2025-02-21 08:58:18');
+INSERT INTO `wishlist` (`id`, `id_user`, `id_produto`, `data_adicionado`, `id_cliente`) VALUES
+(36, 3, 1, '2025-02-19 14:42:42', NULL),
+(53, NULL, 1, '2025-07-08 15:28:26', 1);
 
 --
 -- Índices para tabelas despejadas
@@ -646,15 +721,30 @@ INSERT INTO `wishlist` (`id`, `id_user`, `id_produto`, `data_adicionado`) VALUES
 --
 ALTER TABLE `carrinho`
   ADD PRIMARY KEY (`id_item`),
-  ADD KEY `id_usuario` (`id_usuario`),
+  ADD KEY `id_usuario` (`id_cliente`),
   ADD KEY `id_produto` (`id_produto`);
+
+--
+-- Índices para tabela `clientes`
+--
+ALTER TABLE `clientes`
+  ADD PRIMARY KEY (`id_cliente`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Índices para tabela `clientes_temp`
+--
+ALTER TABLE `clientes_temp`
+  ADD PRIMARY KEY (`id_temp`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `token` (`token`);
 
 --
 -- Índices para tabela `encomendas`
 --
 ALTER TABLE `encomendas`
   ADD PRIMARY KEY (`id_encomenda`),
-  ADD KEY `id_user` (`id_user`);
+  ADD KEY `id_user` (`id_cliente`);
 
 --
 -- Índices para tabela `encomenda_produtos`
@@ -692,6 +782,13 @@ ALTER TABLE `marcas`
   ADD PRIMARY KEY (`id_marca`);
 
 --
+-- Índices para tabela `moradas_cliente`
+--
+ALTER TABLE `moradas_cliente`
+  ADD PRIMARY KEY (`id_morada`),
+  ADD KEY `id_cliente` (`id_cliente`);
+
+--
 -- Índices para tabela `notas_geral`
 --
 ALTER TABLE `notas_geral`
@@ -716,6 +813,14 @@ ALTER TABLE `perfume_notas`
   ADD KEY `fk_nota` (`id_nota`);
 
 --
+-- Índices para tabela `recuperacao_senhas`
+--
+ALTER TABLE `recuperacao_senhas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_user` (`id_user`),
+  ADD KEY `id_cliente` (`id_cliente`);
+
+--
 -- Índices para tabela `tbl_user`
 --
 ALTER TABLE `tbl_user`
@@ -729,7 +834,8 @@ ALTER TABLE `tbl_user`
 ALTER TABLE `wishlist`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_user` (`id_user`),
-  ADD KEY `id_produto` (`id_produto`);
+  ADD KEY `id_produto` (`id_produto`),
+  ADD KEY `fk_wishlist_cliente` (`id_cliente`);
 
 --
 -- AUTO_INCREMENT de tabelas despejadas
@@ -739,19 +845,31 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT de tabela `carrinho`
 --
 ALTER TABLE `carrinho`
-  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id_item` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT de tabela `clientes`
+--
+ALTER TABLE `clientes`
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de tabela `clientes_temp`
+--
+ALTER TABLE `clientes_temp`
+  MODIFY `id_temp` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `encomendas`
 --
 ALTER TABLE `encomendas`
-  MODIFY `id_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de tabela `encomenda_produtos`
 --
 ALTER TABLE `encomenda_produtos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT de tabela `familias_olfativas`
@@ -769,13 +887,19 @@ ALTER TABLE `familia_notas`
 -- AUTO_INCREMENT de tabela `imagens_perfume`
 --
 ALTER TABLE `imagens_perfume`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de tabela `marcas`
 --
 ALTER TABLE `marcas`
   MODIFY `id_marca` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT de tabela `moradas_cliente`
+--
+ALTER TABLE `moradas_cliente`
+  MODIFY `id_morada` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de tabela `notas_geral`
@@ -787,13 +911,19 @@ ALTER TABLE `notas_geral`
 -- AUTO_INCREMENT de tabela `perfumes`
 --
 ALTER TABLE `perfumes`
-  MODIFY `id_perfume` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_perfume` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de tabela `perfume_notas`
 --
 ALTER TABLE `perfume_notas`
-  MODIFY `id_perfume_nota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id_perfume_nota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=143;
+
+--
+-- AUTO_INCREMENT de tabela `recuperacao_senhas`
+--
+ALTER TABLE `recuperacao_senhas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de tabela `tbl_user`
@@ -805,7 +935,7 @@ ALTER TABLE `tbl_user`
 -- AUTO_INCREMENT de tabela `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- Restrições para despejos de tabelas
@@ -815,14 +945,14 @@ ALTER TABLE `wishlist`
 -- Limitadores para a tabela `carrinho`
 --
 ALTER TABLE `carrinho`
-  ADD CONSTRAINT `carrinho_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `tbl_user` (`id_user`),
-  ADD CONSTRAINT `carrinho_ibfk_2` FOREIGN KEY (`id_produto`) REFERENCES `perfumes` (`id_perfume`);
+  ADD CONSTRAINT `carrinho_ibfk_2` FOREIGN KEY (`id_produto`) REFERENCES `perfumes` (`id_perfume`),
+  ADD CONSTRAINT `fk_carrinho_cliente` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`);
 
 --
 -- Limitadores para a tabela `encomendas`
 --
 ALTER TABLE `encomendas`
-  ADD CONSTRAINT `encomendas_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `tbl_user` (`id_user`);
+  ADD CONSTRAINT `fk_encomendas_cliente` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`);
 
 --
 -- Limitadores para a tabela `encomenda_produtos`
@@ -845,6 +975,12 @@ ALTER TABLE `imagens_perfume`
   ADD CONSTRAINT `imagens_perfume_ibfk_1` FOREIGN KEY (`perfume_id`) REFERENCES `perfumes` (`id_perfume`) ON DELETE CASCADE;
 
 --
+-- Limitadores para a tabela `moradas_cliente`
+--
+ALTER TABLE `moradas_cliente`
+  ADD CONSTRAINT `moradas_cliente_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE;
+
+--
 -- Limitadores para a tabela `perfumes`
 --
 ALTER TABLE `perfumes`
@@ -859,9 +995,18 @@ ALTER TABLE `perfume_notas`
   ADD CONSTRAINT `fk_perfume` FOREIGN KEY (`id_perfume`) REFERENCES `perfumes` (`id_perfume`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Limitadores para a tabela `recuperacao_senhas`
+--
+ALTER TABLE `recuperacao_senhas`
+  ADD CONSTRAINT `recuperacao_senhas_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `tbl_user` (`id_user`) ON DELETE CASCADE,
+  ADD CONSTRAINT `recuperacao_senhas_ibfk_2` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE;
+
+--
 -- Limitadores para a tabela `wishlist`
 --
 ALTER TABLE `wishlist`
+  ADD CONSTRAINT `fk_wishlist_cliente` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`),
+  ADD CONSTRAINT `fk_wishlist_user` FOREIGN KEY (`id_user`) REFERENCES `tbl_user` (`id_user`),
   ADD CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `tbl_user` (`id_user`) ON DELETE CASCADE,
   ADD CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`id_produto`) REFERENCES `perfumes` (`id_perfume`) ON DELETE CASCADE;
 COMMIT;
